@@ -45,10 +45,14 @@ export default function AdminLayout({
   }
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
-    { name: "Editor Konten", icon: Type, href: "/admin/konten" },
-    { name: "Pengaturan", icon: Settings, href: "/admin/settings" },
+    { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
+    { name: "Services", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
+    { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
+    { name: "Editor Konten", icon: Type, href: "/admin/konten", category: "CMS" },
+    { name: "Pengaturan", icon: Settings, href: "/admin/settings", category: "Sistem" },
   ];
+
+  const categories = ["Utama", "CMS", "Sistem"];
 
   const handleLogout = () => {
     localStorage.removeItem("mitralabs_admin_auth");
@@ -56,41 +60,55 @@ export default function AdminLayout({
   };
 
   return (
-    <div className="flex min-h-screen bg-surface-container-lowest font-sans text-on-surface">
+    <div className="flex min-h-screen bg-[#F8FAFC] font-sans text-slate-900">
       {/* Sidebar */}
-      <aside className="w-72 bg-inverse-surface text-inverse-on-surface flex flex-col shadow-2xl z-50">
-        <div className="p-8 border-b border-white/10">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-10 h-10 bg-primary rounded-xl flex items-center justify-center font-bold text-xl text-on-primary">
+      <aside className="w-80 bg-slate-900 text-white flex flex-col shadow-2xl z-50 overflow-hidden relative">
+        {/* Decorative background element */}
+        <div className="absolute top-0 right-0 w-64 h-64 bg-primary/10 rounded-full blur-3xl -mr-32 -mt-32 pointer-events-none"></div>
+        
+        <div className="p-8 border-b border-white/5 relative z-10">
+          <Link href="/" className="flex items-center gap-4 group">
+            <div className="w-12 h-12 bg-gradient-to-br from-primary to-primary-container rounded-2xl flex items-center justify-center font-black text-2xl text-on-primary shadow-lg shadow-primary/30 group-hover:scale-110 transition-transform duration-500">
               M
             </div>
-            <span className="font-display font-extrabold text-2xl tracking-tight">Mitralabs</span>
+            <div>
+              <span className="font-display font-black text-2xl tracking-tighter block leading-tight">Mitralabs</span>
+              <span className="text-[10px] font-bold text-primary tracking-widest uppercase opacity-70">Admin Core v3</span>
+            </div>
           </Link>
-          <div className="mt-4 px-3 py-1 bg-primary/20 text-primary-fixed-dim rounded-full text-[10px] font-bold uppercase tracking-widest inline-block border border-primary/30">
-            Admin Panel v2.0
-          </div>
         </div>
 
-        <nav className="flex-grow p-6 space-y-2">
-          {menuItems.map((item) => {
-            const isActive = pathname === item.href;
-            return (
-              <Link
-                key={item.name}
-                href={item.href}
-                className={`flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-300 font-bold ${
-                  isActive 
-                    ? "bg-primary text-on-primary shadow-lg shadow-primary/20" 
-                    : "text-surface-variant/60 hover:bg-white/5 hover:text-white"
-                }`}
-              >
-                <item.icon size={20} />
-                {item.name}
-                {isActive && <ChevronRight size={16} className="ml-auto opacity-50" />}
-              </Link>
-            );
-          })}
-        </nav>
+        <div className="flex-grow overflow-y-auto p-6 space-y-8 relative z-10 custom-scrollbar">
+          {categories.map((cat) => (
+            <div key={cat} className="space-y-2">
+              <h3 className="px-5 text-[11px] font-black uppercase tracking-[0.2em] text-slate-500 mb-4">{cat}</h3>
+              <div className="space-y-1">
+                {menuItems.filter(i => i.category === cat).map((item) => {
+                  const isActive = pathname === item.href;
+                  return (
+                    <Link
+                      key={item.name}
+                      href={item.href}
+                      className={`group flex items-center gap-4 px-5 py-4 rounded-2xl transition-all duration-500 font-bold relative overflow-hidden ${
+                        isActive 
+                          ? "bg-primary text-on-primary shadow-xl shadow-primary/20 scale-[1.02]" 
+                          : "text-slate-400 hover:bg-white/5 hover:text-white"
+                      }`}
+                    >
+                      <div className={`transition-transform duration-500 ${isActive ? "scale-110" : "group-hover:scale-110"}`}>
+                        <item.icon size={20} strokeWidth={2.5} />
+                      </div>
+                      <span className="relative z-10">{item.name}</span>
+                      {isActive && (
+                        <div className="ml-auto w-1.5 h-1.5 bg-white rounded-full animate-pulse shadow-[0_0_8px_rgba(255,255,255,0.8)]"></div>
+                      )}
+                    </Link>
+                  );
+                })}
+              </div>
+            </div>
+          ))}
+        </div>
 
         <div className="p-6 mt-auto">
           <button 

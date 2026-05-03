@@ -67,6 +67,28 @@ export default function MasterCMS() {
     setUploadingPath(null);
   };
 
+  const addItem = (path: string, defaultValue: any) => {
+    const newData = JSON.parse(JSON.stringify(formData));
+    const keys = path.split(".");
+    let current: any = newData;
+    for (let i = 0; i < keys.length; i++) {
+      current = current[keys[i]];
+    }
+    current.push({ ...defaultValue, id: Date.now() });
+    setFormData(newData);
+  };
+
+  const removeItem = (path: string, index: number) => {
+    const newData = JSON.parse(JSON.stringify(formData));
+    const keys = path.split(".");
+    let current: any = newData;
+    for (let i = 0; i < keys.length; i++) {
+      current = current[keys[i]];
+    }
+    current.splice(index, 1);
+    setFormData(newData);
+  };
+
   const SectionHeader = ({ icon: Icon, title, desc }: any) => (
     <div className="flex items-center gap-6 mb-12 p-8 bg-surface-container rounded-3xl border border-surface-container-highest">
       <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-on-primary shadow-xl shadow-primary/20">
@@ -261,11 +283,18 @@ export default function MasterCMS() {
               <SectionHeader icon={Package} title="Pricing Plans" desc="Kelola paket harga dan fitur layanan Anda." />
               <div className="grid md:grid-cols-3 gap-8">
                 {formData.services.plans.map((plan, i) => (
-                  <div key={plan.id} className="p-10 bg-surface-container-low rounded-[3rem] border border-surface-container-highest space-y-6 relative overflow-hidden">
-                    {plan.highlight && <div className="absolute top-0 right-0 bg-primary text-on-primary px-4 py-1 text-[10px] font-black uppercase">Populer</div>}
+                  <div key={plan.id} className="p-10 bg-surface-container-low rounded-[3rem] border border-surface-container-highest space-y-6 relative overflow-hidden group">
+                    <button 
+                      onClick={() => removeItem("services.plans", i)}
+                      className="absolute top-6 right-6 p-3 bg-error/10 text-error rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-error hover:text-white"
+                    >
+                      <Trash2 size={16} />
+                    </button>
+                    {plan.highlight && <div className="absolute top-0 right-16 bg-primary text-on-primary px-4 py-1 text-[10px] font-black uppercase">Populer</div>}
                     <InputField label="Nama Paket" path={`services.plans.${i}.name`} value={plan.name} />
                     <InputField label="Harga" path={`services.plans.${i}.price`} value={plan.price} />
                     <InputField label="Tier" path={`services.plans.${i}.tier`} value={plan.tier} />
+                    <InputField label="Halaman" path={`services.plans.${i}.pages`} value={plan.pages} />
                     <InputField label="Durasi" path={`services.plans.${i}.duration`} value={plan.duration} />
                     <InputField label="Fitur (Satu per baris)" path={`services.plans.${i}.features`} value={plan.features.join("\n")} type="textarea" />
                     <div className="flex items-center gap-3">
@@ -274,6 +303,13 @@ export default function MasterCMS() {
                     </div>
                   </div>
                 ))}
+                <button 
+                  onClick={() => addItem("services.plans", { name: "New Plan", price: "Rp 0", tier: "Basic", pages: "1 page", duration: "1 day", features: [], missing: [], highlight: false })}
+                  className="p-10 rounded-[3rem] border-4 border-dashed border-surface-container-highest flex flex-col items-center justify-center gap-4 hover:border-primary hover:text-primary transition-all text-on-surface-variant/40"
+                >
+                  <Plus size={48} />
+                  <span className="font-black uppercase tracking-widest">Tambah Paket</span>
+                </button>
               </div>
             </section>
             
@@ -296,6 +332,32 @@ export default function MasterCMS() {
               </div>
             </section>
             
+            <section className="pt-20 border-t border-surface-container-highest">
+               <SectionHeader icon={Briefcase} title="Project Gallery" desc="Daftar hasil karya Anda." />
+               <div className="grid md:grid-cols-2 gap-8">
+                  {formData.portfolio.projects.map((project, i) => (
+                    <div key={project.id} className="p-10 bg-surface-container-low rounded-[3rem] border border-surface-container-highest space-y-6 relative group">
+                       <button 
+                          onClick={() => removeItem("portfolio.projects", i)}
+                          className="absolute top-6 right-6 p-3 bg-error/10 text-error rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-error hover:text-white"
+                        >
+                          <Trash2 size={16} />
+                        </button>
+                       <InputField label="Judul Project" path={`portfolio.projects.${i}.title`} value={project.title} />
+                       <InputField label="Kategori" path={`portfolio.projects.${i}.category`} value={project.category} />
+                       <ImageInput label="Foto Project" path={`portfolio.projects.${i}.image`} value={project.image} />
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => addItem("portfolio.projects", { title: "New Project", category: "UMKM", image: "", status: "Published" })}
+                    className="p-10 rounded-[3rem] border-4 border-dashed border-surface-container-highest flex flex-col items-center justify-center gap-4 hover:border-primary hover:text-primary transition-all text-on-surface-variant/40"
+                  >
+                    <Plus size={48} />
+                    <span className="font-black uppercase tracking-widest">Tambah Project</span>
+                  </button>
+               </div>
+            </section>
+
             <section className="pt-20 border-t border-surface-container-highest">
                <SectionHeader icon={Target} title="Portfolio CTA" desc="Teks ajakan kolaborasi di halaman portfolio." />
                <div className="grid md:grid-cols-2 gap-10">
@@ -334,13 +396,26 @@ export default function MasterCMS() {
                <SectionHeader icon={Users} title="Team Members" desc="Profil pengembang dan pengelola." />
                <div className="grid md:grid-cols-2 gap-10">
                   {formData.about.team.map((member, i) => (
-                    <div key={member.id} className="p-10 bg-surface-container-low rounded-[3rem] border border-surface-container-highest space-y-6">
+                    <div key={member.id} className="p-10 bg-surface-container-low rounded-[3rem] border border-surface-container-highest space-y-6 relative group">
+                       <button 
+                          onClick={() => removeItem("about.team", i)}
+                          className="absolute top-6 right-6 p-3 bg-error/10 text-error rounded-xl opacity-0 group-hover:opacity-100 transition-all hover:bg-error hover:text-white"
+                        >
+                          <Trash2 size={16} />
+                        </button>
                        <InputField label="Nama Lengkap" path={`about.team.${i}.name`} value={member.name} />
                        <InputField label="Jabatan" path={`about.team.${i}.role`} value={member.role} />
                        <InputField label="Bio Singkat" path={`about.team.${i}.bio`} value={member.bio} type="textarea" />
                        <ImageInput label="Foto Profil" path={`about.team.${i}.image`} value={member.image} />
                     </div>
                   ))}
+                  <button 
+                    onClick={() => addItem("about.team", { name: "New Member", role: "Staff", bio: "", image: "" })}
+                    className="p-10 rounded-[3rem] border-4 border-dashed border-surface-container-highest flex flex-col items-center justify-center gap-4 hover:border-primary hover:text-primary transition-all text-on-surface-variant/40"
+                  >
+                    <Plus size={48} />
+                    <span className="font-black uppercase tracking-widest">Tambah Tim</span>
+                  </button>
                </div>
             </section>
           </div>

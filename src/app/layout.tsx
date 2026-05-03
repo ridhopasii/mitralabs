@@ -3,6 +3,9 @@ import { Inter, Manrope } from "next/font/google";
 import "./globals.css";
 import Navbar from "@/components/Navbar";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
+import { DataProvider } from "@/context/DataContext";
+import MaintenanceGuard from "@/components/MaintenanceGuard";
+import { supabase } from "@/lib/supabase";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -16,52 +19,49 @@ const manrope = Manrope({
   display: "swap",
 });
 
-export const metadata: Metadata = {
-  title: {
-    default: "Mitralabs.id — Jasa Website Profesional Medan",
-    template: "%s | Mitralabs.id",
-  },
-  description:
-    "Mitralabs.id adalah jasa pembuatan website profesional di Medan. Kami membangun website UMKM, sekolah, travel, dan bisnis dengan standar global. Konsultasi gratis via WhatsApp.",
-  keywords: [
-    "jasa buat website Medan",
-    "jasa website UMKM Medan",
-    "bikin website murah Medan",
-    "web developer Medan",
-    "pembuatan website profesional Medan",
-    "Mitralabs",
-  ],
-  authors: [{ name: "Mitralabs.id" }],
-  creator: "Mitralabs.id",
-  openGraph: {
-    type: "website",
-    locale: "id_ID",
-    url: "https://mitralabs.id",
-    siteName: "Mitralabs.id",
-    title: "Mitralabs.id — Jasa Website Profesional Medan",
-    description:
-      "Website profesional untuk bisnis Anda. Kami bangun, Anda berkembang. Konsultasi gratis!",
-    images: [
-      {
-        url: "/og-image.png",
-        width: 1200,
-        height: 630,
-        alt: "Mitralabs.id",
-      },
-    ],
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Mitralabs.id — Jasa Website Profesional Medan",
-    description: "Website profesional untuk bisnis Anda. Konsultasi gratis!",
-  },
-  robots: {
-    index: true,
-    follow: true,
-  },
-};
+// Dynamic Metadata Generation
+export async function generateMetadata(): Promise<Metadata> {
+  let title = "Mitralabs.id — Jasa Website Profesional Medan";
+  let description = "Mitralabs.id adalah jasa pembuatan website profesional di Medan. Kami membangun website UMKM, sekolah, travel, dan bisnis dengan standar global.";
 
-import { DataProvider } from "@/context/DataContext";
+  try {
+    const { data: sbData } = await supabase
+      .from('site_data')
+      .select('json_content')
+      .eq('id', 1)
+      .single();
+
+    if (sbData?.json_content?.home?.hero) {
+      const hero = sbData.json_content.home.hero;
+      title = `${hero.title} | Mitralabs.id`;
+      description = hero.subtitle;
+    }
+  } catch (e) {
+    console.error("Failed to fetch metadata from Supabase", e);
+  }
+
+  return {
+    title: {
+      default: title,
+      template: "%s | Mitralabs.id",
+    },
+    description: description,
+    keywords: [
+      "jasa buat website Medan",
+      "jasa website UMKM Medan",
+      "web developer Medan",
+      "Mitralabs",
+    ],
+    openGraph: {
+      title: title,
+      description: description,
+      url: "https://mitralabs.id",
+      siteName: "Mitralabs.id",
+      locale: "id_ID",
+      type: "website",
+    },
+  };
+}
 
 export default function RootLayout({
   children,
@@ -72,9 +72,11 @@ export default function RootLayout({
     <html lang="id" className={`${inter.variable} ${manrope.variable}`}>
       <body className="antialiased">
         <DataProvider>
-          <Navbar />
-          <main>{children}</main>
-          <FloatingWhatsApp />
+          <MaintenanceGuard>
+            <Navbar />
+            <main>{children}</main>
+            <FloatingWhatsApp />
+          </MaintenanceGuard>
         </DataProvider>
       </body>
     </html>
