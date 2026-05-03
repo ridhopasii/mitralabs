@@ -15,7 +15,8 @@ import {
   Type
 } from "lucide-react";
 import Link from "next/link";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function AdminLayout({
   children,
@@ -23,12 +24,36 @@ export default function AdminLayout({
   children: React.ReactNode;
 }) {
   const pathname = usePathname();
+  const router = useRouter();
+  const [isAuthorized, setIsAuthorized] = useState(false);
+
+  useEffect(() => {
+    const auth = localStorage.getItem("mitralabs_admin_auth");
+    if (auth !== "true") {
+      router.push("/login");
+    } else {
+      setIsAuthorized(true);
+    }
+  }, [router]);
+
+  if (!isAuthorized) {
+    return (
+      <div className="min-h-screen bg-on-background flex items-center justify-center">
+        <div className="w-12 h-12 border-4 border-primary border-t-transparent rounded-full animate-spin"></div>
+      </div>
+    );
+  }
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
     { name: "Editor Konten", icon: Type, href: "/admin/konten" },
     { name: "Pengaturan", icon: Settings, href: "/admin/settings" },
   ];
+
+  const handleLogout = () => {
+    localStorage.removeItem("mitralabs_admin_auth");
+    router.push("/login");
+  };
 
   return (
     <div className="flex min-h-screen bg-surface-container-lowest font-sans text-on-surface">
@@ -68,13 +93,13 @@ export default function AdminLayout({
         </nav>
 
         <div className="p-6 mt-auto">
-          <Link 
-            href="/" 
-            className="flex items-center gap-4 px-5 py-4 rounded-2xl text-error font-bold hover:bg-error/10 transition-all"
+          <button 
+            onClick={handleLogout}
+            className="w-full flex items-center gap-4 px-5 py-4 rounded-2xl text-error font-bold hover:bg-error/10 transition-all"
           >
             <LogOut size={20} />
             Keluar
-          </Link>
+          </button>
         </div>
       </aside>
 

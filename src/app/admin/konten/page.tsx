@@ -20,8 +20,10 @@ import {
   Info,
   Zap,
   Target,
-  ListChecks
+  ListChecks,
+  Loader2
 } from "lucide-react";
+import { uploadImage } from "@/lib/supabase";
 
 export default function MasterCMS() {
   const { data, updateData } = useData();
@@ -29,6 +31,7 @@ export default function MasterCMS() {
   const [formData, setFormData] = useState(data);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [uploadingPath, setUploadingPath] = useState<string | null>(null);
 
   useEffect(() => {
     setFormData(data);
@@ -55,12 +58,13 @@ export default function MasterCMS() {
     setFormData(newData);
   };
 
-  const handleImageUpload = (path: string, file: File) => {
-    const reader = new FileReader();
-    reader.onloadend = () => {
-      updateField(path, reader.result as string);
-    };
-    reader.readAsDataURL(file);
+  const handleImageUpload = async (path: string, file: File) => {
+    setUploadingPath(path);
+    const publicUrl = await uploadImage(file);
+    if (publicUrl) {
+      updateField(path, publicUrl);
+    }
+    setUploadingPath(null);
   };
 
   const SectionHeader = ({ icon: Icon, title, desc }: any) => (
@@ -97,24 +101,35 @@ export default function MasterCMS() {
     </div>
   );
 
-  const ImageInput = ({ label, path, value }: any) => (
-    <div className="space-y-4">
-      <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">{label}</label>
-      <div className="relative group aspect-video rounded-[2.5rem] overflow-hidden border-4 border-dashed border-surface-container-highest bg-surface-container-low flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-all">
-        {value ? <img src={value} className="absolute inset-0 w-full h-full object-cover" /> : null}
-        <div className="relative z-10 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl flex flex-col items-center gap-3">
-          <Upload size={32} className="text-primary" />
-          <p className="font-black text-sm uppercase tracking-widest">Upload Image</p>
+  const ImageInput = ({ label, path, value }: any) => {
+    const isUploading = uploadingPath === path;
+    
+    return (
+      <div className="space-y-4">
+        <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">{label}</label>
+        <div className="relative group aspect-video rounded-[2.5rem] overflow-hidden border-4 border-dashed border-surface-container-highest bg-surface-container-low flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-all">
+          {value ? <img src={value} className="absolute inset-0 w-full h-full object-cover" /> : null}
+          <div className="relative z-10 bg-white/90 backdrop-blur-md p-6 rounded-2xl shadow-xl flex flex-col items-center gap-3">
+            {isUploading ? (
+              <Loader2 size={32} className="text-primary animate-spin" />
+            ) : (
+              <Upload size={32} className="text-primary" />
+            )}
+            <p className="font-black text-sm uppercase tracking-widest">
+              {isUploading ? "Uploading..." : "Upload Image"}
+            </p>
+          </div>
+          <input 
+            type="file" 
+            accept="image/*"
+            disabled={isUploading}
+            onChange={(e) => e.target.files && handleImageUpload(path, e.target.files[0])}
+            className="absolute inset-0 opacity-0 cursor-pointer disabled:cursor-not-allowed" 
+          />
         </div>
-        <input 
-          type="file" 
-          accept="image/*"
-          onChange={(e) => e.target.files && handleImageUpload(path, e.target.files[0])}
-          className="absolute inset-0 opacity-0 cursor-pointer" 
-        />
       </div>
-    </div>
-  );
+    );
+  };
 
   const tabs = [
     { id: "home", label: "Homepage", icon: Layout },
