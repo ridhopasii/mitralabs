@@ -27,8 +27,6 @@ export default function AdminLayout({
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin" },
     { name: "Editor Konten", icon: Type, href: "/admin/konten" },
-    { name: "CMS Layanan", icon: Package, href: "/admin/layanan" },
-    { name: "CMS Portfolio", icon: Briefcase, href: "/admin/portfolio" },
     { name: "Pengaturan", icon: Settings, href: "/admin/settings" },
   ];
 

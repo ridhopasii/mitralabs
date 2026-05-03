@@ -1,17 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-
-// Helper for deep merging to ensure structure consistency
-function deepMerge(target: any, source: any) {
-  for (const key of Object.keys(source)) {
-    if (source[key] instanceof Object && key in target) {
-      Object.assign(source[key], deepMerge(target[key], source[key]));
-    }
-  }
-  Object.assign(target || {}, source);
-  return target;
-}
+import { supabase } from "@/lib/supabase";
 
 interface Plan {
   id: number;
@@ -331,13 +321,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(initialData);
 
   useEffect(() => {
-    const saved = localStorage.getItem("mitralabs_final_cms_data_v6");
+    // 1. Initial Load from LocalStorage (fastest)
+    const saved = localStorage.getItem("mitralabs_final_cms_data_v7");
     if (saved) {
       try {
         const parsed = JSON.parse(saved);
-        // Deep merge saved data with initial data to ensure structure integrity
         const merged = { ...initialData };
-        // Simple recursive merge
         const merge = (target: any, source: any) => {
           for (const key in source) {
             if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
@@ -350,15 +339,60 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         };
         merge(merged, parsed);
         setData(merged);
+      } catch (e) { console.error(e); }
+    }
+
+    // 2. Fetch from Supabase (source of truth)
+    const fetchFromSupabase = async () => {
+      try {
+        const { data: sbData, error } = await supabase
+          .from('site_data')
+          .select('json_content')
+          .eq('id', 1)
+          .single();
+
+        if (sbData && sbData.json_content) {
+          const merged = { ...initialData };
+          const merge = (target: any, source: any) => {
+            for (const key in source) {
+              if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+                if (!target[key]) target[key] = {};
+                merge(target[key], source[key]);
+              } else {
+                target[key] = source[key];
+              }
+            }
+          };
+          merge(merged, sbData.json_content);
+          setData(merged);
+          localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(merged));
+        }
       } catch (e) {
-        console.error("Failed to parse saved data", e);
+        console.warn("Supabase fetch failed, using local data", e);
       }
+    };
+
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      fetchFromSupabase();
     }
   }, []);
 
-  const updateData = (newData: AppData) => {
+  const updateData = async (newData: AppData) => {
     setData(newData);
-    localStorage.setItem("mitralabs_final_cms_data_v6", JSON.stringify(newData));
+    localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
+
+    // Persist to Supabase
+    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+      try {
+        const { error } = await supabase
+          .from('site_data')
+          .upsert({ id: 1, json_content: newData });
+        
+        if (error) throw error;
+      } catch (e) {
+        console.error("Failed to save to Supabase", e);
+      }
+    }
   };
 
   return (
