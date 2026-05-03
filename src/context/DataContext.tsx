@@ -1,7 +1,7 @@
 "use client";
 
 import React, { createContext, useContext, useState, useEffect } from "react";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 interface Plan {
   id: number;
@@ -372,7 +372,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       }
     };
 
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    if (isSupabaseConfigured()) {
       fetchFromSupabase();
     }
   }, []);
@@ -382,7 +382,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
 
     // Persist to Supabase
-    if (process.env.NEXT_PUBLIC_SUPABASE_URL) {
+    if (isSupabaseConfigured()) {
       try {
         const { error } = await supabase
           .from('site_data')
