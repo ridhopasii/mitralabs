@@ -1,0 +1,109 @@
+@import "tailwindcss";
+
+@theme {
+  /* Colors from Clean V2 */
+  --color-surface: #faf8ff;
+  --color-surface-container-highest: #e1e1ef;
+  --color-on-background: #191b24;
+  --color-on-error: #ffffff;
+  --color-primary: #0045d1;
+  --color-secondary-fixed-dim: #b4cbca;
+  --color-on-surface-variant: #434656;
+  --color-surface-container: #ededfa;
+  --color-on-secondary-container: #536868;
+  --color-on-primary-container: #edeeff;
+  --color-on-tertiary-container: #f0edff;
+  --color-tertiary-fixed-dim: #c0c1ff;
+  --color-surface-container-low: #f3f2ff;
+  --color-primary-container: #1a5cff;
+  --color-tertiary-container: #585ae5;
+  --color-secondary-container: #d0e7e6;
+  --color-on-tertiary: #ffffff;
+  --color-tertiary-fixed: #e1e0ff;
+  --color-on-primary: #ffffff;
+  --color-surface-variant: #e1e1ef;
+  --color-secondary: #4d6262;
+  --color-on-secondary: #ffffff;
+  --color-inverse-on-surface: #f0f0fd;
+  --color-surface-container-lowest: #ffffff;
+  --color-tertiary: #3e3fcc;
+  --color-error: #ba1a1a;
+  --color-on-secondary-fixed: #0a1f1f;
+  --color-on-secondary-fixed-variant: #364a4a;
+  --color-outline: #737688;
+  --color-on-error-container: #93000a;
+  --color-secondary-fixed: #d0e7e6;
+  --color-background: #faf8ff;
+  --color-surface-bright: #faf8ff;
+  --color-outline-variant: #c3c5d9;
+  --color-on-tertiary-fixed-variant: #2f2ebe;
+  --color-on-tertiary-fixed: #07006c;
+  --color-primary-fixed: #dce1ff;
+  --color-surface-container-high: #e7e7f4;
+  --color-surface-dim: #d9d9e6;
+  --color-inverse-primary: #b6c4ff;
+  --color-on-surface: #191b24;
+  --color-error-container: #ffdad6;
+  --color-on-primary-fixed-variant: #003ab2;
+  --color-surface-tint: #004ee8;
+  --color-primary-fixed-dim: #b6c4ff;
+  --color-inverse-surface: #2e303a;
+  --color-on-primary-fixed: #001550;
+
+  /* Typography from Clean V2 */
+  --font-display: 'Manrope', sans-serif;
+  --font-body: 'Manrope', sans-serif;
+}
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    background-color: var(--color-background);
+    color: var(--color-on-surface);
+    @apply font-body antialiased;
+    overflow-x: hidden;
+  }
+
+  h1, h2, h3, h4, h5, h6 {
+    @apply font-display;
+  }
+}
+
+@layer components {
+  .shadow-premium {
+    box-shadow: 0px 10px 30px rgba(0, 69, 209, 0.05);
+  }
+
+  .ambient-shadow {
+    box-shadow: 0px 10px 30px rgba(26, 92, 255, 0.05);
+  }
+
+  .glass-effect {
+    backdrop-filter: blur(8px);
+    background: rgba(250, 248, 255, 0.8);
+  }
+
+  /* Legacy utility mapping for compatibility during migration */
+  .text-gradient {
+    @apply text-primary;
+  }
+  .gradient-primary {
+    @apply bg-primary;
+  }
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 6px;
+}
+
+::-webkit-scrollbar-track {
+  @apply bg-surface;
+}
+
+::-webkit-scrollbar-thumb {
+  @apply bg-surface-container-highest rounded-full hover:bg-outline-variant transition-colors;
+}
