@@ -11,3 +11,18 @@ model SiteData {
   json_content Json
   updated_at   DateTime @default(now()) @updatedAt
 }
+
+model SiteMessage {
+  id         Int      @id @default(autoincrement())
+  name       String
+  email      String
+  message    String
+  created_at DateTime @default(now())
+}
+
+model AdminLog {
+  id         Int      @id @default(autoincrement())
+  action     String
+  detail     String
+  created_at DateTime @default(now())
+}

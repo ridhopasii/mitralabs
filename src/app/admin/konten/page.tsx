@@ -21,8 +21,33 @@ import {
   Zap,
   Target,
   ListChecks,
-  Loader2
+  Loader2,
+  AlertCircle
 } from "lucide-react";
+import { z } from "zod";
+
+// Validation Schemas
+const blogPostSchema = z.object({
+  title: z.string().min(5, "Judul minimal 5 karakter"),
+  slug: z.string().min(3, "Slug minimal 3 karakter").regex(/^[a-z0-9-]+$/, "Slug hanya boleh huruf kecil, angka, dan dash"),
+  category: z.string().min(2, "Kategori wajib diisi"),
+  author: z.string().min(2, "Nama penulis wajib diisi"),
+  date: z.string().min(5, "Format tanggal tidak valid"),
+  image: z.string().url("URL Gambar tidak valid").or(z.string().length(0)),
+  content: z.string().min(50, "Konten minimal 50 karakter")
+});
+
+const projectSchema = z.object({
+  title: z.string().min(3, "Judul project minimal 3 karakter"),
+  slug: z.string().min(3).regex(/^[a-z0-9-]+$/),
+  category: z.string().min(2),
+  status: z.string(),
+  image: z.string().url().or(z.string().length(0)),
+  description: z.string().min(20),
+  challenge: z.string().min(10),
+  solution: z.string().min(10),
+  results: z.array(z.string()).min(1, "Minimal 1 hasil harus diisi")
+});
 import { uploadImage } from "@/lib/supabase";
 
 export default function MasterCMS() {
@@ -31,6 +56,7 @@ export default function MasterCMS() {
   const [formData, setFormData] = useState(data);
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [validationErrors, setValidationErrors] = useState<string[]>([]);
   const [uploadingPath, setUploadingPath] = useState<string | null>(null);
 
   useEffect(() => {
@@ -38,13 +64,36 @@ export default function MasterCMS() {
   }, [data]);
 
   const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      updateData(formData);
-      setIsSaving(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 1000);
+    setValidationErrors([]);
+    
+    try {
+      // Validate Blog Posts
+      formData.blog.posts.forEach((post, i) => {
+        const result = blogPostSchema.safeParse(post);
+        if (!result.success) {
+          throw new Error(`Blog Post #${i + 1}: ${result.error.errors[0].message}`);
+        }
+      });
+
+      // Validate Portfolio
+      formData.portfolio.projects.forEach((proj, i) => {
+        const result = projectSchema.safeParse(proj);
+        if (!result.success) {
+          throw new Error(`Portfolio #${i + 1}: ${result.error.errors[0].message}`);
+        }
+      });
+
+      setIsSaving(true);
+      setTimeout(() => {
+        updateData(formData);
+        setIsSaving(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 3000);
+      }, 1000);
+    } catch (err: any) {
+      setValidationErrors([err.message]);
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    }
   };
 
   const updateField = (path: string, value: any) => {
@@ -157,6 +206,7 @@ export default function MasterCMS() {
     { id: "home", label: "Homepage", icon: Layout },
     { id: "services", label: "Layanan", icon: Package },
     { id: "portfolio", label: "Portfolio", icon: Briefcase },
+    { id: "blog", label: "Blog", icon: Layout },
     { id: "about", label: "Tentang Kami", icon: Users },
     { id: "contact", label: "Kontak", icon: Smartphone },
     { id: "navfooter", label: "Nav & Footer", icon: Globe }
@@ -191,6 +241,30 @@ export default function MasterCMS() {
 
       {/* Master Content Area */}
       <div className="flex-1 bg-surface-container-lowest p-16 rounded-[4rem] shadow-premium border border-surface-container-highest">
+        
+        {validationErrors.length > 0 && (
+          <div className="bg-error/10 border-2 border-error/20 p-10 rounded-[3rem] animate-in slide-in-from-top-4 duration-500 mb-16 flex gap-8 items-start">
+            <div className="w-14 h-14 bg-error text-white rounded-2xl flex items-center justify-center shrink-0 shadow-lg shadow-error/20">
+              <AlertCircle size={32} />
+            </div>
+            <div>
+              <h4 className="text-xl font-black text-error uppercase tracking-tighter mb-4">Gagal Menyimpan: Kesalahan Data</h4>
+              <ul className="space-y-3">
+                {validationErrors.map((err, i) => (
+                  <li key={i} className="text-on-surface font-bold text-lg leading-tight flex gap-3">
+                    <span className="text-error">•</span> {err}
+                  </li>
+                ))}
+              </ul>
+              <button 
+                onClick={() => setValidationErrors([])}
+                className="mt-8 text-error font-black uppercase tracking-widest text-xs hover:underline"
+              >
+                Tutup Peringatan
+              </button>
+            </div>
+          </div>
+        )}
         
         {/* HOME EDITOR */}
         {activeTab === "home" && (
@@ -343,9 +417,14 @@ export default function MasterCMS() {
                         >
                           <Trash2 size={16} />
                         </button>
-                       <InputField label="Judul Project" path={`portfolio.projects.${i}.title`} value={project.title} />
-                       <InputField label="Kategori" path={`portfolio.projects.${i}.category`} value={project.category} />
-                       <ImageInput label="Foto Project" path={`portfolio.projects.${i}.image`} value={project.image} />
+                        <InputField label="Judul Project" path={`portfolio.projects.${i}.title`} value={project.title} />
+                        <InputField label="Slug (URL)" path={`portfolio.projects.${i}.slug`} value={project.slug} />
+                        <InputField label="Kategori" path={`portfolio.projects.${i}.category`} value={project.category} />
+                        <InputField label="Deskripsi Singkat" path={`portfolio.projects.${i}.description`} value={project.description} type="textarea" />
+                        <InputField label="Tantangan (Challenge)" path={`portfolio.projects.${i}.challenge`} value={project.challenge} type="textarea" />
+                        <InputField label="Solusi (Solution)" path={`portfolio.projects.${i}.solution`} value={project.solution} type="textarea" />
+                        <InputField label="Hasil (Results - Pisahkan Baris)" path={`portfolio.projects.${i}.results`} value={project.results?.join("\n")} type="textarea" />
+                        <ImageInput label="Foto Project" path={`portfolio.projects.${i}.image`} value={project.image} />
                     </div>
                   ))}
                   <button 
@@ -363,6 +442,56 @@ export default function MasterCMS() {
                <div className="grid md:grid-cols-2 gap-10">
                   <InputField label="CTA Title" path="portfolio.cta.title" value={formData.portfolio.cta.title} />
                   <InputField label="CTA Button" path="portfolio.cta.buttonText" value={formData.portfolio.cta.buttonText} />
+               </div>
+            </section>
+          </div>
+        )}
+
+        {/* BLOG EDITOR */}
+        {activeTab === "blog" && (
+          <div className="space-y-32">
+            <section>
+              <SectionHeader icon={Layout} title="Blog Page Header" desc="Teks utama halaman edukasi digital." />
+              <div className="grid md:grid-cols-2 gap-10">
+                <InputField label="Headline Blog" path="blog.title" value={formData.blog.title} />
+                <InputField label="Sub-headline" path="blog.subtitle" value={formData.blog.subtitle} type="textarea" />
+              </div>
+            </section>
+            
+            <section className="pt-20 border-t border-surface-container-highest">
+               <SectionHeader icon={Layout} title="Article Posts" desc="Kelola konten edukasi Anda." />
+               <div className="grid md:grid-cols-1 gap-12">
+                  {formData.blog.posts.map((post, i) => (
+                    <div key={post.id} className="p-10 bg-surface-container-low rounded-[3.5rem] border border-surface-container-highest space-y-10 relative group">
+                        <button 
+                          onClick={() => removeItem("blog.posts", i)}
+                          className="absolute top-10 right-10 p-4 bg-error/10 text-error rounded-2xl opacity-0 group-hover:opacity-100 transition-all hover:bg-error hover:text-white"
+                        >
+                          <Trash2 size={24} />
+                        </button>
+                        <div className="grid md:grid-cols-2 gap-10">
+                           <div className="space-y-6">
+                              <InputField label="Judul Artikel" path={`blog.posts.${i}.title`} value={post.title} />
+                              <InputField label="Slug (URL)" path={`blog.posts.${i}.slug`} value={post.slug} />
+                              <div className="grid grid-cols-2 gap-6">
+                                 <InputField label="Kategori" path={`blog.posts.${i}.category`} value={post.category} />
+                                 <InputField label="Penulis" path={`blog.posts.${i}.author`} value={post.author} />
+                              </div>
+                              <InputField label="Tanggal" path={`blog.posts.${i}.date`} value={post.date} />
+                           </div>
+                           <ImageInput label="Thumbnail Artikel" path={`blog.posts.${i}.image`} value={post.image} />
+                        </div>
+                        <InputField label="Ringkasan (Excerpt)" path={`blog.posts.${i}.excerpt`} value={post.excerpt} type="textarea" />
+                        <InputField label="Konten Lengkap (Markdown/HTML Support)" path={`blog.posts.${i}.content`} value={post.content} type="textarea" />
+                    </div>
+                  ))}
+                  <button 
+                    onClick={() => addItem("blog.posts", { title: "New Article", slug: "new-article", excerpt: "", content: "", category: "Edukasi", author: "Admin", date: new Date().toLocaleDateString(), image: "" })}
+                    className="p-20 rounded-[3.5rem] border-4 border-dashed border-surface-container-highest flex flex-col items-center justify-center gap-6 hover:border-primary hover:text-primary transition-all text-on-surface-variant/40"
+                  >
+                    <Plus size={64} />
+                    <span className="font-black uppercase tracking-widest text-xl">Tambah Artikel Baru</span>
+                  </button>
                </div>
             </section>
           </div>

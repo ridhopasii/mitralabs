@@ -1,148 +1,171 @@
 "use client";
 
 import { useState } from "react";
-import { 
-  Save, 
-  Globe, 
-  Smartphone, 
-  Zap,
-  Info,
-  Eye,
-  CheckCircle2,
-  MessageSquare
-} from "lucide-react";
 import { useData } from "@/context/DataContext";
+import { 
+  Database, 
+  Download, 
+  Upload, 
+  RefreshCcw, 
+  CheckCircle2, 
+  AlertCircle,
+  ShieldCheck,
+  History,
+  Trash2,
+  FileJson
+} from "lucide-react";
 
 export default function SettingsPage() {
   const { data, updateData } = useData();
-  const { settings } = data;
-  
-  const [localSettings, setLocalSettings] = useState(settings);
-  const [isSaving, setIsSaving] = useState(false);
-  const [showSuccess, setShowSuccess] = useState(false);
+  const [isExporting, setIsExporting] = useState(false);
+  const [isImporting, setIsImporting] = useState(false);
+  const [success, setSuccess] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
-  const handleSave = () => {
-    setIsSaving(true);
-    setTimeout(() => {
-      updateData({ ...data, settings: localSettings });
-      setIsSaving(false);
-      setShowSuccess(true);
-      setTimeout(() => setShowSuccess(false), 3000);
-    }, 1000);
+  const exportData = () => {
+    setIsExporting(true);
+    try {
+      const dataStr = JSON.stringify(data, null, 2);
+      const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+      
+      const exportFileDefaultName = `mitralabs_backup_${new Date().toISOString().split('T')[0]}.json`;
+      
+      const linkElement = document.createElement('a');
+      linkElement.setAttribute('href', dataUri);
+      linkElement.setAttribute('download', exportFileDefaultName);
+      linkElement.click();
+      
+      setSuccess("Backup berhasil diunduh!");
+      setTimeout(() => setSuccess(null), 3000);
+    } catch (e) {
+      setError("Gagal melakukan backup.");
+    } finally {
+      setIsExporting(false);
+    }
+  };
+
+  const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setIsImporting(true);
+    const reader = new FileReader();
+    reader.onload = (event) => {
+      try {
+        const json = JSON.parse(event.target?.result as string);
+        if (confirm("Apakah Anda yakin ingin me-restore data ini? Data saat ini akan ditimpa.")) {
+          updateData(json);
+          setSuccess("Data berhasil di-restore!");
+          setTimeout(() => setSuccess(null), 3000);
+        }
+      } catch (err) {
+        setError("File JSON tidak valid.");
+        setTimeout(() => setError(null), 3000);
+      } finally {
+        setIsImporting(false);
+      }
+    };
+    reader.readAsText(file);
   };
 
   return (
-    <div className="max-w-4xl space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-700">
-      {/* Success Toast */}
-      {showSuccess && (
-        <div className="fixed top-10 right-10 z-[200] bg-green-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 duration-500">
-          <CheckCircle2 size={24} />
-          <p className="font-black">Pengaturan Berhasil Disimpan!</p>
+    <div className="space-y-12 pb-20">
+      <div className="max-w-4xl space-y-12">
+        {/* Header */}
+        <div>
+          <h1 className="text-4xl font-black tracking-tight uppercase mb-2">Pengaturan Sistem</h1>
+          <p className="text-on-surface-variant font-medium opacity-60">Kelola backup, restore, dan integritas data website Anda.</p>
         </div>
-      )}
 
-      {/* Business Mode Selection */}
-      <section className="bg-surface-container-lowest p-12 rounded-[3rem] shadow-premium border border-surface-container-highest overflow-hidden relative">
-        <div className="absolute top-0 right-0 p-12 opacity-5">
-          <Zap size={200} />
-        </div>
-        
-        <div className="flex items-center gap-6 mb-12 relative z-10">
-          <div className="w-16 h-16 bg-primary rounded-[1.5rem] flex items-center justify-center text-on-primary shadow-xl shadow-primary/20">
-            <Zap size={32} />
+        {success && (
+          <div className="p-6 bg-green-500 text-white rounded-3xl flex items-center gap-4 animate-in slide-in-from-top-4">
+            <CheckCircle2 size={24} />
+            <p className="font-black">{success}</p>
           </div>
-          <div>
-            <h2 className="text-3xl font-black tracking-tighter">Business Strategy Mode</h2>
-            <p className="text-on-surface-variant font-medium">Otomasi respons UI berdasarkan strategi bisnis saat ini.</p>
+        )}
+
+        {error && (
+          <div className="p-6 bg-error text-white rounded-3xl flex items-center gap-4 animate-in slide-in-from-top-4">
+            <AlertCircle size={24} />
+            <p className="font-black">{error}</p>
           </div>
-        </div>
+        )}
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 relative z-10">
-          {[
-            { id: "agresif", label: "Mode Agresif", desc: "Prioritas Leads & CTA Menonjol", icon: Zap },
-            { id: "minimalis", label: "Mode Clean", desc: "Fokus pada Estetika & Portfolio", icon: Eye },
-            { id: "maintenance", label: "Mode Libur", desc: "Tutup Sementara (Maintenance)", icon: Info },
-          ].map((mode) => (
-            <button
-              key={mode.id}
-              onClick={() => setLocalSettings({ ...localSettings, businessMode: mode.id })}
-              className={`p-10 rounded-[2.5rem] border-4 text-left transition-all duration-500 ${
-                localSettings.businessMode === mode.id 
-                  ? "bg-primary text-on-primary border-primary shadow-2xl shadow-primary/30 scale-105" 
-                  : "bg-surface-container border-transparent text-on-surface hover:bg-surface-container-high"
-              }`}
-            >
-              <mode.icon size={32} className="mb-6" />
-              <p className="font-black text-xl mb-2">{mode.label}</p>
-              <p className={`text-xs font-medium leading-relaxed ${localSettings.businessMode === mode.id ? 'opacity-80' : 'opacity-40'}`}>
-                {mode.desc}
-              </p>
-            </button>
-          ))}
-        </div>
-      </section>
-
-      {/* Global Config */}
-      <div className="grid md:grid-cols-2 gap-10">
-        <section className="bg-surface-container-lowest p-12 rounded-[3rem] shadow-premium border border-surface-container-highest">
-          <h3 className="text-2xl font-black mb-10 flex items-center gap-4 text-primary">
-            <Smartphone size={24} /> Info Kontak
-          </h3>
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-2">WhatsApp Business</label>
-              <input 
-                type="text" 
-                value={localSettings.waNumber} 
-                onChange={(e) => setLocalSettings({ ...localSettings, waNumber: e.target.value })}
-                className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent focus:border-primary rounded-[1.5rem] outline-none font-black text-lg transition-all" 
-              />
+        {/* Backup & Restore Section */}
+        <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+              <Database size={32} />
             </div>
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-2">Pesan Promo WhatsApp</label>
-              <textarea 
-                value={localSettings.waPromoMessage} 
-                onChange={(e) => setLocalSettings({ ...localSettings, waPromoMessage: e.target.value })}
-                className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent focus:border-primary rounded-[1.5rem] outline-none font-bold text-sm transition-all h-32" 
-              />
+            <div>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Manajemen Data</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Backup & Restore JSON Data</p>
             </div>
           </div>
-        </section>
 
-        <section className="bg-surface-container-lowest p-12 rounded-[3rem] shadow-premium border border-surface-container-highest">
-          <h3 className="text-2xl font-black mb-10 flex items-center gap-4 text-primary">
-            <Globe size={24} /> SEO & Branding
-          </h3>
-          <div className="space-y-8">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-2">Meta Title Default</label>
-              <input 
-                type="text" 
-                value="Mitralabs.id - Digital Agency" 
-                readOnly
-                className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent opacity-50 rounded-[1.5rem] outline-none font-black text-lg" 
-              />
+          <div className="grid md:grid-cols-2 gap-8">
+            {/* Export */}
+            <div className="p-8 bg-surface-container-low rounded-[2.5rem] border border-surface-container space-y-6 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
+                  <Download size={24} />
+                </div>
+                <h4 className="text-xl font-black mb-2">Ekspor Data (Backup)</h4>
+                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
+                  Unduh seluruh konfigurasi dan konten website dalam format file JSON.
+                </p>
+              </div>
+              <button 
+                onClick={exportData}
+                disabled={isExporting}
+                className="w-full py-5 bg-on-surface text-surface rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl"
+              >
+                {isExporting ? <RefreshCcw size={18} className="animate-spin" /> : <FileJson size={18} />}
+                Download Backup
+              </button>
             </div>
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-60 ml-2">App Status</label>
-              <div className="flex items-center gap-4 p-5 bg-surface-container-low rounded-2xl">
-                <div className="w-4 h-4 bg-green-500 rounded-full animate-pulse"></div>
-                <span className="font-black text-sm uppercase tracking-widest text-green-600">Sistem Online</span>
+
+            {/* Import */}
+            <div className="p-8 bg-surface-container-low rounded-[2.5rem] border border-surface-container space-y-6 flex flex-col justify-between">
+              <div>
+                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-error mb-6 shadow-sm">
+                  <Upload size={24} />
+                </div>
+                <h4 className="text-xl font-black mb-2">Impor Data (Restore)</h4>
+                <p className="text-on-surface-variant text-sm font-medium leading-relaxed text-error/80 font-bold">
+                  PERINGATAN: Mengunggah file akan menimpa seluruh konten website saat ini.
+                </p>
+              </div>
+              <div className="relative">
+                <input 
+                  type="file" 
+                  accept=".json"
+                  onChange={importData}
+                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
+                />
+                <button 
+                  className="w-full py-5 bg-error text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl shadow-error/20"
+                >
+                  <Upload size={18} />
+                  Restore dari File
+                </button>
               </div>
             </div>
           </div>
         </section>
-      </div>
 
-      {/* Save Action */}
-      <div className="flex justify-end pt-12 pb-24">
-        <button 
-          onClick={handleSave}
-          disabled={isSaving}
-          className="bg-primary text-on-primary px-16 py-6 rounded-[2rem] font-black text-2xl shadow-2xl shadow-primary/40 flex items-center gap-5 hover:scale-[1.05] active:scale-[0.95] transition-all disabled:opacity-50 disabled:scale-100"
-        >
-          {isSaving ? "Sinkronisasi..." : "Simpan Pengaturan"}
-        </button>
+        {/* Security Info */}
+        <section className="bg-inverse-surface text-inverse-on-surface rounded-[3.5rem] p-12 shadow-premium flex flex-col md:flex-row items-center gap-10">
+          <div className="w-24 h-24 bg-primary rounded-[2rem] flex items-center justify-center shrink-0 shadow-2xl shadow-primary/40 rotate-3">
+             <ShieldCheck size={48} className="text-white" />
+          </div>
+          <div>
+            <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Keamanan Sistem</h3>
+            <p className="opacity-60 font-medium leading-relaxed">
+              Seluruh data Anda dienkripsi dan disimpan di infrastruktur Supabase yang aman. Pastikan Anda melakukan backup secara berkala sebelum melakukan perubahan besar pada struktur konten.
+            </p>
+          </div>
+        </section>
       </div>
     </div>
   );

@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Menu, X } from "lucide-react";
 import { useData } from "@/context/DataContext";
+import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const { data } = useData();
@@ -23,7 +24,7 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`bg-white/80 backdrop-blur-md border-b border-surface-container shadow-sm sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-2" : "py-4"}`}>
+      <header className={`bg-background/80 backdrop-blur-md border-b border-surface-container shadow-sm sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-2" : "py-4"}`}>
         <div className="max-w-7xl mx-auto px-6 flex justify-between items-center font-body antialiased">
           {/* Logo */}
           <Link href="/" className="text-2xl font-black tracking-tighter text-on-background font-display flex items-center gap-2 group">
@@ -54,7 +55,8 @@ export default function Navbar() {
           </nav>
 
           {/* CTA */}
-          <div className="hidden md:block">
+          <div className="hidden md:flex items-center gap-6">
+            <ThemeToggle />
             <a
               href={waUrl}
               target="_blank"
@@ -88,6 +90,10 @@ export default function Navbar() {
           }`}
         >
           <div className="p-10 pt-32 flex flex-col gap-8">
+            <div className="flex justify-between items-center mb-4">
+              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Tampilan</span>
+              <ThemeToggle />
+            </div>
             {navbar.links.map((link) => {
               const isActive = pathname === link.href;
               return (

@@ -1,36 +1,64 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Mitralabs Master CMS v6 🚀
 
-## Getting Started
+Digital Agency Platform built with technical precision. Mitralabs.id serves as a premium portal for UMKM, Schools, and Travel businesses in Indonesia.
 
-First, run the development server:
+## 🛠 Tech Stack
+- **Framework**: Next.js 16 (App Router)
+- **Styling**: Tailwind CSS 4 + Lucide Icons
+- **Backend/DB**: Supabase (PostgreSQL + Real-time Storage)
+- **State Management**: React Context API (DataContext)
+- **Analytics**: Vercel Analytics + Speed Insights
+- **Animations**: Framer Motion
 
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
+## 🔐 Security Features
+- **Supabase Auth**: Admin panel protected by industry-standard authentication.
+- **Environment Safety**: Secrets managed via Vercel/Supabase environment variables (excluded from Git).
+- **Session Protection**: Real-time session verification in Admin Layout.
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+## 📁 Project Structure
+- `/src/app`: Next.js pages and layouts.
+- `/src/components`: Reusable UI components.
+- `/src/sections`: Page-specific sections (Hero, Services, etc.).
+- `/src/context`: Global data and state management.
+- `/src/lib`: External library configurations (Supabase, etc.).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🚀 Getting Started
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+1. **Clone the repository**
+2. **Install dependencies**:
+   ```bash
+   npm install
+   ```
+3. **Configure Environment Variables**:
+   Create a `.env.local` file with:
+   ```env
+   NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+   NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
+   ```
+4. **Run development server**:
+   ```bash
+   npm run dev
+   ```
 
-## Learn More
+## 🗺 Roadmap & Refactoring Plan (Next Steps)
 
-To learn more about Next.js, take a look at the following resources:
+### 1. Data Normalization
+Currently, the site uses a single JSON blob for CMS data. To avoid bottlenecks as the platform grows, we plan to split this into:
+- `services`: Normalized table for pricing and features.
+- `portfolio`: Individual records with full case study support.
+- `blog_posts`: Separate table for scalable content management.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### 2. Image Optimization
+- Migrate all external Unsplash URLs to **Supabase Storage**.
+- Implement Next.js `<Image />` component for automatic resizing and WebP conversion.
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+### 3. Advanced Validation
+- Integrate **Zod** for schema-based validation in Admin forms.
+- Add real-time field error feedback.
 
-## Deploy on Vercel
+### 4. Testing Suite
+- Implement **Vitest** for unit testing core logic.
+- Add **Playwright** for end-to-end testing of the booking flow.
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+---
+Built with ❤️ by [Mitralabs.id](https://mitralabs.id)

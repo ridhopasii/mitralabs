@@ -17,10 +17,27 @@ interface Plan {
 
 interface Project {
   id: number;
+  slug: string;
   title: string;
   category: string;
   image: string;
+  description: string;
+  challenge: string;
+  solution: string;
+  results: string[];
   status: string;
+}
+
+interface BlogPost {
+  id: number;
+  slug: string;
+  title: string;
+  excerpt: string;
+  content: string;
+  category: string;
+  author: string;
+  date: string;
+  image: string;
 }
 
 interface AppData {
@@ -121,6 +138,25 @@ interface AppData {
     businessMode: string;
     waPromoMessage: string;
   };
+  blog: {
+    title: string;
+    subtitle: string;
+    posts: BlogPost[];
+  };
+  testimonials: {
+    id: number;
+    name: string;
+    role: string;
+    content: string;
+    rating: number;
+    image: string;
+  }[];
+  faqs: {
+    id: number;
+    question: string;
+    answer: string;
+    category: string;
+  }[];
 }
 
 const initialData: AppData = {
@@ -248,8 +284,30 @@ const initialData: AppData = {
     subtitle: "Explore our curated gallery of digital experiences designed for market leaders and local innovators across diverse sectors.",
     categories: ["All Works", "UMKM", "School", "Travel", "Business"],
     projects: [
-      { id: 1, title: "Wonderful Toba", category: "Travel", image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800", status: "Published" },
-      { id: 2, title: "Mitra Mart", category: "UMKM", image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800", status: "Published" },
+      { 
+        id: 1, 
+        slug: "wonderful-toba",
+        title: "Wonderful Toba", 
+        category: "Travel", 
+        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800", 
+        description: "Platform pariwisata terintegrasi untuk Danau Toba.",
+        challenge: "Membangun sistem booking yang kompleks dengan desain visual yang memanjakan mata.",
+        solution: "Implementasi Next.js dengan optimasi gambar dan sistem manajemen konten yang dinamis.",
+        results: ["Peningkatan traffic 300%", "User experience yang lebih smooth", "Booking rate naik 40%"],
+        status: "Published" 
+      },
+      { 
+        id: 2, 
+        slug: "mitra-mart",
+        title: "Mitra Mart", 
+        category: "UMKM", 
+        image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800", 
+        description: "E-commerce lokal untuk kebutuhan sehari-hari.",
+        challenge: "Sinkronisasi stok real-time dan kemudahan transaksi via WhatsApp.",
+        solution: "Integrasi Supabase real-time database dengan checkout WhatsApp otomatis.",
+        results: ["500+ transaksi per bulan", "Operasional lebih efisien", "Retensi pelanggan tinggi"],
+        status: "Published" 
+      },
     ],
     cta: {
       title: "Punya Visi untuk Project Berikutnya?",
@@ -310,6 +368,66 @@ const initialData: AppData = {
     businessMode: "agresif",
     waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial.",
   },
+  blog: {
+    title: "Edukasi & Wawasan",
+    subtitle: "Tips, trik, dan artikel terbaru seputar dunia teknologi dan bisnis untuk membantu Anda tetap relevan di era digital.",
+    posts: [
+      {
+        id: 1,
+        slug: "kenapa-umkm-butuh-website",
+        title: "Kenapa UMKM Butuh Website di Tahun 2024?",
+        excerpt: "Media sosial saja tidak cukup. Pelajari kenapa website adalah aset terpenting bagi UMKM untuk naik kelas.",
+        content: "Di era digital saat ini, memiliki kehadiran online bukan lagi pilihan, melainkan keharusan...",
+        category: "Edukasi",
+        author: "Ridho",
+        date: "12 Mar 2024",
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
+      },
+      {
+        id: 2,
+        slug: "5-ciri-website-bagus",
+        title: "5 Ciri Website yang Bagus untuk Konversi Penjualan",
+        excerpt: "Bukan hanya sekadar cantik, website yang bagus harus bisa merubah pengunjung menjadi pembeli.",
+        content: "Banyak orang mengira website bagus adalah website yang penuh dengan animasi warna-warni...",
+        category: "Tips",
+        author: "Ghazy",
+        date: "10 Mar 2024",
+        image: "https://images.unsplash.com/photo-1551288049-bbbda536639a?auto=format&fit=crop&q=80&w=800",
+      }
+    ]
+  },
+  testimonials: [
+    {
+      id: 1,
+      name: "Suryo Wijaya",
+      role: "Owner, Toba Travel",
+      content: "Mitralabs membantu kami mendigitalkan paket wisata kami. Sangat profesional!",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
+    },
+    {
+      id: 2,
+      name: "Linda Kusuma",
+      role: "Kepala Sekolah, SD Harapan",
+      content: "Website sekolah kami sekarang sangat informatif dan mudah diakses orang tua murid.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400"
+    }
+  ],
+  faqs: [
+    {
+      id: 1,
+      question: "Berapa lama pengerjaan website?",
+      answer: "Tergantung paket, biasanya 3-14 hari kerja.",
+      category: "Umum"
+    },
+    {
+      id: 2,
+      question: "Apakah ada biaya bulanan?",
+      answer: "Tidak ada biaya bulanan dari kami, hanya biaya tahunan untuk domain dan hosting.",
+      category: "Harga"
+    }
+  ]
 };
 
 const DataContext = createContext<{
@@ -317,83 +435,109 @@ const DataContext = createContext<{
   updateData: (newData: AppData) => void;
 } | undefined>(undefined);
 
+import LoadingScreen from "@/components/LoadingScreen";
+import { AlertCircle, RefreshCcw } from "lucide-react";
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
-  const [data, setData] = useState<AppData>(initialData);
+  const [data, setData] = useState<AppData>(() => {
+    // Instant load from localStorage on first render (no waiting)
+    if (typeof window !== 'undefined') {
+      try {
+        const saved = localStorage.getItem("mitralabs_final_cms_data_v7");
+        if (saved) {
+          const parsed = JSON.parse(saved);
+          return { ...initialData, ...parsed };
+        }
+      } catch (e) { /* ignore */ }
+    }
+    return initialData;
+  });
+  const [isLoading, setIsLoading] = useState(false); // Never block render
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    // 1. Initial Load from LocalStorage (fastest)
-    const saved = localStorage.getItem("mitralabs_final_cms_data_v7");
-    if (saved) {
-      try {
-        const parsed = JSON.parse(saved);
-        const merged = { ...initialData };
-        const merge = (target: any, source: any) => {
-          for (const key in source) {
-            if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-              if (!target[key]) target[key] = {};
-              merge(target[key], source[key]);
-            } else {
-              target[key] = source[key];
-            }
+    const syncFromSupabase = async () => {
+      if (!isSupabaseConfigured()) return;
+
+      // Deep merge helper
+      const mergeData = (target: any, source: any) => {
+        const merged = { ...target };
+        for (const key in source) {
+          if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+            merged[key] = mergeData(merged[key] || {}, source[key]);
+          } else {
+            merged[key] = source[key];
           }
-        };
-        merge(merged, parsed);
-        setData(merged);
-      } catch (e) { console.error(e); }
-    }
-
-    // 2. Fetch from Supabase (source of truth)
-    const fetchFromSupabase = async () => {
-      try {
-        const { data: sbData, error } = await supabase
-          .from('site_data')
-          .select('json_content')
-          .eq('id', 1)
-          .single();
-
-        if (sbData && sbData.json_content) {
-          const merged = { ...initialData };
-          const merge = (target: any, source: any) => {
-            for (const key in source) {
-              if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-                if (!target[key]) target[key] = {};
-                merge(target[key], source[key]);
-              } else {
-                target[key] = source[key];
-              }
-            }
-          };
-          merge(merged, sbData.json_content);
-          setData(merged);
-          localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(merged));
         }
-      } catch (e) {
-        console.warn("Supabase fetch failed, using local data", e);
+        return merged;
+      };
+
+      try {
+        const { data: sbData, error: sbError } = await supabase
+          .from("SiteData")
+          .select("json_content")
+          .eq("id", 1)
+          .maybeSingle();
+
+        if (sbError) {
+          console.warn("Supabase sync warning:", sbError.message);
+          return;
+        }
+
+        if (sbData?.json_content) {
+          const mergedResult = mergeData(initialData, sbData.json_content);
+          setData(mergedResult);
+          localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(mergedResult));
+        } else {
+          // Seed the database if empty (silent background operation)
+          await supabase.from("SiteData").upsert({ id: 1, json_content: initialData });
+        }
+      } catch (err: any) {
+        console.warn("Background Supabase sync failed:", err.message);
+        // Don't show error to user — fallback data is already loaded
       }
     };
 
-    if (isSupabaseConfigured()) {
-      fetchFromSupabase();
-    }
+    syncFromSupabase();
   }, []);
 
   const updateData = async (newData: AppData) => {
     setData(newData);
     localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
-
-    // Persist to Supabase
+    
     if (isSupabaseConfigured()) {
       try {
         const { error } = await supabase
-          .from('site_data')
+          .from("SiteData")
           .upsert({ id: 1, json_content: newData });
-        
         if (error) throw error;
       } catch (e) {
-        console.error("Failed to save to Supabase", e);
+        console.error("Supabase sync error", e);
       }
     }
   };
+
+  if (isLoading) return <LoadingScreen />;
+
+  if (error) {
+    return (
+      <div className="min-h-screen bg-surface flex items-center justify-center p-6">
+        <div className="max-w-md w-full bg-surface-container-lowest p-10 rounded-[3rem] shadow-premium border border-surface-container-highest text-center space-y-6">
+          <div className="w-20 h-20 bg-error/10 text-error rounded-3xl flex items-center justify-center mx-auto">
+            <AlertCircle size={40} />
+          </div>
+          <h2 className="text-3xl font-black tracking-tight uppercase">System Error</h2>
+          <p className="text-on-surface-variant font-medium leading-relaxed">{error}</p>
+          <button 
+            onClick={() => window.location.reload()}
+            className="w-full py-5 bg-primary text-on-primary rounded-2xl font-black flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-xl shadow-primary/20"
+          >
+            <RefreshCcw size={20} /> Coba Lagi
+          </button>
+        </div>
+      </div>
+    );
+  }
 
   return (
     <DataContext.Provider value={{ data, updateData }}>

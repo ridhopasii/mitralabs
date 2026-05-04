@@ -1,14 +1,65 @@
 "use client";
 
+import { useState } from "react";
 import Footer from "@/components/Footer";
-import { Mail, Instagram, MessageCircle, CheckCircle2 } from "lucide-react";
+import { Mail, Instagram, MessageCircle, CheckCircle2, Loader2 } from "lucide-react";
 import { useData } from "@/context/DataContext";
+import { supabase } from "@/lib/supabase";
+import HCaptcha from "@hcaptcha/react-hcaptcha";
 
 export default function ContactPage() {
   const { data } = useData();
   const { contact, settings } = data;
   
+  const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [isSuccess, setIsSuccess] = useState(false);
+  const [lastSubmitTime, setLastSubmitTime] = useState(0);
+  const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
+
   const waUrl = `https://wa.me/${settings.waNumber}?text=Halo Mitralabs! Saya ingin diskusi tentang project saya.`;
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    
+    if (!hcaptchaToken) {
+      alert("Mohon selesaikan tantangan Captcha.");
+      return;
+    }
+    
+    // Rate Limiting: 60 seconds
+    const now = Date.now();
+    if (now - lastSubmitTime < 60000) {
+      const remaining = Math.ceil((60000 - (now - lastSubmitTime)) / 1000);
+      alert(`Mohon tunggu ${remaining} detik sebelum mengirim pesan lagi.`);
+      return;
+    }
+
+    setIsSubmitting(true);
+
+    try {
+      const { error } = await supabase
+        .from('site_messages')
+        .insert([{ 
+          name: formData.name, 
+          email: formData.email, 
+          message: formData.message,
+          created_at: new Date().toISOString()
+        }]);
+
+      if (error) throw error;
+
+      setIsSuccess(true);
+      setLastSubmitTime(Date.now());
+      setFormData({ name: "", email: "", message: "" });
+      setTimeout(() => setIsSuccess(false), 5000);
+    } catch (error) {
+      console.error("Error submitting form:", error);
+      alert("Maaf, terjadi kesalahan. Silakan hubungi kami via WhatsApp.");
+    } finally {
+      setIsSubmitting(false);
+    }
+  };
 
   return (
     <>
@@ -90,40 +141,79 @@ export default function ContactPage() {
             <div className="absolute top-0 right-0 p-20 opacity-[0.03]">
               <Mail size={300} />
             </div>
-            <form className="space-y-10 relative z-10">
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Full Name</label>
-                  <input
-                    type="text"
-                    className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none font-bold text-lg"
-                    placeholder="John Doe"
-                  />
+            {isSuccess ? (
+              <div className="h-full flex flex-col items-center justify-center text-center space-y-6 animate-in zoom-in duration-500 relative z-10">
+                <div className="w-24 h-24 bg-green-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-green-500/30">
+                  <CheckCircle2 size={48} />
+                </div>
+                <h2 className="text-4xl font-black tracking-tight">Message Sent!</h2>
+                <p className="text-on-surface-variant font-bold text-xl max-w-sm">
+                  Terima kasih sudah menghubungi kami. Tim kami akan segera merespon pesan Anda.
+                </p>
+                <button 
+                  onClick={() => setIsSuccess(false)}
+                  className="text-primary font-black uppercase tracking-widest text-sm hover:underline"
+                >
+                  Send another message
+                </button>
+              </div>
+            ) : (
+              <form onSubmit={handleSubmit} className="space-y-10 relative z-10">
+                <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Full Name</label>
+                    <input
+                      required
+                      type="text"
+                      value={formData.name}
+                      onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                      className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none font-bold text-lg"
+                      placeholder="John Doe"
+                    />
+                  </div>
+                  <div className="space-y-3">
+                    <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Email Address</label>
+                    <input
+                      required
+                      type="email"
+                      value={formData.email}
+                      onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                      className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none font-bold text-lg"
+                      placeholder="john@company.com"
+                    />
+                  </div>
                 </div>
                 <div className="space-y-3">
-                  <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Email Address</label>
-                  <input
-                    type="email"
-                    className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none font-bold text-lg"
-                    placeholder="john@company.com"
-                  />
+                  <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Your Message</label>
+                  <textarea
+                    required
+                    value={formData.message}
+                    onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                    className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none resize-none font-medium text-lg"
+                    placeholder="Tell us about your vision..."
+                    rows={6}
+                  ></textarea>
                 </div>
-              </div>
-              <div className="space-y-3">
-                <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-2">Your Message</label>
-                <textarea
-                  className="w-full px-8 py-5 rounded-2xl bg-surface-container-low border-2 border-transparent focus:border-primary transition-all outline-none resize-none font-medium text-lg"
-                  placeholder="Tell us about your vision..."
-                  rows={6}
-                ></textarea>
-              </div>
-              <button
-                type="submit"
-                className="w-full md:w-auto px-16 py-6 bg-primary text-on-primary font-black rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.05] active:scale-[0.95] transition-all text-xl"
-              >
-                Send Inquiry
-              </button>
-            </form>
+                <div className="space-y-3">
+                   <HCaptcha
+                     sitekey="10000000-ffff-ffff-ffff-000000000001" // Test key
+                     onVerify={(token) => setHcaptchaToken(token)}
+                   />
+                </div>
+                <button
+                  disabled={isSubmitting || !hcaptchaToken}
+                  type="submit"
+                  className="w-full md:w-auto px-16 py-6 bg-primary text-on-primary font-black rounded-2xl shadow-2xl shadow-primary/30 hover:scale-[1.05] active:scale-[0.95] transition-all text-xl flex items-center justify-center gap-4 disabled:opacity-50"
+                >
+                  {isSubmitting ? (
+                    <>
+                      <Loader2 className="animate-spin" />
+                      Sending...
+                    </>
+                  ) : "Send Inquiry"}
+                </button>
+              </form>
+            )}
           </div>
         </div>
       </main>

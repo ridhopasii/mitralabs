@@ -11,26 +11,53 @@ export const isSupabaseConfigured = () => {
          (!!process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY)
 }
 
+import imageCompression from 'browser-image-compression';
+
 // Helper to upload image and return public URL
 export const uploadImage = async (file: File) => {
   if (!isSupabaseConfigured()) return null;
 
-  const fileExt = file.name.split('.').pop();
-  const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
-  const filePath = `uploads/${fileName}`;
+  try {
+    // 1. Compress Image
+    const options = {
+      maxSizeMB: 1,
+      maxWidthOrHeight: 1920,
+      useWebWorker: true
+    };
+    const compressedFile = await imageCompression(file, options);
 
-  const { data, error } = await supabase.storage
-    .from('site-assets')
-    .upload(filePath, file);
+    // 2. Upload
+    const fileExt = compressedFile.name.split('.').pop();
+    const fileName = `${Math.random().toString(36).substring(2)}.${fileExt}`;
+    const filePath = `uploads/${fileName}`;
 
-  if (error) {
-    console.error("Upload error:", error);
+    const { data, error } = await supabase.storage
+      .from('site-assets')
+      .upload(filePath, compressedFile);
+
+    if (error) {
+      console.error("Upload error:", error);
+      return null;
+    }
+
+    const { data: { publicUrl } } = supabase.storage
+      .from('site-assets')
+      .getPublicUrl(filePath);
+
+    return publicUrl;
+  } catch (err) {
+    console.error("Critical Upload failure:", err);
     return null;
   }
+}
 
-  const { data: { publicUrl } } = supabase.storage
-    .from('site-assets')
-    .getPublicUrl(filePath);
-
-  return publicUrl;
+export const logActivity = async (action: string, detail: string) => {
+  try {
+    const { error } = await supabase
+      .from('AdminLog')
+      .insert([{ action, detail, created_at: new Date().toISOString() }]);
+    if (error) console.error("Logging error:", error);
+  } catch (err) {
+    console.error("Failed to log activity:", err);
+  }
 }

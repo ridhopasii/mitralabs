@@ -2,30 +2,37 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
+import { Lock, ShieldCheck, ArrowRight, Loader2, Mail } from "lucide-react";
+import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
+  const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
-  const [error, setError] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
 
-  const handleLogin = (e: React.FormEvent) => {
+  const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(false);
+    setError(null);
 
-    // Simple password check - in production you'd use a more secure method
-    // but for a single admin CMS this is common
-    setTimeout(() => {
-      if (password === "mitralabsadmin") {
-        localStorage.setItem("mitralabs_admin_auth", "true");
+    try {
+      const { data, error: authError } = await supabase.auth.signInWithPassword({
+        email,
+        password,
+      });
+
+      if (authError) throw authError;
+
+      if (data.session) {
+        // Next.js middleware or layout will handle redirection based on session
         router.push("/admin");
-      } else {
-        setError(true);
-        setLoading(false);
       }
-    }, 800);
+    } catch (err: any) {
+      setError(err.message || "Gagal masuk. Periksa kembali email dan password.");
+      setLoading(false);
+    }
   };
 
   return (
@@ -48,30 +55,45 @@ export default function LoginPage() {
 
           <form onSubmit={handleLogin} className="space-y-6">
             <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-4">Master Password</label>
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-4">Email Address</label>
+              <div className="relative">
+                <input
+                  type="email"
+                  value={email}
+                  onChange={(e) => setEmail(e.target.value)}
+                  placeholder="admin@mitralabs.id"
+                  className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent focus:border-primary rounded-[2rem] outline-none font-bold text-lg transition-all"
+                  required
+                />
+              </div>
+            </div>
+
+            <div className="space-y-3">
+              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-4">Password</label>
               <div className="relative">
                 <input
                   type="password"
                   value={password}
                   onChange={(e) => setPassword(e.target.value)}
                   placeholder="••••••••••••"
-                  className={`w-full px-8 py-6 bg-surface-container-low border-2 rounded-[2rem] outline-none font-black text-xl transition-all ${
-                    error ? "border-error text-error animate-shake" : "border-transparent focus:border-primary"
+                  className={`w-full px-8 py-5 bg-surface-container-low border-2 rounded-[2rem] outline-none font-black text-xl transition-all ${
+                    error ? "border-error text-error" : "border-transparent focus:border-primary"
                   }`}
                   required
                 />
-                {error && (
-                  <p className="absolute -bottom-6 left-6 text-[10px] font-black text-error uppercase tracking-widest">
-                    Password Salah! Silakan coba lagi.
-                  </p>
-                )}
               </div>
             </div>
+
+            {error && (
+              <p className="text-[10px] font-black text-error uppercase tracking-widest text-center px-4">
+                {error}
+              </p>
+            )}
 
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 mt-8 disabled:opacity-50"
+              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 mt-4 disabled:opacity-50"
             >
               {loading ? (
                 <Loader2 size={24} className="animate-spin" />
@@ -85,7 +107,7 @@ export default function LoginPage() {
 
           <div className="mt-12 pt-8 border-t border-surface-container-highest text-center">
             <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-20">
-              <ShieldCheck size={14} /> Encrypted Session Security
+              <ShieldCheck size={14} /> Supabase Auth Protected
             </div>
           </div>
         </div>

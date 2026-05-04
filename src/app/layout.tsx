@@ -5,7 +5,8 @@ import Navbar from "@/components/Navbar";
 import FloatingWhatsApp from "@/components/FloatingWhatsApp";
 import { DataProvider } from "@/context/DataContext";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
-import { supabase } from "@/lib/supabase";
+import { Analytics } from "@vercel/analytics/react";
+import { SpeedInsights } from "@vercel/speed-insights/next";
 
 const inter = Inter({
   subsets: ["latin"],
@@ -21,24 +22,8 @@ const manrope = Manrope({
 
 // Dynamic Metadata Generation
 export async function generateMetadata(): Promise<Metadata> {
-  let title = "Mitralabs.id — Jasa Website Profesional Medan";
-  let description = "Mitralabs.id adalah jasa pembuatan website profesional di Medan. Kami membangun website UMKM, sekolah, travel, dan bisnis dengan standar global.";
-
-  try {
-    const { data: sbData } = await supabase
-      .from('site_data')
-      .select('json_content')
-      .eq('id', 1)
-      .single();
-
-    if (sbData?.json_content?.home?.hero) {
-      const hero = sbData.json_content.home.hero;
-      title = `${hero.title} | Mitralabs.id`;
-      description = hero.subtitle;
-    }
-  } catch (e) {
-    console.error("Failed to fetch metadata from Supabase", e);
-  }
+  const title = "Mitralabs.id — Jasa Website Profesional Medan";
+  const description = "Jasa pembuatan website profesional di Medan. Kami bantu UMKM, sekolah, travel, dan bisnis go-digital dengan website berkinerja tinggi. Harga terjangkau, kualitas premium.";
 
   return {
     title: {
@@ -63,21 +48,30 @@ export async function generateMetadata(): Promise<Metadata> {
   };
 }
 
+import ErrorBoundary from "@/components/ErrorBoundary";
+import { ThemeProvider } from "next-themes";
+
 export default function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="id" className={`${inter.variable} ${manrope.variable}`}>
-      <body className="antialiased">
-        <DataProvider>
-          <MaintenanceGuard>
-            <Navbar />
-            <main>{children}</main>
-            <FloatingWhatsApp />
-          </MaintenanceGuard>
-        </DataProvider>
+    <html lang="id" className={`${inter.variable} ${manrope.variable}`} suppressHydrationWarning>
+      <body className="antialiased bg-background text-on-surface">
+        <ThemeProvider attribute="class" defaultTheme="light" enableSystem={true}>
+          <ErrorBoundary>
+            <DataProvider>
+              <MaintenanceGuard>
+                <Navbar />
+                <main>{children}</main>
+                <FloatingWhatsApp />
+              </MaintenanceGuard>
+            </DataProvider>
+          </ErrorBoundary>
+          <Analytics />
+          <SpeedInsights />
+        </ThemeProvider>
       </body>
     </html>
   );

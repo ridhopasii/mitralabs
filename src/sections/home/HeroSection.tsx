@@ -2,6 +2,7 @@
 
 import { MessageCircle, Zap } from "lucide-react";
 import { useData } from "@/context/DataContext";
+import Image from "next/image";
 
 export default function HeroSection() {
   const { data } = useData();
@@ -54,11 +55,14 @@ export default function HeroSection() {
         </div>
         <div className="relative animate-in fade-in zoom-in-95 duration-1000 delay-200">
           <div className="absolute -top-20 -right-20 w-80 h-80 bg-primary/10 rounded-full blur-3xl"></div>
-          <div className="bg-surface-container-lowest p-6 rounded-[3rem] shadow-premium relative z-10 border border-surface-container-highest">
-            <img
+          <div className="bg-surface-container-lowest p-6 rounded-[3rem] shadow-premium relative z-10 border border-surface-container-highest overflow-hidden">
+            <Image
               src={hero.image}
               alt="Hero Image"
-              className="rounded-[2rem] w-full h-full object-cover aspect-square shadow-inner"
+              width={800}
+              height={800}
+              priority
+              className="rounded-[2rem] w-full h-full object-cover aspect-square shadow-inner hover:scale-105 transition-transform duration-700"
             />
           </div>
           <div className="absolute -bottom-10 -left-10 bg-surface-container-lowest p-8 rounded-[2rem] shadow-2xl z-20 border border-surface-container-highest max-w-[240px] animate-bounce duration-[3000ms]">

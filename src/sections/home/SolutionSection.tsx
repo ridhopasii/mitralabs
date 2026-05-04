@@ -2,6 +2,7 @@
 
 import { Store, School, Plane, Building2, ArrowRight } from "lucide-react";
 import { useData } from "@/context/DataContext";
+import Image from "next/image";
 
 export default function SolutionSection() {
   const { data } = useData();
@@ -35,11 +36,12 @@ export default function SolutionSection() {
                 {cards.umkm.desc}
               </p>
             </div>
-            <div className="mt-12 rounded-[2rem] h-80 w-full overflow-hidden border border-surface-container-highest shadow-inner">
-              <img
+            <div className="mt-12 rounded-[2rem] h-80 w-full overflow-hidden border border-surface-container-highest shadow-inner relative">
+              <Image
                 src={cards.umkm.image}
                 alt={cards.umkm.title}
-                className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-700"
+                fill
+                className="object-cover group-hover:scale-105 transition-transform duration-700"
               />
             </div>
           </div>

@@ -12,11 +12,16 @@ import {
   ChevronRight,
   ArrowUpRight,
   LogOut,
-  Type
+  Type,
+  FileText,
+  History,
+  Star,
+  HelpCircle
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { supabase } from "@/lib/supabase";
 
 export default function AdminLayout({
   children,
@@ -28,12 +33,15 @@ export default function AdminLayout({
   const [isAuthorized, setIsAuthorized] = useState(false);
 
   useEffect(() => {
-    const auth = localStorage.getItem("mitralabs_admin_auth");
-    if (auth !== "true") {
-      router.push("/login");
-    } else {
-      setIsAuthorized(true);
-    }
+    const checkAuth = async () => {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) {
+        router.push("/login");
+      } else {
+        setIsAuthorized(true);
+      }
+    };
+    checkAuth();
   }, [router]);
 
   if (!isAuthorized) {
@@ -48,14 +56,19 @@ export default function AdminLayout({
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
     { name: "Services", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
     { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
+    { name: "Kelola Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
     { name: "Editor Konten", icon: Type, href: "/admin/konten", category: "CMS" },
+    { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
+    { name: "Riwayat Aktivitas", icon: History, href: "/admin/logs", category: "Utama" },
+    { name: "Testimonial", icon: Star, href: "/admin/testimonials", category: "Utama" },
+    { name: "Kelola FAQ", icon: HelpCircle, href: "/admin/faq", category: "Utama" },
     { name: "Pengaturan", icon: Settings, href: "/admin/settings", category: "Sistem" },
   ];
 
   const categories = ["Utama", "CMS", "Sistem"];
 
-  const handleLogout = () => {
-    localStorage.removeItem("mitralabs_admin_auth");
+  const handleLogout = async () => {
+    await supabase.auth.signOut();
     router.push("/login");
   };
 
