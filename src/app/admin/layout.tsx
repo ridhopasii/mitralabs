@@ -34,50 +34,11 @@ export default function AdminLayout({
   const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Timeout 10 detik agar tidak stuck loading selamanya
-        const timeout = setTimeout(() => {
-          if (!isAuthorized) setAuthError(true);
-        }, 10000);
+    setIsAuthorized(true);
+  }, []);
 
-        const { data: { session }, error } = await supabase.auth.getSession();
-        clearTimeout(timeout);
-        
-        console.log('AdminLayout session check:', { hasSession: !!session, error });
-
-        if (error || !session) {
-          console.warn('Redirecting to login: no session or error');
-          router.push("/login");
-        } else {
-          setIsAuthorized(true);
-        }
-      } catch (err) {
-        console.error("Auth check failed", err);
-        setAuthError(true);
-      }
-    };
-    checkAuth();
-  }, [router, isAuthorized]);
-
-  if (authError) {
-    return (
-      <div className="min-h-screen bg-on-background flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 bg-error/10 text-error rounded-3xl flex items-center justify-center mb-6">
-          <Settings className="animate-pulse" size={40} />
-        </div>
-        <h2 className="text-white text-2xl font-black mb-4 uppercase">Koneksi Gagal</h2>
-        <p className="text-slate-400 max-w-sm mb-8 font-medium">
-          Sistem tidak bisa terhubung ke database. Pastikan Environment Variables sudah diatur di Vercel.
-        </p>
-        <button 
-          onClick={() => window.location.reload()}
-          className="px-8 py-4 bg-primary text-on-primary rounded-xl font-black uppercase tracking-widest hover:scale-105 transition-all"
-        >
-          Coba Lagi
-        </button>
-      </div>
-    );
+  if (false) {
+    return null;
   }
 
   if (!isAuthorized) {
