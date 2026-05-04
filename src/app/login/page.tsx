@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ShieldCheck, ArrowRight, Loader2, Mail } from "lucide-react";
-import { supabase } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function LoginPage() {
   const [email, setEmail] = useState("");
@@ -11,6 +11,8 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  const isConfigured = isSupabaseConfigured();
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -51,6 +53,15 @@ export default function LoginPage() {
             </div>
             <h1 className="font-display text-4xl font-black tracking-tight text-on-surface mb-2">Admin Access</h1>
             <p className="text-on-surface-variant font-medium text-sm uppercase tracking-widest">Mitralabs Master CMS</p>
+            
+            {!isConfigured && (
+              <div className="mt-6 p-4 bg-error/10 border border-error/20 rounded-2xl text-left">
+                <p className="text-[10px] font-black text-error uppercase tracking-widest mb-1">Peringatan Sistem</p>
+                <p className="text-xs font-bold text-on-surface-variant leading-relaxed">
+                  Environment Variables belum diatur di Vercel. Silakan tambahkan <code className="text-error">NEXT_PUBLIC_SUPABASE_URL</code> dan <code className="text-error">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> di dashboard Vercel Anda.
+                </p>
+              </div>
+            )}
           </div>
 
           <form onSubmit={handleLogin} className="space-y-6">
