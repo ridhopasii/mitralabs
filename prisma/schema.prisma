@@ -13,16 +13,41 @@ model SiteData {
 }
 
 model SiteMessage {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   name       String
   email      String
   message    String
-  created_at DateTime @default(now())
+  is_read    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
 }
 
 model AdminLog {
-  id         Int      @id @default(autoincrement())
+  id         Int       @id @default(autoincrement())
   action     String
   detail     String
-  created_at DateTime @default(now())
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model admin_logs {
+  id         Int       @id @default(autoincrement())
+  action     String
+  detail     String
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model newsletter_subs {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
+model site_messages {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String
+  message    String
+  created_at DateTime? @default(now()) @db.Timestamp(6)
 }

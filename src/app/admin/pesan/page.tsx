@@ -51,6 +51,26 @@ export default function MessagesPage() {
 
   useEffect(() => {
     fetchMessages();
+
+    // REALTIME SUBSCRIPTION
+    const channel = supabase
+      .channel('realtime_messages')
+      .on(
+        'postgres_changes',
+        {
+          event: '*', // Listen to INSERT, UPDATE, DELETE
+          schema: 'public',
+          table: 'SiteMessage'
+        },
+        () => {
+          fetchMessages(); // Refresh the list
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, [page]);
 
   const totalPages = Math.ceil(totalCount / ITEMS_PER_PAGE);

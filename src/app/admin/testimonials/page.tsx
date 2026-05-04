@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
 import { Star, Plus, Trash2, Edit, Save, X, Image as ImageIcon, Quote } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
@@ -10,6 +10,10 @@ export default function TestimonialsAdmin() {
   const [testimonials, setTestimonials] = useState(data.testimonials || []);
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
+
+  useEffect(() => {
+    setTestimonials(data.testimonials || []);
+  }, [data.testimonials]);
 
   const handleSave = async () => {
     let newTestimonials;

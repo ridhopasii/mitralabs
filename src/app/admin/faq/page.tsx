@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
 import { Plus, Trash2, Edit, Save, X, HelpCircle, ChevronDown, ChevronUp } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
@@ -11,6 +11,10 @@ export default function FAQAdmin() {
   const [isEditing, setIsEditing] = useState<number | null>(null);
   const [editForm, setEditForm] = useState<any>(null);
   const [expandedId, setExpandedId] = useState<number | null>(null);
+
+  useEffect(() => {
+    setFaqs(data.faqs || []);
+  }, [data.faqs]);
 
   const handleSave = async () => {
     let newFaqs;

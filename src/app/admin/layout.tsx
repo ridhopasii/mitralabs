@@ -43,8 +43,11 @@ export default function AdminLayout({
 
         const { data: { session }, error } = await supabase.auth.getSession();
         clearTimeout(timeout);
+        
+        console.log('AdminLayout session check:', { hasSession: !!session, error });
 
         if (error || !session) {
+          console.warn('Redirecting to login: no session or error');
           router.push("/login");
         } else {
           setIsAuthorized(true);

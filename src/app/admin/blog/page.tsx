@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
 import { 
   Plus, 
@@ -45,6 +45,11 @@ export default function BlogManagement() {
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  
+  // Sync with global data (for realtime updates)
+  useEffect(() => {
+    setPosts(data.blog.posts);
+  }, [data.blog.posts]);
 
   const handleSave = () => {
     setErrors([]);
@@ -52,7 +57,7 @@ export default function BlogManagement() {
 
     const result = blogPostSchema.safeParse(editingPost);
     if (!result.success) {
-      setErrors(result.error.errors.map(e => e.message));
+      setErrors(result.error.issues.map((e: any) => e.message));
       return;
     }
 

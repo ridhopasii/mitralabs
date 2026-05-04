@@ -20,6 +20,7 @@ import {
   Info,
   Zap,
   Target,
+  TrendingUp,
   ListChecks,
   Loader2,
   AlertCircle
@@ -71,7 +72,7 @@ export default function MasterCMS() {
       formData.blog.posts.forEach((post, i) => {
         const result = blogPostSchema.safeParse(post);
         if (!result.success) {
-          throw new Error(`Blog Post #${i + 1}: ${result.error.errors[0].message}`);
+          throw new Error(`Blog Post #${i + 1}: ${result.error.issues[0].message}`);
         }
       });
 
@@ -79,7 +80,7 @@ export default function MasterCMS() {
       formData.portfolio.projects.forEach((proj, i) => {
         const result = projectSchema.safeParse(proj);
         if (!result.success) {
-          throw new Error(`Portfolio #${i + 1}: ${result.error.errors[0].message}`);
+          throw new Error(`Portfolio #${i + 1}: ${result.error.issues[0].message}`);
         }
       });
 
@@ -334,6 +335,33 @@ export default function MasterCMS() {
                       <InputField label="Deskripsi" path={`home.process.steps.${i}.desc`} value={step.desc} type="textarea" />
                    </div>
                  ))}
+               </div>
+            </section>
+
+            {/* Global Stats */}
+            <section className="pt-20 border-t border-surface-container-highest">
+               <SectionHeader icon={TrendingUp} title="Global Statistics" desc="Angka keberhasilan yang ditampilkan di Beranda." />
+               <div className="grid md:grid-cols-2 lg:grid-cols-4 gap-6">
+                 {formData.home.stats.map((stat, i) => (
+                   <div key={stat.id} className="p-8 bg-surface-container-low rounded-3xl border border-surface-container-highest space-y-4 group relative">
+                      <button 
+                        onClick={() => removeItem("home.stats", i)}
+                        className="absolute top-4 right-4 p-2 bg-error/10 text-error rounded-lg opacity-0 group-hover:opacity-100 transition-all hover:bg-error hover:text-white"
+                      >
+                        <Trash2 size={14} />
+                      </button>
+                      <InputField label="Value (e.g. 150+)" path={`home.stats.${i}.value`} value={stat.value} />
+                      <InputField label="Label" path={`home.stats.${i}.label`} value={stat.label} />
+                      <InputField label="Deskripsi Singkat" path={`home.stats.${i}.desc`} value={stat.desc} />
+                   </div>
+                 ))}
+                 <button 
+                   onClick={() => addItem("home.stats", { label: "New Stat", value: "0", desc: "" })}
+                   className="p-8 rounded-3xl border-2 border-dashed border-surface-container-highest flex flex-col items-center justify-center gap-2 hover:border-primary hover:text-primary transition-all text-on-surface-variant/40"
+                 >
+                   <Plus size={24} />
+                   <span className="font-black uppercase tracking-widest text-[10px]">Tambah Stat</span>
+                 </button>
                </div>
             </section>
 

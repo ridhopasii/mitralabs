@@ -39,7 +39,7 @@ export default function ContactPage() {
 
     try {
       const { error } = await supabase
-        .from('site_messages')
+        .from('SiteMessage')
         .insert([{ 
           name: formData.name, 
           email: formData.email, 

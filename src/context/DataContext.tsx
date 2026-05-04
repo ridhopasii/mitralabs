@@ -455,22 +455,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [isLoading, setIsLoading] = useState(false); // Never block render
   const [error, setError] = useState<string | null>(null);
 
+  // Deep merge helper
+  const mergeData = (target: any, source: any) => {
+    const merged = { ...target };
+    for (const key in source) {
+      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+        merged[key] = mergeData(merged[key] || {}, source[key]);
+      } else {
+        merged[key] = source[key];
+      }
+    }
+    return merged;
+  };
+
   useEffect(() => {
     const syncFromSupabase = async () => {
       if (!isSupabaseConfigured()) return;
-
-      // Deep merge helper
-      const mergeData = (target: any, source: any) => {
-        const merged = { ...target };
-        for (const key in source) {
-          if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-            merged[key] = mergeData(merged[key] || {}, source[key]);
-          } else {
-            merged[key] = source[key];
-          }
-        }
-        return merged;
-      };
 
       try {
         const { data: sbData, error: sbError } = await supabase
@@ -499,6 +499,32 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     };
 
     syncFromSupabase();
+
+    // REALTIME SUBSCRIPTION
+    const channel = supabase
+      .channel('realtime_site_data')
+      .on(
+        'postgres_changes',
+        {
+          event: 'UPDATE',
+          schema: 'public',
+          table: 'SiteData',
+          filter: 'id=eq.1'
+        },
+        (payload) => {
+          if (payload.new && payload.new.json_content) {
+            console.log("Realtime update received:", payload.new.json_content);
+            const mergedResult = mergeData(initialData, payload.new.json_content);
+            setData(mergedResult);
+            localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(mergedResult));
+          }
+        }
+      )
+      .subscribe();
+
+    return () => {
+      supabase.removeChannel(channel);
+    };
   }, []);
 
   const updateData = async (newData: AppData) => {

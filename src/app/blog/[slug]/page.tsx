@@ -4,7 +4,7 @@ import { useParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
-import { ArrowLeft, Calendar, User, Clock, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Calendar, User, Clock, Share2 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 import DOMPurify from "isomorphic-dompurify";
