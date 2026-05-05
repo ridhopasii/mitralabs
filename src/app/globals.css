@@ -121,3 +121,10 @@
 ::-webkit-scrollbar-thumb {
   @apply bg-surface-container-highest rounded-full hover:bg-outline-variant transition-colors;
 }
+
+
+/* Hide Navbar and FloatingWhatsApp on login page */
+body:has([data-login-page]) nav,
+body:has([data-login-page]) > div > div[class*="fixed"] {
+  display: none !important;
+}

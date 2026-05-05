@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
-import { Lock, ShieldCheck, ArrowRight, Loader2, Mail } from "lucide-react";
+import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -28,8 +28,8 @@ export default function LoginPage() {
       if (authError) throw authError;
 
       if (data.session) {
-        // Next.js middleware or layout will handle redirection based on session
         router.push("/admin");
+        router.refresh();
       }
     } catch (err: any) {
       setError(err.message || "Gagal masuk. Periksa kembali email dan password.");
@@ -38,7 +38,7 @@ export default function LoginPage() {
   };
 
   return (
-    <div className="min-h-screen bg-on-background flex items-center justify-center p-6 relative overflow-hidden">
+    <div data-login-page className="min-h-screen bg-on-background flex items-center justify-center p-6 relative overflow-hidden">
       {/* Decorative Elements */}
       <div className="absolute top-0 left-0 w-full h-full opacity-10 pointer-events-none">
         <div className="absolute top-[-10%] left-[-10%] w-[40%] h-[40%] bg-primary rounded-full blur-[120px]"></div>
@@ -53,12 +53,12 @@ export default function LoginPage() {
             </div>
             <h1 className="font-display text-4xl font-black tracking-tight text-on-surface mb-2">Admin Access</h1>
             <p className="text-on-surface-variant font-medium text-sm uppercase tracking-widest">Mitralabs Master CMS</p>
-            
+
             {!isConfigured && (
               <div className="mt-6 p-4 bg-error/10 border border-error/20 rounded-2xl text-left">
                 <p className="text-[10px] font-black text-error uppercase tracking-widest mb-1">Peringatan Sistem</p>
                 <p className="text-xs font-bold text-on-surface-variant leading-relaxed">
-                  Environment Variables belum diatur di Vercel. Silakan tambahkan <code className="text-error">NEXT_PUBLIC_SUPABASE_URL</code> dan <code className="text-error">NEXT_PUBLIC_SUPABASE_ANON_KEY</code> di dashboard Vercel Anda.
+                  Environment Variables belum diatur di Vercel. Silakan tambahkan <code className="text-error">NEXT_PUBLIC_SUPABASE_URL</code> dan <code className="text-error">NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY</code> di dashboard Vercel Anda.
                 </p>
               </div>
             )}
@@ -75,6 +75,7 @@ export default function LoginPage() {
                   placeholder="admin@mitralabs.id"
                   className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent focus:border-primary rounded-[2rem] outline-none font-bold text-lg transition-all"
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -91,6 +92,7 @@ export default function LoginPage() {
                     error ? "border-error text-error" : "border-transparent focus:border-primary"
                   }`}
                   required
+                  disabled={loading}
                 />
               </div>
             </div>
@@ -104,7 +106,7 @@ export default function LoginPage() {
             <button
               type="submit"
               disabled={loading}
-              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 mt-4 disabled:opacity-50"
+              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {loading ? (
                 <Loader2 size={24} className="animate-spin" />
