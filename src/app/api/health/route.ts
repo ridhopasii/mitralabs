@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@/lib/supabase";
+import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
 export const dynamic = "force-dynamic";
 
@@ -7,8 +7,22 @@ export async function GET() {
   const startTime = Date.now();
 
   try {
+    // Check if Supabase is configured
+    if (!isSupabaseConfigured()) {
+      return NextResponse.json(
+        {
+          status: "unhealthy",
+          timestamp: new Date().toISOString(),
+          checks: {
+            database: "not configured",
+            error: "Supabase environment variables not set",
+          },
+        },
+        { status: 503 }
+      );
+    }
+
     // Check database connection
-    const supabase = createClient();
     const { error: dbError } = await supabase.from("SiteData").select("id").limit(1);
 
     if (dbError) {
