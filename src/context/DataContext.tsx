@@ -193,23 +193,23 @@ const initialData: AppData = {
       title: "Website Profesional untuk Setiap Lini Bisnis",
       subtitle: "Kami menghadirkan website yang dirancang khusus sesuai karakteristik dan target market industri Anda.",
       cards: {
-        umkm: { 
-          tag: "Terpopuler", 
-          title: "Website UMKM & Toko", 
+        umkm: {
+          tag: "Terpopuler",
+          title: "Website UMKM & Toko",
           desc: "Toko, warung, bengkel, laundry, dan usaha kecil lainnya. Solusi cepat dan tepat untuk go-digital dengan sistem pemesanan via WhatsApp.",
           image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"
         },
-        travel: { 
-          title: "Website Travel", 
-          desc: "Paket wisata, galeri, form booking, dan profil tourguide dalam satu platform interaktif." 
+        travel: {
+          title: "Website Travel",
+          desc: "Paket wisata, galeri, form booking, dan profil tourguide dalam satu platform interaktif."
         },
-        school: { 
-          title: "Website Sekolah", 
-          desc: "Profil, pengumuman, galeri, dan info pendaftaran siswa baru secara online." 
+        school: {
+          title: "Website Sekolah",
+          desc: "Profil, pengumuman, galeri, dan info pendaftaran siswa baru secara online."
         },
-        business: { 
-          title: "Website Bisnis", 
-          desc: "Company profile, portofolio, dan landing page promosi untuk tingkatkan trust klien." 
+        business: {
+          title: "Website Bisnis",
+          desc: "Company profile, portofolio, dan landing page promosi untuk tingkatkan trust klien."
         }
       }
     },
@@ -284,29 +284,29 @@ const initialData: AppData = {
     subtitle: "Explore our curated gallery of digital experiences designed for market leaders and local innovators across diverse sectors.",
     categories: ["All Works", "UMKM", "School", "Travel", "Business"],
     projects: [
-      { 
-        id: 1, 
+      {
+        id: 1,
         slug: "wonderful-toba",
-        title: "Wonderful Toba", 
-        category: "Travel", 
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800", 
+        title: "Wonderful Toba",
+        category: "Travel",
+        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800",
         description: "Platform pariwisata terintegrasi untuk Danau Toba.",
         challenge: "Membangun sistem booking yang kompleks dengan desain visual yang memanjakan mata.",
         solution: "Implementasi Next.js dengan optimasi gambar dan sistem manajemen konten yang dinamis.",
         results: ["Peningkatan traffic 300%", "User experience yang lebih smooth", "Booking rate naik 40%"],
-        status: "Published" 
+        status: "Published"
       },
-      { 
-        id: 2, 
+      {
+        id: 2,
         slug: "mitra-mart",
-        title: "Mitra Mart", 
-        category: "UMKM", 
-        image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800", 
+        title: "Mitra Mart",
+        category: "UMKM",
+        image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800",
         description: "E-commerce lokal untuk kebutuhan sehari-hari.",
         challenge: "Sinkronisasi stok real-time dan kemudahan transaksi via WhatsApp.",
         solution: "Integrasi Supabase real-time database dengan checkout WhatsApp otomatis.",
         results: ["500+ transaksi per bulan", "Operasional lebih efisien", "Retensi pelanggan tinggi"],
-        status: "Published" 
+        status: "Published"
       },
     ],
     cta: {
@@ -454,6 +454,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   });
   const [isLoading, setIsLoading] = useState(false); // Never block render
   const [error, setError] = useState<string | null>(null);
+  const [hasSynced, setHasSynced] = useState(false); // Track if we've synced
 
   // Deep merge helper
   const mergeData = (target: any, source: any) => {
@@ -469,8 +470,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   useEffect(() => {
+    // Only sync once per session
+    if (hasSynced) return;
+
     const syncFromSupabase = async () => {
-      if (!isSupabaseConfigured()) return;
+      if (!isSupabaseConfigured()) {
+        setHasSynced(true);
+        return;
+      }
 
       try {
         const { data: sbData, error: sbError } = await supabase
@@ -481,6 +488,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
         if (sbError) {
           console.warn("Supabase sync warning:", sbError.message);
+          setHasSynced(true);
           return;
         }
 
@@ -492,13 +500,16 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           // Seed the database if empty (silent background operation)
           await supabase.from("SiteData").upsert({ id: 1, json_content: initialData });
         }
+        setHasSynced(true);
       } catch (err: any) {
         console.warn("Background Supabase sync failed:", err.message);
+        setHasSynced(true);
         // Don't show error to user — fallback data is already loaded
       }
     };
 
-    syncFromSupabase();
+    // Delay sync to not block initial render
+    const timeoutId = setTimeout(syncFromSupabase, 100);
 
     // REALTIME SUBSCRIPTION
     const channel = supabase
@@ -523,14 +534,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
       .subscribe();
 
     return () => {
+      clearTimeout(timeoutId);
       supabase.removeChannel(channel);
     };
-  }, []);
+  }, [hasSynced]);
 
   const updateData = async (newData: AppData) => {
     setData(newData);
     localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
-    
+
     if (isSupabaseConfigured()) {
       try {
         const { error } = await supabase
@@ -554,7 +566,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           </div>
           <h2 className="text-3xl font-black tracking-tight uppercase">System Error</h2>
           <p className="text-on-surface-variant font-medium leading-relaxed">{error}</p>
-          <button 
+          <button
             onClick={() => window.location.reload()}
             className="w-full py-5 bg-primary text-on-primary rounded-2xl font-black flex items-center justify-center gap-4 hover:scale-105 transition-all shadow-xl shadow-primary/20"
           >

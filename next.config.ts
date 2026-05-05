@@ -12,6 +12,18 @@ const nextConfig: NextConfig = {
         hostname: '*.supabase.co',
       },
     ],
+    formats: ['image/avif', 'image/webp'],
+    minimumCacheTTL: 60,
+  },
+  // Enable compression
+  compress: true,
+  // Optimize production builds
+  productionBrowserSourceMaps: false,
+  // Enable SWC minification
+  swcMinify: true,
+  // Experimental features for better performance
+  experimental: {
+    optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
 };
 

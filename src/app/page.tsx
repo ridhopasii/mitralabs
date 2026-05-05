@@ -15,6 +15,9 @@ export const metadata: Metadata = {
     "Jasa pembuatan website profesional di Medan. Kami bantu UMKM, sekolah, travel, dan bisnis go-digital dengan website berkinerja tinggi. Harga terjangkau, kualitas premium.",
 };
 
+// Enable static generation with revalidation
+export const revalidate = 3600; // Revalidate every hour
+
 export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
