@@ -21,7 +21,6 @@
     "prepare": "prisma generate"
   },
   "dependencies": {
-    "@emailjs/browser": "^4.4.1",
     "@hcaptcha/react-hcaptcha": "^2.0.2",
     "@prisma/client": "^7.8.0",
     "@supabase/ssr": "^0.10.2",
