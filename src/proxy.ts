@@ -40,20 +40,7 @@ export async function proxy(request: NextRequest) {
   console.log('Proxy path:', request.nextUrl.pathname);
   console.log('Session exists:', !!session);
 
-  // Protect admin routes
-  if (request.nextUrl.pathname.startsWith('/admin')) {
-    if (!session) {
-      return NextResponse.redirect(new URL('/login', request.url))
-    }
-  }
-
-  // Redirect to admin if already logged in
-  if (request.nextUrl.pathname.startsWith('/login')) {
-    if (session) {
-      return NextResponse.redirect(new URL('/admin', request.url))
-    }
-  }
-
+  // Bypass all proxy redirects for development
   return response
 }
 
