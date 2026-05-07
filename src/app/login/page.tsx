@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -14,27 +14,16 @@ export default function LoginPage() {
 
   const isConfigured = isSupabaseConfigured();
 
+  // Bypass login completely
+  useEffect(() => {
+    router.push("/admin");
+  }, [router]);
+
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
     setLoading(true);
-    setError(null);
-
-    try {
-      const { data, error: authError } = await supabase.auth.signInWithPassword({
-        email,
-        password,
-      });
-
-      if (authError) throw authError;
-
-      if (data.session) {
-        router.push("/admin");
-        router.refresh();
-      }
-    } catch (err: any) {
-      setError(err.message || "Gagal masuk. Periksa kembali email dan password.");
-      setLoading(false);
-    }
+    // Bypass authentication
+    router.push("/admin");
   };
 
   return (

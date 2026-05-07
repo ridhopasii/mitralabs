@@ -30,35 +30,13 @@ export default function AdminLayout({
 }) {
   const pathname = usePathname();
   const router = useRouter();
-  const [isAuthorized, setIsAuthorized] = useState(false);
+  const [isAuthorized, setIsAuthorized] = useState(true);
   const [authError, setAuthError] = useState(false);
 
   useEffect(() => {
-    const checkAuth = async () => {
-      try {
-        // Timeout 10 detik agar tidak stuck loading selamanya
-        const timeout = setTimeout(() => {
-          if (!isAuthorized) setAuthError(true);
-        }, 10000);
-
-        const { data: { session }, error } = await supabase.auth.getSession();
-        clearTimeout(timeout);
-        
-        console.log('AdminLayout session check:', { hasSession: !!session, error });
-
-        if (error || !session) {
-          console.warn('Redirecting to login: no session or error');
-          router.push("/login");
-        } else {
-          setIsAuthorized(true);
-        }
-      } catch (err) {
-        console.error("Auth check failed", err);
-        setAuthError(true);
-      }
-    };
-    checkAuth();
-  }, [router, isAuthorized]);
+    // Auth bypass: always authorized
+    setIsAuthorized(true);
+  }, []);
 
   if (authError) {
     return (
