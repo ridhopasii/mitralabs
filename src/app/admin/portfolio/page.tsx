@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useData } from "@/context/DataContext";
+import { useData, Project } from "@/context/DataContext";
 import { 
   Save, 
   Briefcase, 
@@ -28,33 +28,6 @@ import {
 } from "lucide-react";
 import { uploadImage } from "@/lib/supabase";
 import Image from "next/image";
-
-interface Project {
-  id: number;
-  slug: string;
-  title: string;
-  category: string;
-  image: string;
-  description: string;
-  challenge: string;
-  solution: string;
-  results: string[];
-  client_name?: string;
-  project_date?: string;
-  live_link?: string;
-  github_link?: string;
-  tech_stack?: string[];
-  gallery_urls?: string[];
-  status: string;
-  role?: string;
-  scope?: string[];
-  feedback?: {
-    name: string;
-    avatar?: string;
-    comment: string;
-    rating: number;
-  };
-}
 
 export default function PortfolioCMS() {
   const { data, updateData } = useData();

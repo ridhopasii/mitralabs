@@ -3,7 +3,7 @@
 import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
-interface Plan {
+export interface Plan {
   id: number;
   name: string;
   price: string;
@@ -15,7 +15,7 @@ interface Plan {
   highlight?: boolean;
 }
 
-interface Invoice {
+export interface Invoice {
   id: number;
   project_id: number;
   invoice_number: string;
@@ -25,7 +25,7 @@ interface Invoice {
   items: { desc: string; price: number }[];
 }
 
-interface Project {
+export interface Project {
   id: number;
   slug: string;
   title: string;
@@ -39,12 +39,21 @@ interface Project {
   client_name?: string;
   project_date?: string;
   live_link?: string;
+  github_link?: string;
   tech_stack?: string[];
   gallery_urls?: string[];
   invoices?: Invoice[];
+  role?: string;
+  scope?: string[];
+  feedback?: {
+    name: string;
+    avatar?: string;
+    comment: string;
+    rating: number;
+  };
 }
 
-interface BlogPost {
+export interface BlogPost {
   id: number;
   slug: string;
   title: string;
@@ -81,10 +90,10 @@ interface AppData {
       title: string;
       subtitle: string;
       cards: {
-        umkm: { tag: string; title: string; desc: string; image: string };
-        travel: { title: string; desc: string };
-        school: { title: string; desc: string };
-        business: { title: string; desc: string };
+        umkm: { tag?: string; title: string; desc: string; image?: string };
+        travel: { tag?: string; title: string; desc: string; image?: string };
+        school: { tag?: string; title: string; desc: string; image?: string };
+        business: { tag?: string; title: string; desc: string; image?: string };
       };
     };
     process: {

@@ -1,7 +1,7 @@
 "use client";
 
 import { useState, useEffect } from "react";
-import { useData } from "@/context/DataContext";
+import { useData, Plan } from "@/context/DataContext";
 import { 
   Save, 
   Package, 
@@ -22,18 +22,6 @@ import {
   Layout,
   Filter
 } from "lucide-react";
-
-interface Plan {
-  id: number;
-  name: string;
-  price: string;
-  tier: string;
-  pages: string;
-  duration: string;
-  features: string[];
-  missing: string[];
-  highlight: boolean;
-}
 
 export default function ServicesCMS() {
   const { data, updateData } = useData();

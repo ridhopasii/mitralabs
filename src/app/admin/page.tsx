@@ -20,7 +20,8 @@ import {
   ChevronRight,
   Sparkles,
   ShieldCheck,
-  MousePointer2
+  MousePointer2,
+  Clock
 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { supabase } from "@/lib/supabase";
