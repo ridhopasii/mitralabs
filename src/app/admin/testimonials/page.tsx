@@ -16,7 +16,8 @@ import {
   Filter,
   User as UserIcon,
   Loader2,
-  ThumbsUp
+  ThumbsUp,
+  Upload
 } from "lucide-react";
 import { logActivity, uploadImage } from "@/lib/supabase";
 import Image from "next/image";

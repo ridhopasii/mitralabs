@@ -23,7 +23,8 @@ import {
   Type,
   Layout,
   BookOpen,
-  Tag
+  Tag,
+  Upload
 } from "lucide-react";
 import { z } from "zod";
 import { uploadImage, logActivity } from "@/lib/supabase";
