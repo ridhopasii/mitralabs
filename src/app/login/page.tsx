@@ -53,63 +53,18 @@ export default function LoginPage() {
             )}
           </div>
 
-          <form onSubmit={handleLogin} className="space-y-6">
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-4">Email Address</label>
-              <div className="relative">
-                <input
-                  type="email"
-                  value={email}
-                  onChange={(e) => setEmail(e.target.value)}
-                  placeholder="admin@mitralabs.id"
-                  className="w-full px-8 py-5 bg-surface-container-low border-2 border-transparent focus:border-primary rounded-[2rem] outline-none font-bold text-lg transition-all"
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            <div className="space-y-3">
-              <label className="text-[10px] font-black uppercase tracking-[0.2em] opacity-40 ml-4">Password</label>
-              <div className="relative">
-                <input
-                  type="password"
-                  value={password}
-                  onChange={(e) => setPassword(e.target.value)}
-                  placeholder="••••••••••••"
-                  className={`w-full px-8 py-5 bg-surface-container-low border-2 rounded-[2rem] outline-none font-black text-xl transition-all ${
-                    error ? "border-error text-error" : "border-transparent focus:border-primary"
-                  }`}
-                  required
-                  disabled={loading}
-                />
-              </div>
-            </div>
-
-            {error && (
-              <p className="text-[10px] font-black text-error uppercase tracking-widest text-center px-4">
-                {error}
-              </p>
-            )}
-
+          <div className="text-center mt-8">
             <button
-              type="submit"
-              disabled={loading}
-              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 mt-4 disabled:opacity-50 disabled:cursor-not-allowed"
+              onClick={() => router.push("/admin")}
+              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40"
             >
-              {loading ? (
-                <Loader2 size={24} className="animate-spin" />
-              ) : (
-                <>
-                  Verifikasi Akses <ArrowRight size={24} />
-                </>
-              )}
+              Masuk Dashboard <ArrowRight size={24} />
             </button>
-          </form>
+          </div>
 
           <div className="mt-12 pt-8 border-t border-surface-container-highest text-center">
             <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-20">
-              <ShieldCheck size={14} /> Supabase Auth Protected
+              <ShieldCheck size={14} /> Dev Mode Bypass Active
             </div>
           </div>
         </div>
