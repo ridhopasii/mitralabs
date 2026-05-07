@@ -4,35 +4,20 @@ import { supabase } from '@/lib/supabase'
 export default async function sitemap(): Promise<MetadataRoute.Sitemap> {
   const baseUrl = 'https://mitralabs.id'
 
-  // Fetch dynamic data for sitemap
-  let posts: any[] = []
-  let projects: any[] = []
+  // Fetch dynamic data from relational tables
+  const { data: posts } = await supabase.from('BlogPost').select('slug, updated_at');
+  const { data: projects } = await supabase.from('Project').select('slug, created_at');
 
-  try {
-    const { data: sbData } = await supabase
-      .from('site_data')
-      .select('json_content')
-      .eq('id', 1)
-      .single()
-
-    if (sbData?.json_content) {
-      posts = sbData.json_content.blog?.posts || []
-      projects = sbData.json_content.portfolio?.projects || []
-    }
-  } catch (e) {
-    console.error("Sitemap fetch failed", e)
-  }
-
-  const blogUrls = posts.map((post) => ({
+  const blogUrls = (posts || []).map((post) => ({
     url: `${baseUrl}/blog/${post.slug}`,
-    lastModified: new Date(),
+    lastModified: new Date(post.updated_at || new Date()),
     changeFrequency: 'weekly' as const,
     priority: 0.7,
   }))
 
-  const portfolioUrls = projects.map((project) => ({
+  const portfolioUrls = (projects || []).map((project) => ({
     url: `${baseUrl}/portfolio/${project.slug}`,
-    lastModified: new Date(),
+    lastModified: new Date(project.created_at || new Date()),
     changeFrequency: 'monthly' as const,
     priority: 0.8,
   }))

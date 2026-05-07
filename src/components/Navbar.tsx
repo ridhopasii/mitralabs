@@ -24,29 +24,25 @@ export default function Navbar() {
 
   return (
     <>
-      <header className={`bg-background/80 backdrop-blur-md border-b border-surface-container shadow-sm sticky top-0 z-50 transition-all duration-300 ${isScrolled ? "py-2" : "py-4"}`}>
-        <div className="max-w-7xl mx-auto px-6 flex justify-between items-center font-body antialiased">
+      <header className={`fixed top-0 left-0 right-0 z-50 transition-all duration-500 ${isScrolled ? "glass-apple shadow-apple py-3" : "bg-transparent py-6"}`}>
+        <div className="max-w-6xl mx-auto px-6 flex justify-between items-center antialiased">
           {/* Logo */}
-          <Link href="/" className="text-2xl font-black tracking-tighter text-on-background font-display flex items-center gap-2 group">
-            <div className="w-8 h-8 bg-primary rounded-lg flex items-center justify-center text-on-primary font-black text-sm group-hover:rotate-12 transition-transform">
-              {navbar.logo[0]}
-            </div>
-            {navbar.logo}
+          <Link href="/" className="text-xl font-bold tracking-tight text-on-background flex items-center gap-2 group">
+             <div className="w-7 h-7 bg-on-background text-background rounded-lg flex items-center justify-center font-bold text-xs transition-transform group-hover:scale-105">
+                M
+             </div>
+             <span>Mitralabs</span>
           </Link>
 
           {/* Desktop Nav */}
-          <nav className="hidden md:flex items-center gap-8 text-[10px] font-black uppercase tracking-[0.2em]">
+          <nav className="hidden md:flex items-center gap-8 text-[12px] font-medium text-secondary">
             {navbar.links.map((link) => {
               const isActive = pathname === link.href;
               return (
                 <Link
                   key={link.href}
                   href={link.href}
-                  className={`transition-all duration-300 ease-in-out ${
-                    isActive
-                      ? "text-primary pb-1"
-                      : "text-on-surface-variant/60 hover:text-primary"
-                  }`}
+                  className={`transition-colors hover:text-on-background ${isActive ? "text-on-background" : ""}`}
                 >
                   {link.label}
                 </Link>
@@ -61,7 +57,7 @@ export default function Navbar() {
               href={waUrl}
               target="_blank"
               rel="noopener noreferrer"
-              className="bg-primary text-on-primary px-8 py-3 rounded-xl text-xs font-black uppercase tracking-widest transition-all hover:scale-[1.05] active:scale-[0.95] shadow-lg shadow-primary/20 inline-block"
+              className="bg-on-background text-background px-6 py-2 rounded-full text-xs font-semibold hover:opacity-90 transition-all"
             >
               {navbar.buttonText}
             </a>
@@ -70,54 +66,42 @@ export default function Navbar() {
           {/* Mobile Toggle */}
           <button
             onClick={() => setMobileOpen(!mobileOpen)}
-            className="md:hidden p-2 text-on-surface-variant"
+            className="md:hidden p-2 text-on-surface"
           >
-            {mobileOpen ? <X size={24} /> : <Menu size={24} />}
+            {mobileOpen ? <X size={20} /> : <Menu size={20} />}
           </button>
         </div>
       </header>
 
       {/* Mobile Menu */}
       <div
-        className={`fixed inset-0 z-40 md:hidden transition-all duration-300 ${
+        className={`fixed inset-0 z-40 md:hidden transition-all duration-500 ${
           mobileOpen ? "opacity-100 pointer-events-auto" : "opacity-0 pointer-events-none"
         }`}
       >
-        <div className="absolute inset-0 bg-black/20 backdrop-blur-sm" onClick={() => setMobileOpen(false)} />
+        <div className="absolute inset-0 bg-background/60 backdrop-blur-xl" onClick={() => setMobileOpen(false)} />
         <div
-          className={`absolute top-0 right-0 h-full w-80 bg-surface shadow-2xl transition-transform duration-500 ${
-            mobileOpen ? "translate-x-0" : "translate-x-full"
+          className={`absolute top-0 right-0 h-full w-full bg-background transition-transform duration-500 flex flex-col items-center justify-center gap-10 ${
+            mobileOpen ? "translate-y-0" : "-translate-y-full"
           }`}
         >
-          <div className="p-10 pt-32 flex flex-col gap-8">
-            <div className="flex justify-between items-center mb-4">
-              <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Tampilan</span>
-              <ThemeToggle />
-            </div>
-            {navbar.links.map((link) => {
-              const isActive = pathname === link.href;
-              return (
-                <Link
-                  key={link.href}
-                  href={link.href}
-                  onClick={() => setMobileOpen(false)}
-                  className={`text-2xl font-black tracking-tight ${
-                    isActive ? "text-primary" : "text-on-surface-variant"
-                  }`}
-                >
-                  {link.label}
-                </Link>
-              );
-            })}
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="mt-8 bg-primary text-on-primary px-8 py-5 rounded-2xl text-center text-lg font-black shadow-xl shadow-primary/20"
+          {navbar.links.map((link) => (
+            <Link
+              key={link.href}
+              href={link.href}
+              onClick={() => setMobileOpen(false)}
+              className="text-4xl font-semibold tracking-tight text-on-background"
             >
-              {navbar.buttonText}
-            </a>
-          </div>
+              {link.label}
+            </Link>
+          ))}
+          <a
+            href={waUrl}
+            target="_blank"
+            className="mt-10 bg-on-background text-background px-10 py-4 rounded-full text-lg font-semibold"
+          >
+            {navbar.buttonText}
+          </a>
         </div>
       </div>
     </>

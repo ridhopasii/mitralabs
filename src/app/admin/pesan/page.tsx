@@ -14,9 +14,13 @@ import {
   CheckCircle2,
   Clock,
   Loader2,
-  Download
+  Download,
+  Inbox,
+  AlertCircle,
+  ChevronRight,
+  Send,
+  MessageSquare
 } from "lucide-react";
-import { formatDate } from "@/lib/utils";
 
 interface Message {
   id: number;
@@ -52,20 +56,11 @@ export default function MessagesPage() {
   useEffect(() => {
     fetchMessages();
 
-    // REALTIME SUBSCRIPTION
     const channel = supabase
       .channel('realtime_messages')
-      .on(
-        'postgres_changes',
-        {
-          event: '*', // Listen to INSERT, UPDATE, DELETE
-          schema: 'public',
-          table: 'SiteMessage'
-        },
-        () => {
-          fetchMessages(); // Refresh the list
-        }
-      )
+      .on('postgres_changes', { event: '*', schema: 'public', table: 'SiteMessage' }, () => {
+        fetchMessages();
+      })
       .subscribe();
 
     return () => {
@@ -83,7 +78,7 @@ export default function MessagesPage() {
     const link = document.createElement("a");
     const url = URL.createObjectURL(blob);
     link.setAttribute("href", url);
-    link.setAttribute("download", `mitralabs_messages_${new Date().toISOString().split('T')[0]}.csv`);
+    link.setAttribute("download", `mitralabs_inbox_${new Date().toISOString().split('T')[0]}.csv`);
     link.style.visibility = 'hidden';
     document.body.appendChild(link);
     link.click();
@@ -106,154 +101,188 @@ export default function MessagesPage() {
   );
 
   return (
-    <div className="space-y-10">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-40" size={20} />
-          <input
-            type="text"
-            placeholder="Cari pesan atau nama..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-16 pr-8 py-5 bg-white border border-surface-container-highest rounded-3xl outline-none focus:border-primary shadow-sm font-bold transition-all"
-          />
+    <div className="space-y-10 pb-20 animate-in fade-in duration-700">
+      {/* Header & Stats */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-8">
+        <div>
+           <h2 className="text-5xl font-black tracking-tighter text-slate-900 leading-none">Inquiries.</h2>
+           <p className="text-slate-500 font-medium mt-3 text-lg">Pantau dan kelola semua pesan masuk dari calon klien Anda.</p>
         </div>
         <div className="flex items-center gap-4">
+           <div className="bg-white px-8 py-4 rounded-3xl border border-slate-100 shadow-sm flex items-center gap-4">
+              <div className="w-10 h-10 bg-indigo-50 text-indigo-500 rounded-xl flex items-center justify-center font-black">
+                 <Inbox size={20} />
+              </div>
+              <div>
+                 <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Inbox</p>
+                 <h4 className="text-xl font-black text-slate-900 leading-none">{totalCount}</h4>
+              </div>
+           </div>
            <button 
              onClick={downloadCSV}
-             className="px-8 py-4 bg-primary/10 text-primary rounded-2xl font-black text-[10px] uppercase tracking-widest flex items-center gap-3 hover:bg-primary hover:text-white transition-all shadow-sm"
+             className="px-8 py-5 bg-slate-900 text-white rounded-[2rem] font-black text-[11px] uppercase tracking-widest flex items-center gap-3 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-slate-900/20"
            >
-              <Download size={16} /> Export CSV
+              <Download size={18} /> Export Data
            </button>
-           <div className="bg-white px-6 py-4 rounded-2xl border border-surface-container-highest">
-              <span className="font-black text-[10px] uppercase tracking-widest opacity-40">Total: {totalCount}</span>
-           </div>
         </div>
       </div>
 
-      <div className="grid lg:grid-cols-12 gap-10">
-        {/* Messages List */}
-        <div className="lg:col-span-5 space-y-4 max-h-[70vh] overflow-y-auto pr-4 custom-scrollbar">
-          {loading ? (
-            <div className="flex flex-col items-center justify-center py-20 opacity-20">
-              <Loader2 className="animate-spin mb-4" size={40} />
-              <p className="font-black uppercase tracking-widest text-xs">Syncing Messages...</p>
+      {/* Main Inbox Interface */}
+      <div className="bg-white rounded-[3.5rem] border border-slate-100 shadow-2xl overflow-hidden min-h-[700px] flex flex-col lg:flex-row">
+        
+        {/* Messages List Panel */}
+        <div className="w-full lg:w-[450px] border-r border-slate-50 flex flex-col bg-slate-50/30">
+          <div className="p-8 border-b border-slate-100 bg-white">
+            <div className="relative group">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={18} />
+              <input
+                type="text"
+                placeholder="Cari pesan atau nama..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="w-full pl-16 pr-8 py-5 bg-slate-50 border border-slate-200 rounded-[2rem] outline-none focus:border-primary font-bold text-sm transition-all"
+              />
             </div>
-          ) : filteredMessages.length === 0 ? (
-            <div className="text-center py-20 bg-white rounded-[3rem] border border-dashed border-surface-container-highest">
-               <Mail className="mx-auto mb-4 opacity-20" size={48} />
-               <p className="font-bold text-on-surface-variant">Tidak ada pesan ditemukan.</p>
-            </div>
-          ) : (
-            filteredMessages.map((msg) => (
-              <button
-                key={msg.id}
-                onClick={() => setSelectedMsg(msg)}
-                className={`w-full text-left p-8 rounded-[2.5rem] border transition-all flex gap-6 group relative overflow-hidden ${
-                  selectedMsg?.id === msg.id 
-                    ? "bg-on-surface text-surface border-on-surface shadow-2xl" 
-                    : "bg-white border-surface-container-highest hover:border-primary"
-                }`}
-              >
-                <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 ${
-                  selectedMsg?.id === msg.id ? "bg-white/10" : "bg-primary/5 text-primary"
-                }`}>
-                  <User size={24} />
-                </div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex justify-between items-start mb-2">
-                    <h4 className="font-black truncate pr-4">{msg.name}</h4>
-                    <span className="text-[10px] font-black uppercase tracking-widest opacity-40 whitespace-nowrap">
-                       {new Date(msg.created_at).toLocaleDateString()}
-                    </span>
+          </div>
+
+          <div className="flex-1 overflow-y-auto custom-scrollbar p-6 space-y-3">
+            {loading ? (
+              <div className="flex flex-col items-center justify-center py-24 opacity-20">
+                <Loader2 className="animate-spin mb-4" size={48} />
+                <p className="font-black uppercase tracking-widest text-xs text-center">Syncing Inbox...</p>
+              </div>
+            ) : filteredMessages.length === 0 ? (
+              <div className="text-center py-24 opacity-30 space-y-4">
+                 <Mail className="mx-auto" size={64} />
+                 <p className="font-black uppercase tracking-widest text-xs">Inbox Kosong</p>
+              </div>
+            ) : (
+              filteredMessages.map((msg) => (
+                <button
+                  key={msg.id}
+                  onClick={() => setSelectedMsg(msg)}
+                  className={`w-full text-left p-8 rounded-[2.5rem] transition-all flex gap-6 group relative overflow-hidden ${
+                    selectedMsg?.id === msg.id 
+                      ? "bg-slate-900 text-white shadow-2xl shadow-slate-900/30 scale-[1.02] z-10" 
+                      : "bg-white border border-slate-100 hover:border-primary hover:shadow-lg"
+                  }`}
+                >
+                  <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shrink-0 font-black text-xl ${
+                    selectedMsg?.id === msg.id ? "bg-white/10" : "bg-primary/5 text-primary"
+                  }`}>
+                    {msg.name.charAt(0)}
                   </div>
-                  <p className={`text-sm font-medium truncate opacity-60`}>
-                    {msg.message}
-                  </p>
-                </div>
-              </button>
-            ))
-          )}
+                  <div className="flex-1 min-w-0">
+                    <div className="flex justify-between items-start mb-2">
+                      <h4 className="font-black truncate pr-4 text-sm uppercase tracking-tight">{msg.name}</h4>
+                      <span className={`text-[9px] font-black uppercase tracking-widest whitespace-nowrap ${
+                        selectedMsg?.id === msg.id ? "text-white/40" : "text-slate-300"
+                      }`}>
+                         {new Date(msg.created_at).toLocaleDateString('id-ID')}
+                      </span>
+                    </div>
+                    <p className={`text-xs font-medium truncate ${
+                      selectedMsg?.id === msg.id ? "text-white/60" : "text-slate-400"
+                    }`}>
+                      {msg.message}
+                    </p>
+                  </div>
+                </button>
+              ))
+            )}
+          </div>
 
           {/* Pagination */}
           {totalPages > 1 && (
-            <div className="flex items-center justify-between p-6 bg-white rounded-[2.5rem] border border-surface-container-highest">
-               <span className="text-[10px] font-black uppercase tracking-widest opacity-40">Halaman {page} / {totalPages}</span>
-               <div className="flex gap-2">
+            <div className="p-6 border-t border-slate-100 bg-white flex items-center justify-between">
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-400">Page {page} of {totalPages}</span>
+               <div className="flex gap-3">
                   <button 
                     disabled={page === 1}
                     onClick={() => setPage(p => p - 1)}
-                    className="px-4 py-2 bg-surface-container-low rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-20 hover:bg-on-surface hover:text-surface transition-all"
+                    className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl disabled:opacity-30 hover:bg-slate-900 hover:text-white transition-all"
                   >
-                     Prev
+                     <ChevronRight size={18} className="rotate-180" />
                   </button>
                   <button 
                     disabled={page === totalPages}
                     onClick={() => setPage(p => p + 1)}
-                    className="px-4 py-2 bg-primary text-on-primary rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-20 hover:scale-105 transition-all shadow-sm"
+                    className="w-10 h-10 flex items-center justify-center bg-slate-50 text-slate-400 rounded-xl disabled:opacity-30 hover:bg-slate-900 hover:text-white transition-all"
                   >
-                     Next
+                     <ChevronRight size={18} />
                   </button>
                </div>
             </div>
           )}
         </div>
 
-        {/* Message Detail View */}
-        <div className="lg:col-span-7">
+        {/* Message Content Panel */}
+        <div className="flex-1 bg-white relative">
           {selectedMsg ? (
-            <div className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium sticky top-0 animate-in fade-in slide-in-from-right-10 duration-500">
-               <div className="flex justify-between items-start mb-12">
+            <div className="h-full flex flex-col animate-in fade-in slide-in-from-right-10 duration-500">
+               {/* Detail Header */}
+               <div className="p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/30">
                   <div className="flex items-center gap-6">
-                     <div className="w-16 h-16 bg-primary rounded-2xl flex items-center justify-center text-on-primary font-black text-2xl">
+                     <div className="w-16 h-16 bg-primary text-on-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/30 font-black text-2xl">
                         {selectedMsg.name.charAt(0)}
                      </div>
                      <div>
-                        <h2 className="text-3xl font-black tracking-tight">{selectedMsg.name}</h2>
-                        <p className="text-on-surface-variant font-bold">{selectedMsg.email}</p>
+                        <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">{selectedMsg.name}</h2>
+                        <div className="flex items-center gap-4 text-xs font-bold text-slate-400 mt-2">
+                          <span className="flex items-center gap-1"><Mail size={12} /> {selectedMsg.email}</span>
+                          <span className="flex items-center gap-1"><Clock size={12} /> {new Date(selectedMsg.created_at).toLocaleString('id-ID')}</span>
+                        </div>
                      </div>
                   </div>
-                  <div className="flex gap-2">
-                     <button 
-                       onClick={() => deleteMessage(selectedMsg.id)}
-                       className="p-4 bg-error/10 text-error rounded-2xl hover:bg-error hover:text-white transition-all"
-                     >
-                        <Trash2 size={24} />
-                     </button>
+                  <button 
+                    onClick={() => deleteMessage(selectedMsg.id)}
+                    className="p-5 bg-white border border-slate-200 text-rose-500 rounded-2xl hover:bg-rose-500 hover:text-white hover:border-rose-500 transition-all shadow-sm"
+                  >
+                    <Trash2 size={24} />
+                  </button>
+               </div>
+
+               {/* Detail Body */}
+               <div className="flex-1 p-12 overflow-y-auto custom-scrollbar">
+                  <div className="bg-slate-50 p-12 rounded-[3rem] border border-slate-100 relative overflow-hidden group">
+                     <div className="absolute top-0 right-0 p-12 opacity-[0.03] group-hover:scale-125 transition-transform duration-1000">
+                        <MessageSquare size={180} />
+                     </div>
+                     <div className="flex items-center gap-3 mb-8 text-primary opacity-50 font-black text-[10px] uppercase tracking-[0.2em]">
+                        <MessageCircle size={14} /> User Inquiry Content
+                     </div>
+                     <p className="text-2xl font-medium leading-relaxed text-slate-800 relative z-10 whitespace-pre-line">
+                        {selectedMsg.message}
+                     </p>
                   </div>
                </div>
 
-               <div className="bg-surface-container-low p-10 rounded-[2.5rem] mb-12 relative overflow-hidden">
-                  <div className="absolute top-0 right-0 p-8 opacity-[0.03]">
-                     <MessageCircle size={150} />
-                  </div>
-                  <p className="text-xl font-medium leading-relaxed text-on-surface relative z-10 whitespace-pre-line">
-                     {selectedMsg.message}
-                  </p>
-               </div>
-
-               <div className="flex flex-wrap gap-4 pt-8 border-t border-surface-container-highest">
+               {/* Detail Actions */}
+               <div className="p-12 border-t border-slate-100 bg-slate-50/50 flex gap-6">
                   <a 
                     href={`mailto:${selectedMsg.email}`}
-                    className="flex-1 px-10 py-5 bg-on-surface text-surface rounded-2xl font-black flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl"
+                    className="flex-1 py-6 bg-slate-900 text-white rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-slate-900/20"
                   >
-                     <Mail size={20} /> Reply via Email
+                     <Send size={20} /> Respond via Email
                   </a>
                   <a 
                     href={`https://wa.me/?text=${encodeURIComponent(`Halo ${selectedMsg.name}, kami dari Mitralabs ingin merespon pesan Anda: "${selectedMsg.message.substring(0, 50)}..."`)}`}
                     target="_blank"
-                    className="flex-1 px-10 py-5 bg-[#25D366] text-white rounded-2xl font-black flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-xl shadow-green-500/20"
+                    className="flex-1 py-6 bg-emerald-500 text-white rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-emerald-500/20"
                   >
-                     <MessageCircle size={20} /> Reply via WhatsApp
+                     <MessageCircle size={20} /> Chat via WhatsApp
                   </a>
                </div>
             </div>
           ) : (
-            <div className="h-full min-h-[500px] bg-white/40 backdrop-blur-md rounded-[3.5rem] border-4 border-dashed border-surface-container-highest flex flex-col items-center justify-center text-center p-12">
-               <div className="w-24 h-24 bg-surface-container rounded-full flex items-center justify-center mb-6 opacity-20">
-                  <Mail size={40} />
+            <div className="h-full flex flex-col items-center justify-center text-center p-12 opacity-20 space-y-6">
+               <div className="w-32 h-32 bg-slate-100 rounded-full flex items-center justify-center">
+                  <Inbox size={64} />
                </div>
-               <h3 className="text-2xl font-black opacity-20 uppercase tracking-widest">Select a message to read</h3>
+               <div>
+                 <h3 className="text-3xl font-black uppercase tracking-widest">Select Inquiry</h3>
+                 <p className="font-bold text-sm">Pilih pesan di sebelah kiri untuk membaca detail</p>
+               </div>
             </div>
           )}
         </div>

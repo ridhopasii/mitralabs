@@ -6,12 +6,122 @@ datasource db {
   provider = "postgresql"
 }
 
-model SiteData {
-  id           Int      @id @default(1)
-  json_content Json
-  updated_at   DateTime @default(now()) @updatedAt
+// --- CORE SETTINGS ---
+model SiteConfig {
+  id               Int      @id @default(1)
+  logo_text        String   @default("Mitralabs")
+  navbar_button    String   @default("Get Started")
+  footer_desc      String   @default("Technical precision in every pixel.")
+  wa_number        String   @default("6282381118520")
+  business_mode    String   @default("agresif")
+  wa_promo_msg     String   @default("🔥 Promo!")
+  phone            String   @default("6282381118520")
+  email            String   @default("ridhorobbipasi@gmail.com")
+  instagram        String   @default("@mitralabs.id")
+  address          String   @default("Medan, Indonesia")
+  maps_url         String   @default("")
+  updated_at       DateTime @default(now()) @updatedAt
 }
 
+// --- HOME SECTIONS ---
+model HeroSection {
+  id         Int      @id @default(1)
+  tagline    String   @default("Mitra Digital Bisnis Mu")
+  promo      String   @default("Promo Aktif")
+  title      String   @default("Tampil Profesional Tanpa Ribet.")
+  subtitle   String   @default("Jasa pembuatan website profesional...")
+  image_url  String   @default("https://images.unsplash.com/...")
+  stats_label String  @default("Live Projects")
+  stats_value String  @default("150+")
+  stats_desc  String  @default("Website Berhasil Online")
+}
+
+// --- DYNAMIC CONTENT ---
+model ServicePlan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       String
+  tier        String
+  pages       String
+  duration    String
+  features    String[]
+  missing     String[]
+  highlight   Boolean  @default(false)
+  order       Int      @default(0)
+}
+
+model Project {
+  id            Int       @id @default(autoincrement())
+  slug          String    @unique
+  title         String
+  category      String
+  image_url     String
+  description   String    @db.Text
+  challenge     String    @db.Text
+  solution      String    @db.Text
+  results       String[]
+  client_name   String?
+  project_date  String?
+  live_link     String?
+  tech_stack    String[]
+  gallery_urls  String[]
+  status        String    @default("Published")
+  created_at    DateTime  @default(now())
+  invoices      Invoice[]
+}
+
+model Invoice {
+  id             Int      @id @default(autoincrement())
+  project_id     Int
+  project        Project  @relation(fields: [project_id], references: [id])
+  invoice_number String   @unique
+  amount         Float
+  status         String   @default("Pending") // Pending, Paid, Cancelled
+  due_date       DateTime
+  items          Json     // Array of { desc: string, price: number }
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String   @db.Text
+  category    String
+  author      String
+  image_url   String
+  published_at DateTime @default(now())
+}
+
+model TeamMember {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  bio        String
+  image_url  String
+  order      Int      @default(0)
+}
+
+model Testimonial {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  content    String
+  rating     Int      @default(5)
+  image_url  String
+}
+
+model FAQ {
+  id         Int      @id @default(autoincrement())
+  question   String
+  answer     String
+  category   String
+  order      Int      @default(0)
+}
+
+// --- MESSAGES & LOGS ---
 model SiteMessage {
   id         Int       @id @default(autoincrement())
   name       String
@@ -21,34 +131,15 @@ model SiteMessage {
   created_at DateTime? @default(now()) @db.Timestamptz(6)
 }
 
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model admin_logs {
-  id         Int       @id @default(autoincrement())
-  action     String
-  detail     String
-  created_at DateTime? @default(now()) @db.Timestamptz(6)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model newsletter_subs {
-  id         Int       @id @default(autoincrement())
-  email      String    @unique
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
-model site_messages {
-  id         Int       @id @default(autoincrement())
-  name       String
-  email      String
-  message    String
-  created_at DateTime? @default(now()) @db.Timestamp(6)
-}
-
-/// This model contains row level security and requires additional setup for migrations. Visit https://pris.ly/d/row-level-security for more info.
 model AdminLog {
   id         Int       @id @default(autoincrement())
   action     String
   detail     String
   created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model NewsletterSub {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  created_at DateTime? @default(now()) @db.Timestamp(6)
 }

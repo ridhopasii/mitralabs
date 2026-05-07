@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
@@ -54,12 +55,12 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center mt-8">
-            <button
-              onClick={() => router.push("/admin")}
+            <Link
+              href="/admin"
               className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40"
             >
               Masuk Dashboard <ArrowRight size={24} />
-            </button>
+            </Link>
           </div>
 
           <div className="mt-12 pt-8 border-t border-surface-container-highest text-center">

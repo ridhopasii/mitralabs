@@ -1,77 +1,57 @@
 @import "tailwindcss";
 
 @theme {
-  /* Colors from Clean V2 */
-  --color-surface: #faf8ff;
-  --color-surface-container-highest: #e1e1ef;
-  --color-on-background: #191b24;
-  --color-on-error: #ffffff;
-  --color-primary: #0045d1;
-  --color-secondary-fixed-dim: #b4cbca;
-  --color-on-surface-variant: #434656;
-  --color-surface-container: #ededfa;
-  --color-on-secondary-container: #536868;
-  --color-on-primary-container: #edeeff;
-  --color-on-tertiary-container: #f0edff;
-  --color-tertiary-fixed-dim: #c0c1ff;
-  --color-surface-container-low: #f3f2ff;
-  --color-primary-container: #1a5cff;
-  --color-tertiary-container: #585ae5;
-  --color-secondary-container: #d0e7e6;
-  --color-on-tertiary: #ffffff;
-  --color-tertiary-fixed: #e1e0ff;
+  /* Apple-inspired Minimalist Palette */
+  --color-background: #ffffff;
+  --color-on-background: #000000;
+  
+  --color-surface: #fbfbfd;
+  --color-on-surface: #1d1d1f;
+  
+  --color-primary: #0066cc; /* Apple Blue */
   --color-on-primary: #ffffff;
-  --color-surface-variant: #e1e1ef;
-  --color-secondary: #4d6262;
+  
+  --color-secondary: #86868b;
   --color-on-secondary: #ffffff;
-  --color-inverse-on-surface: #f0f0fd;
+  
+  --color-surface-container: #f5f5f7;
+  --color-surface-container-low: #fbfbfd;
+  --color-surface-container-high: #f5f5f7;
+  --color-surface-container-highest: #e8e8ed;
   --color-surface-container-lowest: #ffffff;
-  --color-tertiary: #3e3fcc;
-  --color-error: #ba1a1a;
-  --color-on-secondary-fixed: #0a1f1f;
-  --color-on-secondary-fixed-variant: #364a4a;
-  --color-outline: #737688;
-  --color-on-error-container: #93000a;
-  --color-secondary-fixed: #d0e7e6;
-  --color-on-primary-fixed: #001550;
-  --color-outline-variant: #e1e1ef;
+  
+  --color-outline: #d2d2d7;
+  --color-outline-variant: #e8e8ed;
 
-  /* Typography from Clean V2 */
-  --font-display: 'Manrope', sans-serif;
-  --font-body: 'Manrope', sans-serif;
+  /* Typography: Inter is the closest free equivalent to San Francisco */
+  --font-display: 'Inter', sans-serif;
+  --font-body: 'Inter', sans-serif;
 
-  /* Dark Theme Overrides */
-  --color-background: #faf8ff;
-  --color-on-surface: #191b24;
+  /* Accent Colors */
+  --color-error: #ff3b30;
+  --color-success: #34c759;
 }
 
 .dark {
-  --color-background: #0f111a;
-  --color-on-background: #e1e1ef;
-  --color-surface: #191b24;
-  --color-surface-container: #232533;
-  --color-surface-container-low: #1d1f2b;
-  --color-surface-container-high: #2d2f3d;
-  --color-surface-container-highest: #373a4a;
-  --color-surface-container-lowest: #0c0d14;
-  --color-on-surface: #e1e1ef;
-  --color-on-surface-variant: #b0b2c1;
-  --color-surface-variant: #2d2f3d;
-  --color-outline: #8e90a6;
-  --color-outline-variant: #444759;
-  --color-inverse-surface: #e1e1ef;
-  --color-inverse-on-surface: #191b24;
-  --color-primary: #4d82ff;
-  --color-primary-container: #0045d1;
-  --color-on-primary: #ffffff;
-  --color-secondary: #b4cbca;
-  --color-secondary-container: #334a4a;
-  --color-on-secondary: #0a1f1f;
+  --color-background: #000000;
+  --color-on-background: #f5f5f7;
+  
+  --color-surface: #1d1d1f;
+  --color-on-surface: #f5f5f7;
+  
+  --color-surface-container: #161617;
+  --color-surface-container-low: #1d1d1f;
+  --color-surface-container-highest: #2d2d2f;
+  --color-surface-container-lowest: #000000;
+  
+  --color-outline: #424245;
 }
 
 @layer base {
   html {
     scroll-behavior: smooth;
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
   }
 
   body {
@@ -79,33 +59,38 @@
     color: var(--color-on-surface);
     @apply font-body antialiased;
     overflow-x: hidden;
+    letter-spacing: -0.011em; /* San Francisco-like tracking */
   }
 
   h1, h2, h3, h4, h5, h6 {
     @apply font-display;
+    letter-spacing: -0.022em;
+    font-weight: 600;
   }
 }
 
 @layer components {
-  .shadow-premium {
-    box-shadow: 0px 10px 30px rgba(0, 69, 209, 0.05);
+  .shadow-apple {
+    box-shadow: 0 4px 24px rgba(0,0,0,0.04);
   }
 
-  .ambient-shadow {
-    box-shadow: 0px 10px 30px rgba(26, 92, 255, 0.05);
+  .glass-apple {
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.7);
   }
 
-  .glass-effect {
-    backdrop-filter: blur(8px);
-    background: rgba(250, 248, 255, 0.8);
+  .dark .glass-apple {
+    background: rgba(0, 0, 0, 0.7);
   }
 
-  /* Legacy utility mapping for compatibility during migration */
-  .text-gradient {
-    @apply text-primary;
+  .btn-apple {
+    @apply px-6 py-2.5 rounded-full font-semibold transition-all duration-300;
+    @apply bg-on-background text-background hover:opacity-90;
   }
-  .gradient-primary {
-    @apply bg-primary;
+
+  .btn-apple-secondary {
+    @apply px-6 py-2.5 rounded-full font-semibold transition-all duration-300;
+    @apply text-primary hover:underline;
   }
 }
 
@@ -115,16 +100,15 @@
 }
 
 ::-webkit-scrollbar-track {
-  @apply bg-surface;
+  background: transparent;
 }
 
 ::-webkit-scrollbar-thumb {
-  @apply bg-surface-container-highest rounded-full hover:bg-outline-variant transition-colors;
+  background: var(--color-outline);
+  border-radius: 10px;
 }
 
-
-/* Hide Navbar and FloatingWhatsApp on login page */
-body:has([data-login-page]) nav,
-body:has([data-login-page]) > div > div[class*="fixed"] {
+/* Hide Navbar on login page */
+body:has([data-login-page]) nav {
   display: none !important;
 }

@@ -1,65 +1,59 @@
 "use client";
 
-import { useState } from "react";
 import Link from "next/link";
 import { useData } from "@/context/DataContext";
 
 export default function Footer() {
   const { data } = useData();
   const { footer, navbar } = data;
-  const [loading, setLoading] = useState(false);
 
   return (
-    <footer className="bg-surface-container-low border-t border-surface-container-highest">
-      <div className="max-w-7xl mx-auto px-6 py-12 flex flex-col md:flex-row justify-between items-center gap-8 font-body text-sm text-on-surface-variant">
-        <div className="flex flex-col items-center md:items-start gap-2">
-          <Link href="/" className="font-bold text-on-background text-2xl font-display tracking-tighter">
-            {navbar.logo}.id
-          </Link>
-          <p>© 2024 {navbar.logo}.id. {footer.description}</p>
+    <footer className="bg-background py-20 border-t border-outline/5">
+      <div className="max-w-6xl mx-auto px-6">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-12 mb-20">
+          <div className="md:col-span-4">
+             <Link href="/" className="text-xl font-bold tracking-tight text-on-background mb-4 block">
+                {navbar.logo}
+             </Link>
+             <p className="text-sm text-secondary font-medium leading-relaxed">
+                {footer.description}
+             </p>
+          </div>
+          <div className="md:col-span-2">
+             <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Navigasi</h4>
+             <ul className="space-y-4">
+                {navbar.links.map((link, i) => (
+                  <li key={i}>
+                    <Link href={link.href} className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
+                      {link.label}
+                    </Link>
+                  </li>
+                ))}
+             </ul>
+          </div>
+          <div className="md:col-span-2">
+             <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Sosial</h4>
+             <ul className="space-y-4">
+                <li><a href="#" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">Instagram</a></li>
+                <li><a href="#" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">LinkedIn</a></li>
+             </ul>
+          </div>
+          <div className="md:col-span-4">
+             <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Newsletter</h4>
+             <p className="text-sm text-secondary mb-6 font-medium">Dapatkan info terbaru seputar tren digital.</p>
+             <form className="flex gap-2">
+                <input 
+                  type="email" 
+                  placeholder="Email" 
+                  className="bg-surface-container px-5 py-3 rounded-xl outline-none text-sm w-full focus:ring-2 focus:ring-primary/20 transition-all"
+                />
+                <button className="bg-on-background text-background px-6 py-3 rounded-xl font-semibold text-sm">Join</button>
+             </form>
+          </div>
         </div>
-        <div className="flex flex-wrap justify-center md:justify-end gap-12 flex-1">
-           <div className="flex flex-col gap-4 min-w-[200px]">
-              <h4 className="font-black text-on-surface text-[10px] uppercase tracking-widest">Navigation</h4>
-              {footer.links.map((link, i) => (
-                <Link key={i} href={link.href} className="text-on-surface-variant hover:text-primary transition-colors font-bold">
-                  {link.label}
-                </Link>
-              ))}
-           </div>
-           
-           <div className="flex flex-col gap-6 max-w-sm">
-              <h4 className="font-black text-on-surface text-[10px] uppercase tracking-widest">Newsletter</h4>
-              <p className="text-xs opacity-60 font-medium">Dapatkan tips digital marketing & info promo terbaru.</p>
-              <form 
-                onSubmit={async (e) => {
-                  e.preventDefault();
-                  setLoading(true);
-                  const form = e.target as HTMLFormElement;
-                  const email = (form.elements.namedItem('email') as HTMLInputElement).value;
-                  // Future: add to supabase newsletter_subs
-                  alert(`Terima kasih! ${email} telah terdaftar.`);
-                  setLoading(false);
-                  form.reset();
-                }}
-                className="flex gap-2"
-              >
-                 <input 
-                   name="email"
-                   type="email" 
-                   placeholder="Email anda..." 
-                   required
-                   disabled={loading}
-                   className="bg-white border border-surface-container-highest rounded-xl px-4 py-3 text-xs outline-none focus:border-primary flex-1 font-bold"
-                 />
-                 <button 
-                  disabled={loading}
-                  className="bg-on-surface text-surface px-6 py-3 rounded-xl text-[10px] font-black uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50"
-                 >
-                    {loading ? "..." : "Join"}
-                 </button>
-              </form>
-           </div>
+        <div className="pt-8 border-t border-outline/5 text-center md:text-left flex flex-col md:flex-row justify-between gap-4">
+           <p className="text-xs text-secondary/60 font-medium">© 2024 {navbar.logo}. All rights reserved.</p>
+           <p className="text-xs text-secondary/60 font-medium">Designed with precision in Medan, Indonesia.</p>
         </div>
       </div>
     </footer>
