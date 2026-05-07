@@ -226,9 +226,10 @@ export default function SiteSettingsCMS() {
                    </div>
                 </div>
                 <div className="space-y-8">
-                  <InputField label="About Title" path="about.title" value={formData.about.title} />
-                  <InputField label="Detailed Bio / Mission" path="about.bio" value={formData.about.bio} type="textarea" />
-                  <ImageInput label="About Hero Visual" path="about.image" value={formData.about.image} />
+                  <InputField label="About Tagline" path="about.hero.tagline" value={formData.about.hero.tagline} />
+                  <InputField label="About Title" path="about.hero.title" value={formData.about.hero.title} />
+                  <InputField label="Detailed Subtitle / Bio" path="about.hero.subtitle" value={formData.about.hero.subtitle} type="textarea" />
+                  <ImageInput label="About Hero Visual" path="about.hero.image" value={formData.about.hero.image} />
                 </div>
              </div>
           </div>
