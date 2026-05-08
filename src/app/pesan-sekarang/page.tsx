@@ -91,9 +91,15 @@ export default function PesanSekarang() {
           total_price: getPrice()
         }]);
 
-        if (error) throw error;
+        if (error) {
+          console.error("Booking insert error (non-blocking):", error);
+        }
 
         await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
+      } catch (err) {
+        console.error("Submission error (non-blocking):", err);
+      } finally {
+        // Always redirect to WhatsApp even if DB logging fails
         setIsSubmitting(false);
         setShowSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -102,10 +108,6 @@ export default function PesanSekarang() {
         setTimeout(() => {
           window.open(waUrl, "_blank");
         }, 2000);
-      } catch (err) {
-        console.error("Submission error:", err);
-        setIsSubmitting(false);
-        alert("Terjadi kesalahan saat mengirim data. Silakan coba lagi.");
       }
     };
 
