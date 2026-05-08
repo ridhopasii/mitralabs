@@ -25,7 +25,8 @@ import {
   Filter,
   User,
   Clock,
-  Settings
+  Settings,
+  Zap
 } from "lucide-react";
 import { uploadImage } from "@/lib/supabase";
 import Image from "next/image";
