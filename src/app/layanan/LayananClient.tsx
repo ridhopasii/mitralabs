@@ -1,90 +1,112 @@
 "use client";
 
 import Footer from "@/components/Footer";
-import { Check, X } from "lucide-react";
+import { Check, X, ArrowRight } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import Link from "next/link";
 import FAQSection from "@/sections/home/FAQSection";
+import { motion } from "framer-motion";
 
 export default function LayananClient() {
   const { data } = useData();
-  const { services } = data;
+  const { services, settings } = data;
   const { plans, notes } = services;
+
+  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin bertanya tentang paket ")}`;
 
   return (
     <>
       <main className="bg-background">
         {/* Hero Section */}
-        <header className="pt-40 pb-20 px-6">
-          <div className="max-w-7xl mx-auto text-center animate-in fade-in slide-in-from-bottom-4 duration-700">
-            <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-6 block">Our Solutions</span>
-            <h1 className="font-display text-5xl md:text-8xl font-black text-on-surface mb-8 leading-[0.9] tracking-tighter">
-              {services.title}
-            </h1>
-            <p className="text-xl md:text-2xl text-on-surface-variant max-w-2xl mx-auto font-medium leading-relaxed opacity-80">
-              {services.subtitle}
-            </p>
+        <header className="pt-40 pb-24 md:pt-60 md:pb-40 px-6">
+          <div className="section-container text-center">
+            <motion.div
+              initial={{ opacity: 0, y: 30 }}
+              animate={{ opacity: 1, y: 0 }}
+              transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+            >
+              <span className="text-primary font-semibold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-6 block">Solusi Digital</span>
+              <h1 className="text-5xl md:text-8xl lg:text-9xl font-semibold text-on-surface mb-10 leading-[1.05] tracking-tight md:tracking-[-0.03em] reveal-text">
+                {services.title}
+              </h1>
+              <p className="text-xl md:text-2xl text-secondary max-w-3xl mx-auto font-medium leading-relaxed">
+                {services.subtitle}
+              </p>
+            </motion.div>
           </div>
         </header>
 
         {/* Pricing Section */}
-        <section className="py-24 px-6 bg-surface-container-low">
-          <div className="max-w-7xl mx-auto">
-            <div className="grid grid-cols-1 md:grid-cols-3 gap-8">
+        <section className="py-24 md:py-40 px-6 bg-surface-container/30">
+          <div className="section-container">
+            <div className="grid grid-cols-1 md:grid-cols-3 gap-10 md:gap-8 items-stretch">
               {plans.map((plan, idx) => (
-                <div
+                <motion.div
                   key={plan.id}
-                  className={`bg-surface-container-lowest p-12 rounded-[3rem] shadow-premium border flex flex-col transition-all duration-500 animate-in fade-in slide-in-from-bottom-10 ${
-                    plan.highlight ? "border-primary scale-105 z-10 shadow-2xl shadow-primary/20" : "border-surface-container-highest"
+                  initial={{ opacity: 0, y: 30 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ duration: 0.8, delay: idx * 0.1, ease: [0.22, 1, 0.36, 1] }}
+                  className={`relative flex flex-col p-10 md:p-14 rounded-[3.5rem] bg-background border transition-all duration-700 ${
+                    plan.highlight 
+                    ? "border-primary shadow-apple-hover ring-4 ring-primary/5 z-10" 
+                    : "border-outline/10 shadow-apple"
                   }`}
-                  style={{ animationDelay: `${idx * 100}ms` }}
                 >
                   {plan.highlight && (
-                    <div className="bg-primary text-on-primary px-6 py-2 rounded-full text-[10px] font-black uppercase tracking-widest self-center mb-8 shadow-lg">
+                    <div className="absolute -top-5 left-1/2 -translate-x-1/2 bg-primary text-on-primary px-8 py-2 rounded-full text-[10px] font-bold uppercase tracking-[0.2em] shadow-lg">
                       Paling Populer
                     </div>
                   )}
+                  
                   <div className="mb-12">
-                    <span className="text-primary font-black tracking-[0.2em] text-[10px] uppercase block mb-2">{plan.tier}</span>
-                    <h3 className="text-3xl font-black tracking-tight">{plan.name}</h3>
-                    <div className="mt-6 flex flex-col">
-                      <span className="text-5xl font-black tracking-tighter text-on-surface">{plan.price}</span>
-                      <span className="text-on-surface-variant text-xs font-bold uppercase tracking-widest mt-3 opacity-60">
+                    <span className="text-secondary font-bold tracking-[0.2em] text-[10px] uppercase block mb-3">{plan.tier}</span>
+                    <h3 className="text-4xl font-semibold tracking-tight text-on-background mb-8">{plan.name}</h3>
+                    <div className="flex flex-col">
+                      <span className="text-5xl md:text-6xl font-semibold tracking-tighter text-on-background">{plan.price}</span>
+                      <span className="text-secondary text-[11px] font-bold uppercase tracking-widest mt-4">
                         {plan.duration} • {plan.pages}
                       </span>
                     </div>
                   </div>
-                  <ul className="space-y-5 mb-12 flex-grow">
+
+                  <div className="h-px w-full bg-outline/10 mb-12"></div>
+
+                  <ul className="space-y-6 mb-12 flex-grow">
                     {plan.features.map((f, i) => (
-                      <li key={i} className="flex items-center gap-4 text-sm font-bold">
-                        <div className="w-6 h-6 rounded-lg bg-primary/10 flex items-center justify-center text-primary shrink-0">
-                           <Check size={14} />
+                      <li key={i} className="flex items-start gap-4 text-base font-medium text-on-surface">
+                        <div className="mt-1 w-5 h-5 rounded-full bg-success/10 flex items-center justify-center text-success shrink-0">
+                           <Check size={12} strokeWidth={3} />
                         </div>
                         {f}
                       </li>
                     ))}
                     {plan.missing.map((f, i) => (
-                      <li key={i} className="flex items-center gap-4 text-sm font-bold opacity-30">
-                        <div className="w-6 h-6 rounded-lg bg-surface-container-highest flex items-center justify-center shrink-0">
-                           <X size={14} />
+                      <li key={i} className="flex items-start gap-4 text-base font-medium text-secondary opacity-40">
+                        <div className="mt-1 w-5 h-5 rounded-full bg-outline/10 flex items-center justify-center text-secondary shrink-0">
+                           <X size={12} strokeWidth={3} />
                         </div>
-                        {f}
+                        <span className="line-through">{f}</span>
                       </li>
                     ))}
                   </ul>
-                  <button
-                    className={`w-full py-5 rounded-2xl font-black text-xs uppercase tracking-[0.2em] transition-all ${
+
+                  <a
+                    href={`${waUrl}${plan.name}`}
+                    target="_blank"
+                    className={`w-full text-center py-5 rounded-full font-bold text-sm uppercase tracking-widest transition-all duration-400 ${
                       plan.highlight
-                        ? "bg-primary text-on-primary hover:scale-105 active:scale-95 shadow-xl shadow-primary/20"
-                        : "bg-surface-container-low text-on-surface hover:bg-surface-container-high"
+                        ? "bg-on-background text-background hover:scale-[1.02] active:scale-[0.98] shadow-apple"
+                        : "bg-surface-container text-on-surface hover:bg-on-background hover:text-background"
                     }`}
                   >
                     Pilih Paket
-                  </button>
-                </div>
+                  </a>
+                </motion.div>
               ))}
             </div>
-            <div className="mt-20 text-center text-on-surface-variant/40 text-[10px] font-bold uppercase tracking-widest space-y-3">
+
+            <div className="mt-24 text-center text-secondary/50 text-[10px] font-bold uppercase tracking-[0.2em] space-y-3">
               {notes.map((note, i) => (
                 <p key={i}>{note}</p>
               ))}
@@ -93,35 +115,36 @@ export default function LayananClient() {
         </section>
 
         {/* Comparison Table */}
-        <section className="py-32 px-6">
-          <div className="max-w-7xl mx-auto">
-            <div className="text-center mb-24">
-              <span className="text-primary font-black uppercase tracking-[0.3em] text-[10px] mb-4 block">Feature Matrix</span>
-              <h2 className="text-4xl md:text-6xl font-black tracking-tighter leading-none mb-6">{services.comparisonTitle}</h2>
-              <p className="text-xl text-on-surface-variant font-medium max-w-2xl mx-auto opacity-60">{services.comparisonSubtitle}</p>
+        <section className="py-32 md:py-48 px-6">
+          <div className="section-container">
+            <div className="text-center mb-32">
+              <span className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">Perbandingan Detail</span>
+              <h2 className="text-5xl md:text-7xl font-semibold tracking-tight reveal-text mb-10">{services.comparisonTitle}</h2>
+              <p className="text-xl md:text-2xl text-secondary font-medium max-w-2xl mx-auto">{services.comparisonSubtitle}</p>
             </div>
-            <div className="overflow-x-auto bg-surface-container-lowest rounded-[3rem] border border-surface-container-highest shadow-premium">
-              <table className="w-full border-collapse">
+            
+            <div className="overflow-x-auto no-scrollbar rounded-[3.5rem] border border-outline/10 shadow-apple">
+              <table className="w-full border-collapse bg-background">
                 <thead>
-                  <tr className="border-b border-surface-container-highest text-left">
-                    <th className="p-10 text-[10px] font-black uppercase tracking-widest opacity-40 w-1/4">Fitur Utama</th>
+                  <tr className="border-b border-outline/10 text-left">
+                    <th className="p-10 md:p-14 text-[11px] font-bold uppercase tracking-[0.2em] text-secondary w-1/4">Fitur</th>
                     {plans.map(p => (
-                      <th key={p.id} className="p-10 text-[10px] font-black uppercase tracking-widest text-primary">{p.name}</th>
+                      <th key={p.id} className="p-10 md:p-14 text-[11px] font-bold uppercase tracking-[0.2em] text-on-background">{p.name}</th>
                     ))}
                   </tr>
                 </thead>
-                <tbody className="divide-y divide-surface-container-highest text-sm font-bold">
-                  <tr className="hover:bg-surface-container-low/30 transition-colors">
-                    <td className="p-10 opacity-60">Waktu Pengerjaan</td>
-                    {plans.map(p => <td key={p.id} className="p-10">{p.duration}</td>)}
+                <tbody className="divide-y divide-outline/10 text-lg font-medium text-on-surface">
+                  <tr className="hover:bg-surface-container transition-colors">
+                    <td className="p-10 md:p-14 text-secondary">Waktu Pengerjaan</td>
+                    {plans.map(p => <td key={p.id} className="p-10 md:p-14">{p.duration}</td>)}
                   </tr>
-                  <tr className="hover:bg-surface-container-low/30 transition-colors">
-                    <td className="p-10 opacity-60">Jumlah Halaman</td>
-                    {plans.map(p => <td key={p.id} className="p-10">{p.pages}</td>)}
+                  <tr className="hover:bg-surface-container transition-colors">
+                    <td className="p-10 md:p-14 text-secondary">Jumlah Halaman</td>
+                    {plans.map(p => <td key={p.id} className="p-10 md:p-14">{p.pages}</td>)}
                   </tr>
-                  <tr className="hover:bg-surface-container-low/30 transition-colors">
-                    <td className="p-10 opacity-60">Harga Estimasi</td>
-                    {plans.map(p => <td key={p.id} className="p-10 text-primary font-black">{p.price}</td>)}
+                  <tr className="hover:bg-surface-container transition-colors">
+                    <td className="p-10 md:p-14 text-secondary font-semibold">Investasi</td>
+                    {plans.map(p => <td key={p.id} className="p-10 md:p-14 text-primary font-bold">{p.price}</td>)}
                   </tr>
                 </tbody>
               </table>
@@ -130,23 +153,24 @@ export default function LayananClient() {
         </section>
 
         {/* CTA Section */}
-        <section className="py-24 px-6 mb-40">
-           <div className="max-w-7xl mx-auto bg-primary p-12 md:p-32 rounded-[4rem] text-center relative overflow-hidden group">
-              <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_#1A5CFF_0%,_transparent_70%)] opacity-50"></div>
-              <div className="relative z-10">
-                <h2 className="text-4xl md:text-7xl font-black mb-8 text-on-primary tracking-tighter leading-none">Siap untuk Go-Digital?</h2>
-                <p className="text-xl text-on-primary/70 max-w-2xl mx-auto mb-12 font-medium leading-relaxed">
-                  Konsultasikan kebutuhan bisnis Anda secara gratis dan dapatkan penawaran terbaik.
-                </p>
-                <div className="flex flex-col sm:flex-row gap-6 justify-center">
-                  <Link href="/kontak" className="bg-white text-primary px-12 py-6 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-110 transition-all shadow-2xl">
-                    Konsultasi Sekarang
-                  </Link>
-                  <Link href="/portfolio" className="border-2 border-white/20 text-white px-12 py-6 rounded-2xl font-black text-xs uppercase tracking-widest hover:bg-white/10 transition-all">
-                    Lihat Portfolio
-                  </Link>
+        <section className="py-24 md:py-48 px-6 mb-20">
+           <div className="section-container">
+             <div className="bg-surface-container p-16 md:p-32 rounded-[4rem] text-center relative overflow-hidden border border-outline/5 shadow-apple">
+                <div className="relative z-10">
+                  <h2 className="text-5xl md:text-8xl font-semibold mb-10 text-on-background tracking-tight reveal-text">Siap untuk Go-Digital?</h2>
+                  <p className="text-xl md:text-2xl text-secondary max-w-2xl mx-auto mb-16 font-medium leading-relaxed">
+                    Konsultasikan kebutuhan bisnis Anda secara gratis dan dapatkan penawaran terbaik dari tim ahli kami.
+                  </p>
+                  <div className="flex flex-col sm:flex-row gap-8 justify-center">
+                    <Link href="/kontak" className="btn-apple text-lg px-12 py-5 flex items-center justify-center gap-3">
+                      Konsultasi Gratis <ArrowRight size={20} />
+                    </Link>
+                    <Link href="/portfolio" className="btn-apple-secondary text-lg px-12 py-5 border border-outline/20">
+                      Lihat Portfolio
+                    </Link>
+                  </div>
                 </div>
-              </div>
+             </div>
            </div>
         </section>
 

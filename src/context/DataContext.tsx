@@ -17,12 +17,39 @@ export interface Plan {
 
 export interface Invoice {
   id: number;
-  project_id: number;
   invoice_number: string;
   amount: number;
-  status: string;
+  status: "Unpaid" | "Partial" | "Paid" | "Cancelled";
   due_date: string;
-  items: { desc: string; price: number }[];
+  items: { desc: string; price: number; qty: number }[];
+  client_name: string;
+  client_email: string;
+  created_at: string;
+}
+
+export interface Booking {
+  id: number;
+  customer_name: string;
+  customer_email: string;
+  customer_phone: string;
+  service_type: string;
+  plan_name: string;
+  project_brief: string;
+  desired_domain?: string;
+  business_industry?: string;
+  reference_websites?: string;
+  organization_name?: string;
+  position?: string;
+  target_audience?: string;
+  primary_cta?: string;
+  competitors_list?: string;
+  integrations_needed?: string;
+  biggest_expectation?: string;
+  status: "Pending" | "Confirmed" | "In-Progress" | "Completed" | "Cancelled";
+  created_at: string;
+  scheduled_date?: string;
+  total_price: number;
+  invoices?: Invoice[];
 }
 
 export interface Project {
@@ -182,6 +209,7 @@ interface AppData {
     answer: string;
     category: string;
   }[];
+  bookings: Booking[];
 }
 
 const initialData: AppData = {
@@ -194,7 +222,7 @@ const initialData: AppData = {
       { label: "About", href: "/tentang" },
       { label: "Contact", href: "/kontak" },
     ],
-    buttonText: "Get Started",
+    buttonText: "Pesan Sekarang",
   },
   home: {
     hero: {
@@ -452,6 +480,35 @@ const initialData: AppData = {
       answer: "Tidak ada biaya bulanan dari kami, hanya biaya tahunan untuk domain dan hosting.",
       category: "Harga"
     }
+  ],
+  bookings: [
+    {
+      id: 1,
+      customer_name: "John Doe",
+      customer_email: "john@example.com",
+      customer_phone: "628123456789",
+      service_type: "UMKM Website",
+      plan_name: "Standard",
+      project_brief: "Membangun landing page untuk toko roti saya.",
+      status: "Pending",
+      created_at: new Date().toISOString(),
+      total_price: 3500000,
+      invoices: [
+        {
+          id: 101,
+          invoice_number: "INV-2026-9000",
+          amount: 3500000,
+          status: "Unpaid",
+          due_date: "2026-05-15",
+          items: [
+            { desc: "Website Standard Package", price: 3500000, qty: 1 }
+          ],
+          client_name: "John Doe",
+          client_email: "john@example.com",
+          created_at: new Date().toISOString()
+        }
+      ]
+    }
   ]
 };
 
@@ -513,7 +570,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           postsRes,
           teamRes,
           testimonialsRes,
-          faqsRes
+          faqsRes,
+          bookingsRes
         ] = await Promise.all([
           supabase.from("SiteConfig").select("*").eq("id", 1).maybeSingle(),
           supabase.from("HeroSection").select("*").eq("id", 1).maybeSingle(),
@@ -523,11 +581,12 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           supabase.from("TeamMember").select("*").order("order", { ascending: true }),
           supabase.from("Testimonial").select("*"),
           supabase.from("FAQ").select("*").order("order", { ascending: true }),
+          supabase.from("Booking").select("*, Invoice(*)").order("created_at", { ascending: false }),
         ]);
 
         const merged = { ...initialData };
 
-        // 1. Map Config
+        // 1. Map Config & Global Structural Data
         if (configRes.data) {
           merged.navbar.logo = configRes.data.logo_text ?? initialData.navbar.logo;
           merged.navbar.buttonText = configRes.data.navbar_button ?? initialData.navbar.buttonText;
@@ -540,6 +599,26 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           merged.contact.instagram = configRes.data.instagram ?? initialData.contact.instagram;
           merged.contact.address = configRes.data.address ?? initialData.contact.address;
           merged.contact.mapsUrl = configRes.data.maps_url ?? initialData.contact.mapsUrl;
+
+          // Merge complex structural data from json_content if available
+          if (configRes.data.json_content) {
+            try {
+              const structural = typeof configRes.data.json_content === 'string' 
+                ? JSON.parse(configRes.data.json_content) 
+                : configRes.data.json_content;
+              
+              // Deep merge structural content to preserve defaults for new fields
+              if (structural.home) merged.home = mergeData(merged.home, structural.home);
+              if (structural.services) merged.services = mergeData(merged.services, structural.services);
+              if (structural.portfolio) merged.portfolio = mergeData(merged.portfolio, structural.portfolio);
+              if (structural.about) merged.about = mergeData(merged.about, structural.about);
+              if (structural.contact) merged.contact = mergeData(merged.contact, structural.contact);
+              if (structural.footer) merged.footer = mergeData(merged.footer, structural.footer);
+              if (structural.navbar) merged.navbar = mergeData(merged.navbar, structural.navbar);
+            } catch (e) {
+              console.error("Failed to parse structural json_content", e);
+            }
+          }
         }
 
         // 2. Map Hero
@@ -583,6 +662,13 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           }));
         }
         if (faqsRes.data && faqsRes.data.length > 0) merged.faqs = faqsRes.data;
+        
+        if (bookingsRes.data && bookingsRes.data.length > 0) {
+          merged.bookings = bookingsRes.data.map((b: any) => ({
+            ...b,
+            invoices: b.Invoice || []
+          }));
+        }
 
         setData(merged);
         localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(merged));
@@ -603,9 +689,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
     if (isSupabaseConfigured()) {
       try {
-        // Legacy support: We still keep a backup in json_content for emergency 
-        // but we should ideally update each table. 
-        // For now, let's update the Config and Hero as they are most critical.
+        const allInvoices = newData.bookings.flatMap(b => (b.invoices || []).map(inv => ({ ...inv, booking_id: b.id })));
+        const allProjectInvoices = newData.portfolio.projects.flatMap(p => (p.invoices || []).map(inv => ({ ...inv, project_id: p.id })));
+
         await Promise.all([
           supabase.from("SiteConfig").upsert({
             id: 1,
@@ -620,6 +706,15 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             instagram: newData.contact.instagram,
             address: newData.contact.address,
             maps_url: newData.contact.mapsUrl,
+            json_content: {
+              home: newData.home,
+              services: newData.services,
+              portfolio: newData.portfolio,
+              about: newData.about,
+              contact: newData.contact,
+              footer: newData.footer,
+              navbar: newData.navbar
+            }
           }),
           supabase.from("HeroSection").upsert({
             id: 1,
@@ -632,9 +727,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             stats_value: newData.home.hero.stats.value,
             stats_desc: newData.home.hero.stats.desc,
           }),
-          // Bulk update projects (simplified for dev bypass)
           ...newData.portfolio.projects.map(p => supabase.from("Project").upsert({
-            id: p.id > 1000000000 ? undefined : p.id, // Handle temporary IDs
+            id: p.id > 1000000000 ? undefined : p.id,
             slug: p.slug,
             title: p.title,
             category: p.category,
@@ -643,12 +737,51 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             challenge: p.challenge,
             solution: p.solution,
             results: p.results,
-            client_name: p.client_name,
-            project_date: p.project_date,
-            live_link: p.live_link,
-            tech_stack: p.tech_stack,
-            gallery_urls: p.gallery_urls,
             status: p.status
+          })),
+          ...newData.bookings.map(b => supabase.from("Booking").upsert({
+            id: b.id > 1000000000 ? undefined : b.id,
+            customer_name: b.customer_name,
+            customer_email: b.customer_email,
+            customer_phone: b.customer_phone,
+            service_type: b.service_type,
+            plan_name: b.plan_name,
+            project_brief: b.project_brief,
+            desired_domain: b.desired_domain,
+            business_industry: b.business_industry,
+            reference_websites: b.reference_websites,
+            organization_name: b.organization_name,
+            position: b.position,
+            target_audience: b.target_audience,
+            primary_cta: b.primary_cta,
+            competitors_list: b.competitors_list,
+            integrations_needed: b.integrations_needed,
+            biggest_expectation: b.biggest_expectation,
+            status: b.status,
+            total_price: b.total_price,
+            scheduled_date: b.scheduled_date
+          })),
+          ...allInvoices.map(inv => supabase.from("Invoice").upsert({
+            id: inv.id > 1000000000 ? undefined : inv.id,
+            invoice_number: inv.invoice_number,
+            amount: inv.amount,
+            status: inv.status,
+            due_date: inv.due_date,
+            items: inv.items,
+            client_name: inv.client_name,
+            client_email: inv.client_email,
+            booking_id: inv.booking_id
+          })),
+          ...allProjectInvoices.map(inv => supabase.from("Invoice").upsert({
+            id: inv.id > 1000000000 ? undefined : inv.id,
+            invoice_number: inv.invoice_number,
+            amount: inv.amount,
+            status: inv.status,
+            due_date: inv.due_date,
+            items: inv.items,
+            client_name: inv.client_name,
+            client_email: inv.client_email,
+            project_id: inv.project_id
           }))
         ]);
       } catch (e) {

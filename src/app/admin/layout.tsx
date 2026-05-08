@@ -32,6 +32,7 @@ export default function AdminLayout({
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
+    { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
     { name: "Site Settings", icon: Settings, href: "/admin/konten", category: "CMS" },
     { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
     { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },
@@ -47,36 +48,39 @@ export default function AdminLayout({
   if (!isAuthorized) return null;
 
   return (
-    <div className="flex min-h-screen bg-surface-container font-sans text-on-surface selection:bg-primary/10">
-      {/* Apple-style Sidebar */}
-      <aside className="w-72 bg-surface-container-low border-r border-outline/5 flex flex-col z-50 overflow-hidden">
-        <div className="p-8 pb-10">
-          <Link href="/" className="flex items-center gap-3">
-            <div className="w-8 h-8 bg-on-background text-background rounded-lg flex items-center justify-center font-bold text-sm">
+    <div className="flex min-h-screen bg-[#FBFBFD] font-sans text-slate-900 selection:bg-primary/10">
+      {/* Refined Minimalist Sidebar */}
+      <aside className="w-72 bg-white border-r border-slate-200/60 flex flex-col z-50 overflow-hidden shadow-sm">
+        <div className="p-10 pb-12">
+          <Link href="/admin" className="flex items-center gap-4">
+            <div className="w-10 h-10 bg-slate-900 text-white rounded-2xl flex items-center justify-center font-bold text-lg shadow-lg shadow-slate-900/10">
               M
             </div>
-            <span className="font-semibold text-sm tracking-tight">Mitralabs Admin</span>
+            <div className="flex flex-col">
+              <span className="font-bold text-sm tracking-tight leading-none mb-1">Mitralabs</span>
+              <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Admin Portal</span>
+            </div>
           </Link>
         </div>
 
-        <nav className="flex-grow overflow-y-auto px-4 space-y-8 custom-scrollbar">
+        <nav className="flex-grow overflow-y-auto px-6 space-y-10 custom-scrollbar">
           {categories.map((cat) => (
-            <div key={cat} className="space-y-1">
-              <h3 className="px-4 text-[10px] font-bold uppercase tracking-[0.2em] text-secondary mb-3">{cat}</h3>
-              <div className="space-y-0.5">
+            <div key={cat} className="space-y-4">
+              <h3 className="px-4 text-[10px] font-bold uppercase tracking-[0.3em] text-slate-300">{cat}</h3>
+              <div className="space-y-1">
                 {menuItems.filter(i => i.category === cat).map((item) => {
                   const isActive = pathname === item.href;
                   return (
                     <Link
                       key={item.name}
                       href={item.href}
-                      className={`flex items-center gap-3 px-4 py-2.5 rounded-xl transition-all font-medium text-sm ${
+                      className={`flex items-center gap-4 px-5 py-3 rounded-2xl transition-all font-bold text-[13px] ${
                         isActive 
-                          ? "bg-white shadow-apple text-on-background" 
-                          : "text-secondary hover:bg-white/50 hover:text-on-background"
+                          ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10 translate-x-2" 
+                          : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
-                      <item.icon size={16} strokeWidth={isActive ? 2.5 : 2} />
+                      <item.icon size={18} strokeWidth={isActive ? 2.5 : 2} />
                       {item.name}
                     </Link>
                   );
@@ -85,42 +89,49 @@ export default function AdminLayout({
             </div>
           ))}
           
-          <div className="pt-8">
-             <Link href="/" target="_blank" className="flex items-center justify-between px-4 py-3 bg-primary/5 rounded-2xl text-primary text-xs font-semibold hover:bg-primary/10 transition-all">
-                Buka Website <ExternalLink size={14} />
+          <div className="pt-6">
+             <Link href="/" target="_blank" className="flex items-center justify-between px-6 py-4 bg-slate-50 rounded-2xl text-slate-600 text-[11px] font-bold uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all border border-slate-100">
+                View Site <ExternalLink size={14} />
              </Link>
           </div>
         </nav>
 
-        <div className="p-6 mt-auto border-t border-outline/5">
-          <button className="w-full flex items-center gap-3 px-4 py-3 rounded-xl text-error font-semibold text-sm hover:bg-error/5 transition-all">
-            <LogOut size={16} />
-            Keluar
+        <div className="p-8 mt-auto border-t border-slate-100">
+          <button className="w-full flex items-center gap-4 px-6 py-4 rounded-2xl text-rose-500 font-bold text-[13px] hover:bg-rose-50 transition-all">
+            <LogOut size={18} />
+            Sign Out
           </button>
         </div>
       </aside>
 
-      {/* Main Content */}
-      <main className="flex-grow overflow-y-auto h-screen p-10 bg-background">
+      {/* Clean Main Content Area */}
+      <main className="flex-grow overflow-y-auto h-screen p-10 lg:p-16">
         <header className="flex justify-between items-center mb-16">
-          <div>
-            <h1 className="text-3xl font-semibold tracking-tight text-on-background capitalize">
-              {menuItems.find(i => i.href === pathname)?.name || "Dashboard"}
+          <div className="space-y-1">
+            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+              {menuItems.find(i => i.href === pathname)?.name || "Overview"}
             </h1>
-            <p className="text-secondary font-medium text-sm mt-1">Sistem Kontrol Minimalis Mitralabs</p>
-          </div>
-          <div className="flex items-center gap-4">
-            <div className="text-right">
-              <p className="text-sm font-semibold text-on-background">Ridho Robbi Pasi</p>
-              <p className="text-[11px] text-secondary font-medium uppercase tracking-widest">Administrator</p>
+            <div className="flex items-center gap-2 text-slate-400">
+              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+              <p className="font-bold text-[11px] uppercase tracking-widest">System Control Interface</p>
             </div>
-            <div className="w-10 h-10 bg-surface-container-highest rounded-full flex items-center justify-center font-bold text-sm">
-              RP
+          </div>
+          
+          <div className="flex items-center gap-6">
+            <div className="text-right hidden sm:block">
+              <p className="text-sm font-bold text-slate-900">Ridho Robbi Pasi</p>
+              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Master Admin</p>
+            </div>
+            <div className="relative group">
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-bold text-slate-900 shadow-sm border border-slate-200 group-hover:border-primary transition-all">
+                RP
+              </div>
+              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full"></div>
             </div>
           </div>
         </header>
 
-        <div className="animate-in fade-in slide-in-from-bottom-2 duration-700">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">
            {children}
         </div>
       </main>

@@ -2,38 +2,31 @@
 
 import { useData } from "@/context/DataContext";
 import { MessageCircle } from "lucide-react";
+import Link from "next/link";
 
 export default function CTASection() {
   const { data } = useData();
   const { cta } = data.home;
   const { settings } = data;
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
-
   return (
-    <section className="py-24 px-6">
-      <div className="max-w-5xl mx-auto bg-primary rounded-[3rem] p-12 md:p-20 text-center text-on-primary shadow-premium relative overflow-hidden">
-        <div className="absolute top-0 right-0 w-64 h-64 bg-on-primary/10 rounded-full blur-3xl -mr-32 -mt-32"></div>
-        <div className="absolute bottom-0 left-0 w-96 h-96 bg-on-primary/5 rounded-full blur-3xl -ml-48 -mb-48"></div>
-        
+    <section className="py-24 md:py-40 px-4 md:px-6">
+      <div className="max-w-6xl mx-auto bg-surface-container rounded-[2.5rem] md:rounded-[4rem] p-10 md:p-32 text-center shadow-apple relative overflow-hidden border border-outline/5">
         <div className="relative z-10">
-          <h2 className="font-display text-4xl md:text-6xl font-black mb-8 leading-tight tracking-tighter">
+          <h2 className="text-4xl md:text-8xl font-semibold mb-6 md:mb-10 leading-[1.1] tracking-tight text-on-background text-balance reveal-text">
             {cta.title}
           </h2>
-          <p className="text-xl md:text-2xl mb-12 opacity-80 max-w-2xl mx-auto font-medium leading-relaxed">
+          <p className="text-lg md:text-2xl mb-10 md:mb-14 text-secondary max-w-2xl mx-auto font-medium leading-relaxed">
             {cta.subtitle}
           </p>
-          <div className="flex flex-col items-center gap-6">
-            <a
-              href={waUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className="bg-on-primary text-primary px-12 py-6 rounded-2xl font-black text-xl shadow-2xl hover:scale-[1.05] active:scale-[0.95] transition-all flex items-center gap-4"
+          <div className="flex flex-col items-center gap-6 md:gap-8">
+            <Link
+              href="/pesan-sekarang"
+              className="btn-apple w-full sm:w-auto text-lg md:text-xl px-12 py-4 md:py-5"
             >
-              <MessageCircle size={28} />
-              {cta.buttonText}
-            </a>
-            <p className="text-sm font-bold opacity-60 tracking-widest uppercase">
+              Pesan Sekarang
+            </Link>
+            <p className="text-[8px] md:text-[10px] font-bold text-secondary tracking-[0.2em] uppercase">
               {cta.promoText}
             </p>
           </div>

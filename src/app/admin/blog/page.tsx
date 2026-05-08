@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
 import { 
@@ -24,7 +25,8 @@ import {
   Layout,
   BookOpen,
   Tag,
-  Upload
+  Upload,
+  Zap
 } from "lucide-react";
 import { z } from "zod";
 import { uploadImage, logActivity } from "@/lib/supabase";
@@ -53,26 +55,39 @@ export default function BlogManagement() {
   const [isUploading, setIsUploading] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [activeTab, setActiveTab] = useState("identity");
   
   useEffect(() => {
     setPosts(data.blog.posts);
   }, [data.blog.posts]);
 
+  const generateSlug = (title: string) => {
+    return title
+      .toLowerCase()
+      .replace(/[^\w ]+/g, "")
+      .replace(/ +/g, "-");
+  };
+
   const handleSave = () => {
     setErrors([]);
     if (!editingPost) return;
 
-    const result = blogPostSchema.safeParse(editingPost);
+    const postWithSlug = {
+      ...editingPost,
+      slug: editingPost.slug || generateSlug(editingPost.title)
+    };
+
+    const result = blogPostSchema.safeParse(postWithSlug);
     if (!result.success) {
       setErrors(result.error.issues.map((e: any) => e.message));
       return;
     }
 
     setIsSaving(true);
-    const isNew = !posts.some(p => p.id === editingPost.id);
+    const isNew = !posts.some(p => p.id === postWithSlug.id);
     const newPosts = isNew 
-      ? [{ ...editingPost, id: Date.now() }, ...posts]
-      : posts.map(p => p.id === editingPost.id ? editingPost : p);
+      ? [{ ...postWithSlug, id: Date.now() }, ...posts]
+      : posts.map(p => p.id === postWithSlug.id ? postWithSlug : p);
     
     const newData = { ...data };
     newData.blog.posts = newPosts;
@@ -80,7 +95,7 @@ export default function BlogManagement() {
     setTimeout(() => {
       updateData(newData);
       setPosts(newPosts);
-      logActivity(isNew ? "Create Blog" : "Update Blog", `Artikel: ${editingPost.title}`);
+      logActivity(isNew ? "Create Blog" : "Update Blog", `Artikel: ${postWithSlug.title}`);
       setIsSaving(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
@@ -89,7 +104,7 @@ export default function BlogManagement() {
   };
 
   const deletePost = (id: number) => {
-    if (!confirm("Hapus artikel ini?")) return;
+    if (!confirm("Hapus artikel ini secara permanen?")) return;
     const newPosts = posts.filter(p => p.id !== id);
     const newData = { ...data };
     newData.blog.posts = newPosts;
@@ -114,322 +129,316 @@ export default function BlogManagement() {
   );
 
   return (
-    <div className="space-y-10 pb-20 animate-in fade-in duration-700">
-      {showSuccess && (
-        <div className="fixed top-10 right-10 z-[200] bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 duration-500 font-bold">
-          <CheckCircle2 size={24} />
-          Blog Berhasil Diperbarui!
-        </div>
-      )}
+    <div className="space-y-10 pb-20">
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-10 right-10 z-[300] bg-slate-900 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 font-bold border border-white/10"
+          >
+            <CheckCircle2 size={24} className="text-primary" />
+            Editorial Content Synchronized!
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Header Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
+      {/* Modern Header */}
+      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8">
         <div>
-          <h2 className="text-5xl font-black tracking-tighter text-slate-900">Blog Library</h2>
-          <p className="text-slate-500 font-medium mt-2 text-lg">Bagikan wawasan dan berita terbaru kepada audiens Anda.</p>
+          <h2 className="text-4xl font-bold tracking-tight text-slate-900 leading-none">Editorial Hub.</h2>
+          <p className="text-slate-400 font-medium mt-3 text-lg">Bagikan wawasan dan berita terbaru kepada audiens Anda.</p>
         </div>
-        <button 
-          onClick={() => setEditingPost({
-            id: 0,
-            title: "",
-            slug: "",
-            category: "Edukasi",
-            author: "Admin",
-            date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
-            image: "",
-            content: "",
-            excerpt: ""
-          })}
-          className="px-10 py-5 bg-primary text-on-primary rounded-[2rem] font-black flex items-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30"
-        >
-          <Plus size={24} /> Tambah Artikel
-        </button>
-      </div>
-
-      {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center">
-            <BookOpen size={28} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Artikel</p>
-            <h4 className="text-3xl font-black text-slate-900">{posts.length}</h4>
-          </div>
-        </div>
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center">
-            <Tag size={28} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Kategori</p>
-            <h4 className="text-3xl font-black text-slate-900">{Array.from(new Set(posts.map(p => p.category))).length}</h4>
-          </div>
-        </div>
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
-            <UserIcon size={28} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Penulis</p>
-            <h4 className="text-3xl font-black text-slate-900">{Array.from(new Set(posts.map(p => p.author))).length}</h4>
-          </div>
-        </div>
-      </div>
-
-      {/* Table Section */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
-        <div className="p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50/50">
-          <div className="relative w-full md:w-96">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
-            <input 
-              type="text" 
-              placeholder="Cari judul, kategori, atau penulis..."
-              value={search}
-              onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-16 pr-8 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-primary font-bold transition-all shadow-sm"
-            />
-          </div>
-          <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:border-primary hover:text-primary transition-all">
-            <Filter size={18} />
-            Filter
+        <div className="flex items-center gap-4 w-full md:w-auto">
+           <div className="relative group flex-grow md:flex-grow-0">
+              <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
+              <input 
+                type="text" 
+                placeholder="Cari artikel..."
+                value={search}
+                onChange={(e) => setSearch(e.target.value)}
+                className="pl-16 pr-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none focus:border-primary/30 font-bold text-sm w-full md:w-80 transition-all shadow-sm"
+              />
+           </div>
+           <button 
+            onClick={() => { setEditingPost({
+              id: 0,
+              title: "",
+              slug: "",
+              category: "Edukasi",
+              author: "Admin",
+              date: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'short', year: 'numeric' }),
+              image: "",
+              content: "",
+              excerpt: ""
+            }); setActiveTab("identity"); }}
+            className="bg-slate-900 text-white px-10 py-5 rounded-2xl font-bold text-[11px] uppercase tracking-widest flex items-center gap-4 hover:opacity-90 active:scale-95 transition-all shadow-xl"
+          >
+            <Plus size={20} /> Create Article
           </button>
         </div>
-
-        <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
-            <thead>
-              <tr className="border-b border-slate-50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <th className="px-10 py-6">Artikel Info</th>
-                <th className="px-6 py-6">Category</th>
-                <th className="px-6 py-6">Author</th>
-                <th className="px-6 py-6">Date</th>
-                <th className="px-10 py-6 text-right">Actions</th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-slate-50">
-              {filteredPosts.map((post) => (
-                <tr key={post.id} className="group hover:bg-slate-50/50 transition-all">
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-6">
-                      <div className="w-20 h-14 rounded-xl overflow-hidden bg-slate-100 relative shadow-sm">
-                        {post.image ? (
-                          <Image src={post.image} alt={post.title} fill className="object-cover" />
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-slate-300">
-                            <ImageIcon size={20} />
-                          </div>
-                        )}
-                      </div>
-                      <div className="max-w-md">
-                        <h5 className="font-black text-slate-900 group-hover:text-primary transition-colors line-clamp-1">{post.title}</h5>
-                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{post.slug}</p>
-                      </div>
-                    </div>
-                  </td>
-                  <td className="px-6 py-6">
-                     <span className="px-3 py-1 bg-indigo-50 text-indigo-600 rounded-lg text-[10px] font-black uppercase tracking-widest">
-                       {post.category}
-                     </span>
-                  </td>
-                  <td className="px-6 py-6">
-                    <div className="flex items-center gap-2 font-bold text-slate-600">
-                      <div className="w-6 h-6 bg-slate-200 rounded-full flex items-center justify-center text-[10px]">
-                        {post.author.charAt(0)}
-                      </div>
-                      {post.author}
-                    </div>
-                  </td>
-                  <td className="px-6 py-6 text-slate-400 font-medium text-sm">
-                    {post.date}
-                  </td>
-                  <td className="px-10 py-6 text-right">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                      <button 
-                        onClick={() => setEditingPost(post)}
-                        className="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:border-primary hover:text-primary shadow-sm"
-                      >
-                        <Edit3 size={18} />
-                      </button>
-                      <button 
-                        onClick={() => deletePost(post.id)}
-                        className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white shadow-sm"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
-            </tbody>
-          </table>
-          {filteredPosts.length === 0 && (
-            <div className="p-20 text-center space-y-4 text-slate-400">
-              <Search size={48} className="mx-auto opacity-20" />
-              <p className="font-bold">Tidak ada artikel yang ditemukan.</p>
-            </div>
-          )}
-        </div>
       </div>
 
-      {/* Edit/Add Modal */}
-      {editingPost && (
-        <div className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-6xl max-h-[90vh] rounded-[3.5rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 border border-white/20">
-            {/* Modal Header */}
-            <div className="p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-               <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-primary text-on-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/40">
-                    <FileText size={32} />
+      {/* Grid View for Blog Posts */}
+      <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8">
+        {filteredPosts.map((post) => (
+          <div key={post.id} className="group bg-white border border-slate-200/60 rounded-[2.5rem] overflow-hidden shadow-sm hover:shadow-xl transition-all duration-500 flex flex-col">
+            <div className="aspect-video relative overflow-hidden bg-slate-50">
+              {post.image ? (
+                <Image src={post.image} alt={post.title} fill className="object-cover group-hover:scale-105 transition-transform duration-700" />
+              ) : (
+                <div className="flex items-center justify-center h-full text-slate-200">
+                  <ImageIcon size={48} strokeWidth={1} />
+                </div>
+              )}
+              <div className="absolute top-6 left-6">
+                 <span className="px-4 py-1.5 bg-white/90 backdrop-blur-md text-slate-900 rounded-full text-[9px] font-bold uppercase tracking-widest shadow-sm">
+                    {post.category}
+                 </span>
+              </div>
+            </div>
+            <div className="p-10 flex-grow flex flex-col">
+               <div className="flex items-center gap-4 text-[9px] font-bold uppercase tracking-widest text-slate-400 mb-6">
+                  <div className="flex items-center gap-2">
+                    <Calendar size={14} className="text-primary" />
+                    {post.date}
                   </div>
-                  <div>
-                    <h3 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">
-                      {editingPost.id === 0 ? "Tulis Artikel Baru" : "Edit Artikel"}
-                    </h3>
-                    <p className="text-xs text-slate-400 font-black tracking-[0.2em] uppercase mt-1">Publikasikan ide dan edukasi digital</p>
+                  <div className="flex items-center gap-2">
+                    <UserIcon size={14} className="text-primary" />
+                    {post.author}
                   </div>
                </div>
-               <button onClick={() => setEditingPost(null)} className="p-5 bg-slate-100 text-slate-400 rounded-2xl hover:bg-rose-50 hover:text-rose-500 transition-all">
-                  <X size={24} />
-               </button>
-            </div>
-
-            {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
-               {errors.length > 0 && (
-                 <div className="bg-rose-50 border border-rose-100 p-8 rounded-[2rem] mb-10 flex gap-6 items-start animate-in slide-in-from-top-4">
-                    <AlertCircle className="text-rose-500 shrink-0" size={24} />
-                    <ul className="space-y-1">
-                      {errors.map((e, i) => <li key={i} className="text-rose-600 font-bold text-sm"># {e}</li>)}
-                    </ul>
-                 </div>
-               )}
-
-               <div className="grid lg:grid-cols-12 gap-12">
-                  {/* Sidebar Info */}
-                  <div className="lg:col-span-4 space-y-10">
-                    <div className="space-y-4">
-                      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Featured Image</label>
-                      <div className="relative group aspect-video rounded-[2.5rem] overflow-hidden border-4 border-dashed border-slate-100 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-all">
-                        {editingPost.image && <Image src={editingPost.image} alt="Preview" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />}
-                        <div className="relative z-10 bg-white/90 backdrop-blur-xl p-6 rounded-3xl shadow-2xl flex flex-col items-center gap-3 opacity-0 group-hover:opacity-100 transition-all transform translate-y-4 group-hover:translate-y-0">
-                          {isUploading ? <Loader2 size={32} className="animate-spin text-primary" /> : <Upload size={32} className="text-primary" />}
-                          <p className="font-black text-[10px] uppercase tracking-widest text-slate-900">Upload Image</p>
-                        </div>
-                        {!editingPost.image && (
-                          <div className="flex flex-col items-center gap-3 text-slate-200">
-                             <ImageIcon size={64} strokeWidth={1} />
-                             <p className="font-black text-[10px] uppercase tracking-widest">Featured Art</p>
-                          </div>
-                        )}
-                        <input type="file" accept="image/*" onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
-                      </div>
-                    </div>
-
-                    <div className="bg-slate-50 p-8 rounded-[2.5rem] border border-slate-100 space-y-8">
-                       <div className="space-y-3">
-                          <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Detail Publikasi</label>
-                          <div className="space-y-4">
-                             <div className="relative">
-                               <UserIcon className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                               <input 
-                                 type="text" 
-                                 value={editingPost.author}
-                                 placeholder="Nama Penulis"
-                                 onChange={(e) => setEditingPost({...editingPost, author: e.target.value})}
-                                 className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none font-bold text-sm focus:border-primary transition-all shadow-sm"
-                               />
-                             </div>
-                             <div className="relative">
-                               <Calendar className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                               <input 
-                                 type="text" 
-                                 value={editingPost.date}
-                                 placeholder="Tanggal Terbit"
-                                 onChange={(e) => setEditingPost({...editingPost, date: e.target.value})}
-                                 className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none font-bold text-sm focus:border-primary transition-all shadow-sm"
-                               />
-                             </div>
-                             <div className="relative">
-                               <Tag className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
-                               <input 
-                                 type="text" 
-                                 value={editingPost.category}
-                                 placeholder="Kategori"
-                                 onChange={(e) => setEditingPost({...editingPost, category: e.target.value})}
-                                 className="w-full pl-14 pr-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none font-bold text-sm focus:border-primary transition-all shadow-sm"
-                               />
-                             </div>
-                          </div>
-                       </div>
-                    </div>
-                  </div>
-
-                  {/* Main Content */}
-                  <div className="lg:col-span-8 space-y-10">
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Judul & Identitas</label>
-                        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
-                           <input 
-                              type="text" 
-                              value={editingPost.title}
-                              placeholder="Judul Artikel Menarik..."
-                              onChange={(e) => setEditingPost({...editingPost, title: e.target.value})}
-                              className="w-full px-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-black text-xl focus:border-primary transition-all shadow-sm md:col-span-1"
-                           />
-                           <input 
-                              type="text" 
-                              value={editingPost.slug}
-                              placeholder="url-slug-artikel"
-                              onChange={(e) => setEditingPost({...editingPost, slug: e.target.value})}
-                              className="w-full px-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-lg focus:border-primary transition-all shadow-sm md:col-span-1"
-                           />
-                        </div>
-                     </div>
-
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Ringkasan Singkat (Excerpt)</label>
-                        <textarea 
-                           value={editingPost.excerpt}
-                           placeholder="Jelaskan secara singkat isi artikel ini untuk ditampilkan di halaman depan..."
-                           onChange={(e) => setEditingPost({...editingPost, excerpt: e.target.value})}
-                           className="w-full px-8 py-6 bg-white border border-slate-200 rounded-[2rem] outline-none font-medium text-lg focus:border-primary h-32 transition-all shadow-sm resize-none"
-                        />
-                     </div>
-
-                     <div className="space-y-4 flex flex-col h-full">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Konten Lengkap</label>
-                        <textarea 
-                           value={editingPost.content}
-                           placeholder="Tuliskan isi artikel Anda secara mendalam di sini..."
-                           onChange={(e) => setEditingPost({...editingPost, content: e.target.value})}
-                           className="flex-1 w-full px-8 py-8 bg-white border border-slate-200 rounded-[2.5rem] outline-none font-medium text-lg focus:border-primary transition-all min-h-[400px] shadow-sm custom-scrollbar"
-                        />
-                     </div>
-                  </div>
+               <h4 className="text-xl font-bold text-slate-900 tracking-tight leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">{post.title}</h4>
+               <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-8">/{post.slug}</p>
+               
+               <div className="mt-auto pt-8 border-t border-slate-100 flex justify-between items-center">
+                  <button 
+                    onClick={() => { setEditingPost(post); setActiveTab("identity"); }}
+                    className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-primary transition-colors"
+                  >
+                    Edit Details <Edit3 size={14} />
+                  </button>
+                  <button 
+                    onClick={() => deletePost(post.id)}
+                    className="p-3 text-slate-300 hover:text-rose-500 transition-colors"
+                  >
+                    <Trash2 size={16} />
+                  </button>
                </div>
-            </div>
-
-            {/* Modal Footer */}
-            <div className="p-10 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-6">
-               <button 
-                 onClick={() => setEditingPost(null)}
-                 className="px-12 py-5 bg-white border border-slate-200 text-slate-600 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all shadow-sm"
-               >
-                 Batal
-               </button>
-               <button 
-                 onClick={handleSave}
-                 disabled={isSaving}
-                 className="px-16 py-5 bg-primary text-on-primary rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 disabled:opacity-50"
-               >
-                 {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
-                 {isSaving ? "Menyimpan..." : "Simpan & Publish"}
-               </button>
             </div>
           </div>
-        </div>
-      )}
+        ))}
+        {filteredPosts.length === 0 && (
+          <div className="md:col-span-2 lg:col-span-3 py-32 text-center bg-slate-50/50 rounded-[3rem] border border-dashed border-slate-200">
+             <div className="flex flex-col items-center gap-6 opacity-20">
+                <Search size={64} strokeWidth={1} />
+                <p className="font-bold uppercase tracking-[0.3em] text-[10px]">No publications found in the library</p>
+             </div>
+          </div>
+        )}
+      </div>
+
+      {/* Enhanced Modal Console */}
+      <AnimatePresence>
+        {editingPost && (
+          <div className="fixed inset-0 z-[400] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEditingPost(null)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.98, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 20 }}
+              className="bg-white w-full max-w-6xl max-h-[90vh] rounded-[2.5rem] shadow-2xl flex flex-col overflow-hidden relative z-10 border border-slate-200"
+            >
+              {/* Modal Header */}
+              <div className="p-8 lg:p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
+                 <div className="flex items-center gap-6">
+                    <div className="w-14 h-14 bg-slate-900 text-white rounded-2xl flex items-center justify-center shadow-lg">
+                      <FileText size={28} />
+                    </div>
+                    <div>
+                      <h3 className="text-2xl font-bold tracking-tight text-slate-900 uppercase">
+                        {editingPost.id === 0 ? "Narrative Blueprint" : "Editorial Console"}
+                      </h3>
+                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mt-1 flex items-center gap-2">
+                        <CheckCircle2 size={12} className="text-primary" /> Content Engine v3.0
+                      </p>
+                    </div>
+                 </div>
+                 <button onClick={() => setEditingPost(null)} className="p-3 text-slate-400 hover:text-slate-900 transition-all bg-white border border-slate-200 rounded-xl">
+                    <X size={20} />
+                 </button>
+              </div>
+
+              <div className="flex-1 overflow-hidden flex flex-col lg:flex-row">
+                  {/* Modal Sidebar */}
+                  <div className="lg:w-64 border-r border-slate-100 p-8 bg-slate-50/30 space-y-2 shrink-0 overflow-y-auto">
+                     <p className="px-4 text-[9px] font-bold uppercase tracking-[0.2em] text-slate-400 mb-6">Article Modules</p>
+                     {[
+                       { id: "identity", label: "Metadata", icon: UserIcon },
+                       { id: "narrative", label: "Narrative", icon: Type },
+                       { id: "media", label: "Visual Hub", icon: ImageIcon }
+                     ].map((tab) => (
+                       <button 
+                        key={tab.id} 
+                        onClick={() => setActiveTab(tab.id)}
+                        className={`w-full text-left px-5 py-3.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-4 ${activeTab === tab.id ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10" : "text-slate-500 hover:bg-white hover:text-slate-900"}`}
+                       >
+                         <tab.icon size={16} /> {tab.label}
+                       </button>
+                     ))}
+                  </div>
+
+                  {/* Form Content Area */}
+                  <div className="flex-1 overflow-y-auto p-10 lg:p-14 custom-scrollbar bg-white">
+                     {activeTab === "identity" && (
+                        <div className="space-y-12 animate-in fade-in slide-in-from-right-4 duration-500">
+                           <div className="grid md:grid-cols-2 gap-10">
+                              <div className="space-y-3">
+                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Article Headline</label>
+                                 <input 
+                                    type="text" 
+                                    value={editingPost.title}
+                                    onChange={(e) => setEditingPost({...editingPost, title: e.target.value})}
+                                    className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-lg focus:border-primary/50 focus:bg-white transition-all"
+                                    placeholder="Enter publication title..."
+                                 />
+                              </div>
+                              <div className="space-y-3">
+                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Logic Path (Slug)</label>
+                                 <div className="relative group">
+                                    <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-sm">/</span>
+                                    <input 
+                                      type="text" 
+                                      value={editingPost.slug}
+                                      onChange={(e) => setEditingPost({...editingPost, slug: e.target.value})}
+                                      className="w-full pl-10 pr-16 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm focus:border-primary/50 focus:bg-white transition-all text-primary"
+                                      placeholder="article-unique-slug"
+                                    />
+                                    <button 
+                                      onClick={() => setEditingPost({...editingPost, slug: generateSlug(editingPost.title)})}
+                                      className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-300 hover:text-primary transition-all"
+                                      title="Auto-generate from title"
+                                    >
+                                      <Zap size={14} />
+                                    </button>
+                                 </div>
+                              </div>
+                           </div>
+
+                           <div className="grid md:grid-cols-3 gap-8">
+                              <div className="space-y-3">
+                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Classification</label>
+                                 <input 
+                                    type="text" 
+                                    value={editingPost.category}
+                                    onChange={(e) => setEditingPost({...editingPost, category: e.target.value})}
+                                    className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
+                                    placeholder="e.g. Technology"
+                                 />
+                              </div>
+                              <div className="space-y-3">
+                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Intellectual Author</label>
+                                 <input 
+                                    type="text" 
+                                    value={editingPost.author}
+                                    onChange={(e) => setEditingPost({...editingPost, author: e.target.value})}
+                                    className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
+                                    placeholder="Author name"
+                                 />
+                              </div>
+                              <div className="space-y-3">
+                                 <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Release Date</label>
+                                 <input 
+                                    type="text" 
+                                    value={editingPost.date}
+                                    onChange={(e) => setEditingPost({...editingPost, date: e.target.value})}
+                                    className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
+                                 />
+                              </div>
+                           </div>
+
+                           {errors.length > 0 && (
+                              <div className="bg-rose-50 border border-rose-100 p-6 rounded-2xl space-y-2">
+                                 <p className="text-[10px] font-bold uppercase tracking-widest text-rose-500 flex items-center gap-2">
+                                    <AlertCircle size={14} /> Validation Errors
+                                 </p>
+                                 <ul className="space-y-1">
+                                    {errors.map((err, i) => <li key={i} className="text-xs text-rose-600 font-medium">• {err}</li>)}
+                                 </ul>
+                              </div>
+                           )}
+                        </div>
+                     )}
+
+                     {activeTab === "narrative" && (
+                        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
+                           <div className="space-y-3">
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Executive Summary (Excerpt)</label>
+                              <textarea 
+                                 value={editingPost.excerpt}
+                                 onChange={(e) => setEditingPost({...editingPost, excerpt: e.target.value})}
+                                 className="w-full px-8 py-6 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-medium text-sm leading-relaxed focus:border-primary/50 h-32 transition-all resize-none"
+                                 placeholder="Short summary for the index page..."
+                              />
+                           </div>
+                           <div className="space-y-3">
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Full Narrative Body</label>
+                              <textarea 
+                                 value={editingPost.content}
+                                 onChange={(e) => setEditingPost({...editingPost, content: e.target.value})}
+                                 className="w-full px-8 py-8 bg-slate-50 border border-slate-200 rounded-[2.5rem] outline-none font-medium text-lg leading-relaxed focus:border-primary/50 h-[500px] transition-all resize-none custom-scrollbar"
+                                 placeholder="Write your article depth here..."
+                              />
+                           </div>
+                        </div>
+                     )}
+
+                     {activeTab === "media" && (
+                        <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
+                           <div className="space-y-4">
+                              <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Hero Asset (Cover)</label>
+                              <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all group">
+                                 {editingPost.image && <Image src={editingPost.image} alt="Hero" fill className="object-cover" />}
+                                 <div className="relative z-10 bg-white/90 backdrop-blur-md px-8 py-4 rounded-full shadow-xl flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all">
+                                    {isUploading ? <Loader2 size={20} className="animate-spin text-primary" /> : <Upload size={20} className="text-primary" />}
+                                    <span className="font-bold text-[11px] uppercase tracking-widest">Update Publication Media</span>
+                                 </div>
+                                 <input type="file" accept="image/*" onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
+                              </div>
+                           </div>
+                        </div>
+                     )}
+                  </div>
+              </div>
+
+              {/* Modal Footer */}
+              <div className="p-8 lg:p-10 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-6">
+                 <button 
+                   onClick={() => setEditingPost(null)}
+                   className="px-10 py-4 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:text-slate-900 transition-all"
+                 >
+                   Discard
+                 </button>
+                 <button 
+                   onClick={handleSave}
+                   disabled={isSaving}
+                   className="px-16 py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-xl disabled:opacity-50"
+                 >
+                   {isSaving ? <Loader2 size={16} className="animate-spin" /> : <Save size={16} />}
+                   {isSaving ? "Syncing..." : "Finalize Publication"}
+                 </button>
+              </div>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

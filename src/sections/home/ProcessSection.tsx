@@ -1,37 +1,42 @@
 "use client";
 
 import { useData } from "@/context/DataContext";
+import { motion } from "framer-motion";
 
 export default function ProcessSection() {
   const { data } = useData();
   const { process } = data.home;
 
   return (
-    <section className="py-24 bg-surface-container-low overflow-hidden">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-20 animate-in fade-in slide-in-from-bottom-4 duration-700">
-          <h2 className="font-display text-4xl md:text-5xl font-black text-on-surface mb-6 tracking-tight">
+    <section className="py-40 bg-surface-container-lowest overflow-hidden">
+      <div className="section-container">
+        <div className="text-center mb-32">
+          <h2 className="text-5xl md:text-7xl font-semibold text-on-surface mb-10 tracking-tight reveal-text">
             {process.title}
           </h2>
-          <p className="text-on-surface-variant max-w-2xl mx-auto text-lg font-medium leading-relaxed">
+          <p className="text-secondary max-w-2xl mx-auto text-xl font-medium leading-relaxed">
             {process.subtitle}
           </p>
         </div>
-        <div className="relative flex flex-col md:flex-row justify-between items-start gap-12">
-          {/* Connector Line */}
-          <div className="absolute top-10 left-0 w-full h-1 bg-surface-container-high -z-0 hidden md:block rounded-full"></div>
-
+        <div className="relative flex flex-col md:flex-row justify-between items-start gap-16 md:gap-8">
           {/* Steps */}
           {process.steps.map((step, i) => (
-            <div key={step.id} className="relative z-10 flex-1 text-center group">
-              <div className="w-20 h-20 bg-surface-container-lowest border-4 border-surface-container-high rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-premium text-3xl font-black text-primary group-hover:bg-primary group-hover:text-on-primary group-hover:rotate-6 transition-all duration-500">
+            <motion.div 
+              key={step.id} 
+              initial={{ opacity: 0, y: 20 }}
+              whileInView={{ opacity: 1, y: 0 }}
+              viewport={{ once: true }}
+              transition={{ duration: 0.8, delay: i * 0.1 }}
+              className="relative z-10 flex-1 text-center group"
+            >
+              <div className="w-16 h-16 rounded-2xl bg-surface-container flex items-center justify-center mx-auto mb-10 text-xl font-bold text-on-surface transition-all duration-500 group-hover:scale-110 group-hover:bg-on-background group-hover:text-background border border-outline/5 shadow-apple">
                 {i + 1}
               </div>
-              <h3 className="text-2xl font-black text-on-surface mb-4 tracking-tight">{step.title}</h3>
-              <p className="text-on-surface-variant text-base px-2 leading-relaxed font-medium">
+              <h3 className="text-2xl font-semibold text-on-surface mb-6 tracking-tight">{step.title}</h3>
+              <p className="text-secondary text-lg leading-relaxed font-medium">
                 {step.desc}
               </p>
-            </div>
+            </motion.div>
           ))}
         </div>
       </div>

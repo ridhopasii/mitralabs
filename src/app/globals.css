@@ -24,8 +24,8 @@
   --color-outline-variant: #e8e8ed;
 
   /* Typography: Inter is the closest free equivalent to San Francisco */
-  --font-display: 'Inter', sans-serif;
-  --font-body: 'Inter', sans-serif;
+  --font-display: 'Inter', var(--font-inter), sans-serif;
+  --font-body: 'Inter', var(--font-inter), sans-serif;
 
   /* Accent Colors */
   --color-error: #ff3b30;
@@ -74,29 +74,37 @@
     box-shadow: 0 4px 24px rgba(0,0,0,0.04);
   }
 
+  .shadow-apple-hover {
+    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+  }
+
   .glass-apple {
-    backdrop-filter: blur(20px) saturate(180%);
-    background: rgba(255, 255, 255, 0.7);
+    backdrop-filter: blur(25px) saturate(190%);
+    background: rgba(255, 255, 255, 0.72);
   }
 
   .dark .glass-apple {
-    background: rgba(0, 0, 0, 0.7);
+    background: rgba(0, 0, 0, 0.72);
   }
 
   .btn-apple {
-    @apply px-6 py-2.5 rounded-full font-semibold transition-all duration-300;
-    @apply bg-on-background text-background hover:opacity-90;
+    @apply px-8 py-3 rounded-full font-semibold transition-all duration-400;
+    @apply bg-on-background text-background hover:scale-[1.02] active:scale-[0.98];
   }
 
   .btn-apple-secondary {
-    @apply px-6 py-2.5 rounded-full font-semibold transition-all duration-300;
-    @apply text-primary hover:underline;
+    @apply px-8 py-3 rounded-full font-semibold transition-all duration-400;
+    @apply text-primary hover:bg-surface-container active:scale-[0.98];
+  }
+
+  .section-container {
+    @apply max-w-7xl mx-auto px-6 md:px-12;
   }
 }
 
 /* Custom scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
+  width: 8px;
 }
 
 ::-webkit-scrollbar-track {
@@ -106,9 +114,32 @@
 ::-webkit-scrollbar-thumb {
   background: var(--color-outline);
   border-radius: 10px;
+  border: 2px solid var(--color-background);
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--color-secondary);
 }
 
 /* Hide Navbar on login page */
 body:has([data-login-page]) nav {
   display: none !important;
+}
+
+/* Hide scrollbar for Chrome, Safari and Opera */
+.no-scrollbar::-webkit-scrollbar {
+  display: none;
+}
+
+/* Hide scrollbar for IE, Edge and Firefox */
+.no-scrollbar {
+  -ms-overflow-style: none;  /* IE and Edge */
+  scrollbar-width: none;  /* Firefox */
+}
+
+/* Animation Utilities */
+.reveal-text {
+  background: linear-gradient(to bottom, var(--color-on-background) 0%, var(--color-secondary) 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
 }

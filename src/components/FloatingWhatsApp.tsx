@@ -3,9 +3,14 @@
 import { MessageCircle } from "lucide-react";
 import { useData } from "@/context/DataContext";
 
+import { usePathname } from "next/navigation";
+
 export default function FloatingWhatsApp() {
   const { data } = useData();
   const { settings } = data;
+  const pathname = usePathname();
+
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/login")) return null;
 
   const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik dengan promo bulan ini.")}`;
 

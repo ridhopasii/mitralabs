@@ -52,7 +52,7 @@ export default function LogsPage() {
   const clearLogs = async () => {
     if (!confirm("Hapus seluruh log aktivitas? Tindakan ini tidak dapat dibatalkan.")) return;
     const { error } = await supabase.from("AdminLog").delete().neq("id", 0);
-    if (!error) setLogs([]);
+    if (!error) fetchLogs();
   };
 
   const filteredLogs = logs.filter(l => 
@@ -61,89 +61,92 @@ export default function LogsPage() {
   );
 
   return (
-    <div className="space-y-10 pb-20">
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div className="relative w-full md:w-96">
-          <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-on-surface-variant opacity-40" size={20} />
-          <input
-            type="text"
-            placeholder="Cari aktivitas..."
-            value={search}
-            onChange={(e) => setSearch(e.target.value)}
-            className="w-full pl-16 pr-8 py-5 bg-white border border-surface-container-highest rounded-3xl outline-none focus:border-primary shadow-sm font-bold transition-all"
-          />
+    <div className="max-w-[1200px] mx-auto space-y-12 pb-24">
+      {/* Header Area */}
+      <div className="flex flex-col md:flex-row justify-between items-end gap-10 px-4">
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900">Audit Logs</h1>
+          <p className="text-slate-400 font-medium text-lg leading-relaxed max-w-md">
+            Pantau setiap perubahan dan aktivitas sistem secara real-time.
+          </p>
         </div>
-        <div className="flex gap-4">
-           <button 
-             onClick={fetchLogs}
-             className="p-5 bg-surface-container-low text-on-surface-variant rounded-2xl hover:bg-on-surface hover:text-surface transition-all"
-           >
-              <Clock size={20} />
-           </button>
-           <button 
-             onClick={clearLogs}
-             className="px-8 py-5 bg-error/10 text-error rounded-2xl font-black text-xs uppercase tracking-widest flex items-center gap-3 hover:bg-error hover:text-white transition-all"
-           >
-              <Trash2 size={18} /> Clear All Logs
-           </button>
+        
+        <div className="flex items-center gap-3 w-full md:w-auto">
+          <div className="relative group flex-grow md:flex-grow-0">
+             <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
+             <input 
+               type="text" 
+               placeholder="Cari aktivitas..."
+               value={search}
+               onChange={(e) => setSearch(e.target.value)}
+               className="pl-12 pr-6 py-4 bg-slate-100 border-none rounded-2xl outline-none focus:bg-white focus:ring-1 focus:ring-slate-200 font-medium text-[13px] w-full md:w-72 transition-all shadow-sm"
+             />
+          </div>
+          <button 
+            onClick={clearLogs}
+            className="h-[52px] px-8 bg-white border border-slate-200 text-rose-500 rounded-2xl font-semibold text-[13px] flex items-center gap-2 hover:bg-rose-50 hover:border-rose-100 transition-all active:scale-[0.98]"
+          >
+            <Trash2 size={16} /> Hapus Semua
+          </button>
         </div>
       </div>
 
-      <div className="bg-white rounded-[3.5rem] border border-surface-container-highest shadow-premium overflow-hidden">
-        <div className="p-10 border-b border-surface-container-highest bg-surface-container-low flex items-center gap-4">
-           <div className="w-12 h-12 bg-primary/10 text-primary rounded-xl flex items-center justify-center">
-              <ShieldCheck size={24} />
+      {/* Main Table Container */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden mx-4">
+        <div className="p-8 border-b border-slate-50 flex items-center gap-4 bg-slate-50/30">
+           <div className="w-10 h-10 bg-slate-900 text-white rounded-xl flex items-center justify-center">
+              <ShieldCheck size={18} />
            </div>
            <div>
-              <h2 className="text-2xl font-black tracking-tight uppercase">Audit Logs</h2>
-              <p className="text-[10px] font-black uppercase tracking-widest opacity-40 mt-1">Rekam jejak aktivitas administrasi</p>
+              <h2 className="text-sm font-bold text-slate-900 uppercase tracking-widest leading-none">Security Registry</h2>
+              <p className="text-[10px] font-bold text-slate-400 uppercase tracking-[0.2em] mt-1.5">Sistem Pencatatan Aktivitas Terpusat</p>
            </div>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left">
             <thead>
-              <tr className="bg-surface-container-low/50">
-                <th className="p-8 text-[10px] font-black uppercase tracking-widest opacity-40 border-b border-surface-container-highest">Waktu</th>
-                <th className="p-8 text-[10px] font-black uppercase tracking-widest opacity-40 border-b border-surface-container-highest">Aksi</th>
-                <th className="p-8 text-[10px] font-black uppercase tracking-widest opacity-40 border-b border-surface-container-highest">Detail Perubahan</th>
+              <tr className="border-b border-slate-50">
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Timeline</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Aksi</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Detail Aktivitas</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-surface-container-highest">
+            <tbody className="divide-y divide-slate-50">
               {loading ? (
                 <tr>
-                  <td colSpan={3} className="p-20 text-center">
-                     <Loader2 className="animate-spin mx-auto mb-4 text-primary" size={40} />
-                     <p className="font-black uppercase tracking-widest text-xs opacity-20">Memuat riwayat...</p>
+                  <td colSpan={3} className="p-32 text-center">
+                     <Loader2 className="animate-spin mx-auto mb-4 text-slate-300" size={40} strokeWidth={1.5} />
+                     <p className="font-bold uppercase tracking-widest text-[10px] text-slate-300">Menarik data...</p>
                   </td>
                 </tr>
               ) : filteredLogs.length === 0 ? (
                 <tr>
-                  <td colSpan={3} className="p-20 text-center opacity-20">
-                     <Activity size={48} className="mx-auto mb-4" />
-                     <p className="font-bold">Belum ada aktivitas tercatat.</p>
+                  <td colSpan={3} className="p-32 text-center opacity-10">
+                     <Activity size={64} className="mx-auto mb-4" strokeWidth={1} />
+                     <p className="font-bold uppercase tracking-widest text-[10px]">Belum ada aktivitas</p>
                   </td>
                 </tr>
               ) : (
                 filteredLogs.map((log) => (
-                  <tr key={log.id} className="hover:bg-surface-container-low/30 transition-colors">
-                    <td className="p-8">
-                       <div className="flex flex-col">
-                          <span className="font-black text-sm">{new Date(log.created_at).toLocaleTimeString()}</span>
-                          <span className="text-[10px] font-bold opacity-40">{new Date(log.created_at).toLocaleDateString()}</span>
+                  <tr key={log.id} className="group hover:bg-slate-50/50 transition-all duration-300">
+                    <td className="px-10 py-8">
+                       <div className="flex flex-col gap-1">
+                          <span className="font-bold text-[13px] text-slate-900 tracking-tight">{new Date(log.created_at).toLocaleTimeString('id-ID', { hour: '2-digit', minute: '2-digit' })}</span>
+                          <span className="text-[11px] font-medium text-slate-400">{new Date(log.created_at).toLocaleDateString('id-ID', { month: 'short', day: 'numeric' })}</span>
                        </div>
                     </td>
-                    <td className="p-8">
-                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                         log.action.includes('Update') ? 'bg-blue-50 text-blue-600' :
-                         log.action.includes('Delete') ? 'bg-red-50 text-red-600' :
-                         'bg-green-50 text-green-600'
+                    <td className="px-10 py-8">
+                       <span className={`px-4 py-1.5 rounded-full text-[10px] font-bold uppercase tracking-widest border ${
+                         log.action.includes('Update') ? 'bg-blue-50 text-blue-600 border-blue-100' :
+                         log.action.includes('Delete') ? 'bg-rose-50 text-rose-600 border-rose-100' :
+                         'bg-emerald-50 text-emerald-600 border-emerald-100'
                        }`}>
                           {log.action}
                        </span>
                     </td>
-                    <td className="p-8">
-                       <p className="text-sm font-medium text-on-surface-variant max-w-xl line-clamp-2">{log.detail}</p>
+                    <td className="px-10 py-8">
+                       <p className="text-[13px] font-medium text-slate-600 max-w-2xl leading-relaxed">{log.detail}</p>
                     </td>
                   </tr>
                 ))
@@ -154,38 +157,39 @@ export default function LogsPage() {
 
         {/* Pagination */}
         {totalPages > 1 && (
-          <div className="p-8 border-t border-surface-container-highest bg-surface-container-low/20 flex items-center justify-between">
-             <p className="text-[10px] font-black uppercase tracking-widest opacity-40">
+          <div className="p-8 border-t border-slate-50 bg-slate-50/20 flex items-center justify-between">
+             <p className="text-[11px] font-bold text-slate-400">
                 Menampilkan {(page - 1) * ITEMS_PER_PAGE + 1} - {Math.min(page * ITEMS_PER_PAGE, totalCount)} dari {totalCount} log
              </p>
-             <div className="flex gap-3">
+             <div className="flex gap-2">
                 <button 
                   disabled={page === 1}
                   onClick={() => setPage(p => p - 1)}
-                  className="px-6 py-3 bg-surface-container-low rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-20 hover:bg-primary hover:text-white transition-all"
+                  className="w-10 h-10 flex items-center justify-center bg-white border border-slate-100 text-slate-400 rounded-xl disabled:opacity-20 hover:text-slate-900 transition-all"
                 >
-                   Previous
+                   <ChevronRight size={16} className="rotate-180" />
                 </button>
                 <button 
                   disabled={page === totalPages}
                   onClick={() => setPage(p => p + 1)}
-                  className="px-6 py-3 bg-primary text-on-primary rounded-xl text-[10px] font-black uppercase tracking-widest disabled:opacity-20 hover:scale-105 transition-all"
+                  className="w-10 h-10 flex items-center justify-center bg-slate-900 text-white rounded-xl disabled:opacity-20 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
                 >
-                   Next
+                   <ChevronRight size={16} />
                 </button>
              </div>
           </div>
         )}
       </div>
 
-      <div className="flex items-center gap-6 p-10 bg-inverse-surface text-inverse-on-surface rounded-[3rem] shadow-xl">
-         <div className="w-16 h-16 bg-white/10 rounded-2xl flex items-center justify-center shrink-0">
-            <AlertCircle size={32} />
+      {/* Info Card */}
+      <div className="mx-4 p-10 bg-slate-50 rounded-[2.5rem] border border-slate-100 flex items-center gap-8 group">
+         <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center shrink-0 shadow-sm group-hover:scale-110 transition-transform duration-500">
+            <AlertCircle size={24} className="text-slate-400" />
          </div>
          <div>
-            <h4 className="text-xl font-black mb-1">Penting</h4>
-            <p className="opacity-60 text-sm leading-relaxed font-medium">
-               Halaman ini hanya mencatat perubahan yang dilakukan melalui CMS. Akses langsung ke database melalui Supabase Dashboard tidak akan tercatat di sini secara otomatis.
+            <h4 className="text-sm font-bold text-slate-900 mb-1.5 uppercase tracking-widest">Informasi Sistem</h4>
+            <p className="text-slate-400 text-[13px] leading-relaxed font-medium">
+               Halaman ini merekam seluruh jejak perubahan yang dilakukan melalui panel kontrol. Gunakan data ini untuk audit operasional dan keamanan data.
             </p>
          </div>
       </div>

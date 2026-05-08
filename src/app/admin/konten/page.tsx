@@ -16,9 +16,18 @@ import {
   Instagram,
   MapPin,
   Sparkles,
-  Zap
+  Zap,
+  HelpCircle,
+  Briefcase,
+  Star,
+  Users,
+  MessageCircle,
+  List,
+  Trash2,
+  Plus
 } from "lucide-react";
 import { uploadImage } from "@/lib/supabase";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function SiteSettingsCMS() {
   const { data, updateData } = useData();
@@ -47,6 +56,7 @@ export default function SiteSettingsCMS() {
     const keys = path.split(".");
     let current: any = newData;
     for (let i = 0; i < keys.length - 1; i++) {
+      if (!current[keys[i]]) current[keys[i]] = {};
       current = current[keys[i]];
     }
     current[keys[keys.length - 1]] = value;
@@ -61,24 +71,24 @@ export default function SiteSettingsCMS() {
   };
 
   const InputField = ({ label, path, value, type = "text", placeholder = "", icon: Icon }: any) => (
-    <div className="space-y-2">
-      <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">{label}</label>
+    <div className="space-y-3">
+      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
       <div className="relative group">
-        {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors" size={18} />}
+        {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary/40 group-focus-within:text-primary transition-colors" size={18} />}
         {type === "textarea" ? (
           <textarea 
-            value={value} 
+            value={value || ""} 
             placeholder={placeholder}
             onChange={(e) => updateField(path, e.target.value)}
-            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-white border border-slate-200 rounded-3xl outline-none font-bold text-sm focus:border-primary transition-all shadow-sm h-32 resize-none`}
+            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm h-32 resize-none`}
           />
         ) : (
           <input 
             type={type}
-            value={value}
+            value={value || ""}
             placeholder={placeholder}
             onChange={(e) => updateField(path, e.target.value)}
-            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-white border border-slate-200 rounded-3xl outline-none font-bold text-sm focus:border-primary transition-all shadow-sm`}
+            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm`}
           />
         )}
       </div>
@@ -89,12 +99,12 @@ export default function SiteSettingsCMS() {
     const isUploading = uploadingPath === path;
     return (
       <div className="space-y-4">
-        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">{label}</label>
-        <div className="relative aspect-video rounded-[3rem] overflow-hidden border-2 border-dashed border-slate-200 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-all group shadow-inner">
+        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
+        <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-outline/10 bg-background/50 flex flex-col items-center justify-center cursor-pointer hover:border-primary/30 transition-all group shadow-inner">
           {value ? <img src={value} className="absolute inset-0 w-full h-full object-cover" /> : null}
-          <div className="relative z-10 bg-white/90 backdrop-blur-xl p-5 rounded-3xl shadow-2xl flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
+          <div className="relative z-10 glass-apple p-5 rounded-2xl shadow-apple-hover flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 border border-outline/10">
             {isUploading ? <Loader2 size={24} className="animate-spin text-primary" /> : <Upload size={24} className="text-primary" />}
-            <span className="font-black text-[10px] uppercase tracking-widest">{isUploading ? "Uploading..." : "Ganti Gambar"}</span>
+            <span className="font-bold text-[10px] uppercase tracking-widest">{isUploading ? "Uploading..." : "Ganti Gambar"}</span>
           </div>
           <input 
             type="file" 
@@ -110,31 +120,42 @@ export default function SiteSettingsCMS() {
 
   const tabs = [
     { id: "branding", label: "Branding", icon: Globe },
-    { id: "hero", label: "Hero Sections", icon: Sparkles },
-    { id: "contact", label: "Kontak & Lokasi", icon: MapPin },
-    { id: "about", label: "About Page", icon: Type },
+    { id: "navigation", label: "Navigation", icon: List },
+    { id: "home", label: "Beranda", icon: Sparkles },
+    { id: "services", label: "Layanan", icon: Briefcase },
+    { id: "portfolio", label: "Portfolio", icon: List },
+    { id: "about", label: "Tentang", icon: Users },
+    { id: "contact", label: "Kontak", icon: MapPin },
   ];
 
   return (
-    <div className="flex flex-col lg:flex-row gap-12 pb-40 animate-in fade-in duration-700">
-      {showSuccess && (
-        <div className="fixed top-10 right-10 z-[200] bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 font-bold">
-          <CheckCircle2 size={24} />
-          Pengaturan Situs Disimpan!
-        </div>
-      )}
+    <div className="flex flex-col lg:flex-row gap-12 pb-40">
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-10 right-10 z-[200] bg-on-background text-background px-8 py-4 rounded-2xl shadow-apple flex items-center gap-4 font-bold border border-outline/10"
+          >
+            <CheckCircle2 size={24} className="text-primary" />
+            Global Sync Complete!
+          </motion.div>
+        )}
+      </AnimatePresence>
 
       {/* Sidebar Nav */}
       <div className="w-full lg:w-72 shrink-0">
-        <div className="sticky top-10 space-y-2">
+        <div className="sticky top-10 space-y-2 bg-surface-container/30 p-4 rounded-[3rem] border border-outline/5 shadow-inner">
+          <p className="px-6 text-[10px] font-black uppercase tracking-[0.25em] text-secondary mb-6 mt-2">Console Nodes</p>
           {tabs.map((tab) => (
             <button
               key={tab.id}
               onClick={() => setActiveTab(tab.id)}
-              className={`w-full px-8 py-5 rounded-[2rem] font-black text-[11px] uppercase tracking-widest transition-all flex items-center gap-4 ${
+              className={`w-full px-8 py-5 rounded-[2rem] font-black text-xs transition-all flex items-center gap-5 uppercase tracking-widest ${
                 activeTab === tab.id 
-                  ? "bg-slate-900 text-white shadow-2xl shadow-slate-900/20" 
-                  : "text-slate-400 hover:bg-slate-100 hover:text-slate-600"
+                  ? "bg-on-background text-background shadow-apple scale-105" 
+                  : "text-secondary hover:bg-on-background/5 hover:text-on-background"
               }`}
             >
               <tab.icon size={18} />
@@ -145,115 +166,271 @@ export default function SiteSettingsCMS() {
       </div>
 
       {/* Content Area */}
-      <div className="flex-1 space-y-12">
+      <div className="flex-1 space-y-12 max-w-5xl">
         
-        {activeTab === "branding" && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-10">
-                <div className="flex items-center gap-6 pb-10 border-b border-slate-50">
-                   <div className="w-16 h-16 bg-primary text-on-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/30"><Globe size={32} /></div>
-                   <div>
-                      <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">Global Branding</h2>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Identitas visual dan navigasi utama</p>
-                   </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <InputField label="Logo Text" path="navbar.logo" value={formData.navbar.logo} icon={Type} />
-                  <InputField label="Navbar Button" path="navbar.buttonText" value={formData.navbar.buttonText} icon={Zap} />
-                </div>
-                <InputField label="Footer Description" path="footer.description" value={formData.footer.description} type="textarea" />
-             </div>
-          </div>
-        )}
-
-        {activeTab === "hero" && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-10">
-                <div className="flex items-center gap-6 pb-10 border-b border-slate-50">
-                   <div className="w-16 h-16 bg-amber-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-amber-500/30"><Sparkles size={32} /></div>
-                   <div>
-                      <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">Home Hero</h2>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Headline utama dan visual pertama</p>
-                   </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-12">
-                  <div className="space-y-8">
-                    <InputField label="Promo Badge" path="home.hero.promo" value={formData.home.hero.promo} />
-                    <InputField label="Tagline" path="home.hero.tagline" value={formData.home.hero.tagline} />
-                    <InputField label="Headline Utama" path="home.hero.title" value={formData.home.hero.title} type="textarea" />
-                    <InputField label="Sub-headline" path="home.hero.subtitle" value={formData.home.hero.subtitle} type="textarea" />
+        <AnimatePresence mode="wait">
+          {activeTab === "branding" && (
+            <motion.div 
+              key="branding"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-on-background text-background rounded-3xl flex items-center justify-center shadow-apple"><Globe size={28} /></div>
+                     <div>
+                        <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Global Identity.</h2>
+                        <p className="text-[11px] font-black text-secondary mt-3 uppercase tracking-widest">Branding dan metadata inti sistem.</p>
+                     </div>
                   </div>
-                  <div className="space-y-8">
-                    <ImageInput label="Hero Image Visual" path="home.hero.image" value={formData.home.hero.image} />
-                    <div className="p-8 bg-slate-50 rounded-[2.5rem] border border-slate-100 grid grid-cols-2 gap-6">
-                       <InputField label="Stats Label" path="home.hero.stats.label" value={formData.home.hero.stats.label} />
-                       <InputField label="Stats Value" path="home.hero.stats.value" value={formData.home.hero.stats.value} />
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField label="Master Logo Label" path="navbar.logo" value={formData.navbar.logo} icon={Type} />
+                    <InputField label="Primary CTA Label" path="navbar.buttonText" value={formData.navbar.buttonText} icon={Zap} />
+                  </div>
+                  <InputField label="Corporate Mission Statement (Footer)" path="footer.description" value={formData.footer.description} type="textarea" />
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "navigation" && (
+            <motion.div 
+              key="navigation"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-primary/10 text-primary rounded-3xl flex items-center justify-center shadow-apple"><List size={28} /></div>
+                     <div>
+                        <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Navigation Matrix.</h2>
+                        <p className="text-[11px] font-black text-secondary mt-3 uppercase tracking-widest">Kelola struktur menu dan tautan sistem.</p>
+                     </div>
+                  </div>
+                  
+                  <div className="space-y-6">
+                    <label className="text-[11px] font-black uppercase tracking-widest text-secondary ml-4">Integrated Navigation Nodes</label>
+                    <div className="grid gap-6">
+                      {(formData.navbar.links || []).map((link: any, idx: number) => (
+                        <div key={idx} className="flex gap-6 items-center p-4 bg-background border border-outline/5 rounded-[2.5rem] shadow-inner group">
+                          <div className="w-12 h-12 bg-on-background/5 text-on-background rounded-2xl flex items-center justify-center font-black text-xs shrink-0">{idx + 1}</div>
+                          <div className="grid grid-cols-2 gap-4 flex-1">
+                             <input 
+                                value={link.label}
+                                onChange={(e) => {
+                                   const newLinks = [...formData.navbar.links];
+                                   newLinks[idx].label = e.target.value;
+                                   updateField("navbar.links", newLinks);
+                                }}
+                                className="px-6 py-4 bg-transparent outline-none font-black text-sm text-on-background"
+                                placeholder="Link Label"
+                             />
+                             <input 
+                                value={link.href}
+                                onChange={(e) => {
+                                   const newLinks = [...formData.navbar.links];
+                                   newLinks[idx].href = e.target.value;
+                                   updateField("navbar.links", newLinks);
+                                }}
+                                className="px-6 py-4 bg-transparent outline-none font-bold text-xs text-primary"
+                                placeholder="/path"
+                             />
+                          </div>
+                          <button 
+                             onClick={() => {
+                                const newLinks = formData.navbar.links.filter((_: any, i: number) => i !== idx);
+                                updateField("navbar.links", newLinks);
+                             }}
+                             className="p-4 text-secondary/20 hover:text-error transition-all"
+                          >
+                             <Trash2 size={20} />
+                          </button>
+                        </div>
+                      ))}
+                      <button 
+                        onClick={() => {
+                           const newLinks = [...(formData.navbar.links || []), { label: "New Page", href: "/" }];
+                           updateField("navbar.links", newLinks);
+                        }}
+                        className="w-full py-8 border-2 border-outline/10 border-dashed rounded-[3rem] text-[11px] font-black uppercase tracking-[0.3em] text-secondary hover:bg-background hover:border-primary/30 hover:text-primary transition-all flex items-center justify-center gap-6"
+                      >
+                         <Plus size={20} /> Inject Navigation Node
+                      </button>
                     </div>
                   </div>
-                </div>
-             </div>
-          </div>
-        )}
+               </div>
+            </motion.div>
+          )}
 
-        {activeTab === "contact" && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-10">
-                <div className="flex items-center gap-6 pb-10 border-b border-slate-50">
-                   <div className="w-16 h-16 bg-rose-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-rose-500/30"><MapPin size={32} /></div>
-                   <div>
-                      <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">Kontak & Lokasi</h2>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Informasi jangkauan klien</p>
-                </div>
-                </div>
-                <div className="grid md:grid-cols-2 gap-8">
-                  <InputField label="Business Email" path="contact.email" value={formData.contact.email} icon={Globe} />
-                  <InputField label="WhatsApp Number" path="settings.waNumber" value={formData.settings.waNumber} icon={Phone} />
-                  <InputField label="Instagram User" path="contact.instagram" value={formData.contact.instagram} icon={Instagram} />
-                  <InputField label="Lokasi Studio" path="contact.address" value={formData.contact.address} icon={MapPin} />
-                </div>
-             </div>
-          </div>
-        )}
+          {activeTab === "home" && (
+            <motion.div 
+              key="home"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-16">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-amber-500/10 text-amber-600 rounded-3xl flex items-center justify-center shadow-apple"><Sparkles size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Home Architecture.</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-16">
+                    <div className="space-y-10">
+                      <InputField label="Hero Signal (Promo)" path="home.hero.promo" value={formData.home.hero.promo} />
+                      <InputField label="Strategic Tagline" path="home.hero.tagline" value={formData.home.hero.tagline} />
+                      <InputField label="Executive Headline" path="home.hero.title" value={formData.home.hero.title} type="textarea" />
+                      <InputField label="Sub-strategic Context" path="home.hero.subtitle" value={formData.home.hero.subtitle} type="textarea" />
+                    </div>
+                    <div className="space-y-10">
+                      <ImageInput label="Master Hero Visual" path="home.hero.image" value={formData.home.hero.image} />
+                      <div className="p-12 bg-background rounded-[3.5rem] border border-outline/5 grid grid-cols-2 gap-12 shadow-inner">
+                         <InputField label="Core KPI Label" path="home.hero.stats.label" value={formData.home.hero.stats.label} />
+                         <InputField label="KPI Metric Value" path="home.hero.stats.value" value={formData.home.hero.stats.value} />
+                      </div>
+                    </div>
+                  </div>
+               </div>
 
-        {activeTab === "about" && (
-          <div className="space-y-10 animate-in fade-in slide-in-from-bottom-4 duration-500">
-             <div className="bg-white p-12 rounded-[3.5rem] border border-slate-100 shadow-xl space-y-10">
-                <div className="flex items-center gap-6 pb-10 border-b border-slate-50">
-                   <div className="w-16 h-16 bg-indigo-500 text-white rounded-3xl flex items-center justify-center shadow-2xl shadow-indigo-500/30"><Type size={32} /></div>
-                   <div>
-                      <h2 className="text-3xl font-black tracking-tighter text-slate-900 uppercase leading-none">About Content</h2>
-                      <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Visi dan cerita brand</p>
-                   </div>
-                </div>
-                <div className="space-y-8">
-                  <InputField label="About Tagline" path="about.hero.tagline" value={formData.about.hero.tagline} />
-                  <InputField label="About Title" path="about.hero.title" value={formData.about.hero.title} />
-                  <InputField label="Detailed Subtitle / Bio" path="about.hero.subtitle" value={formData.about.hero.subtitle} type="textarea" />
-                  <ImageInput label="About Hero Visual" path="about.hero.image" value={formData.about.hero.image} />
-                </div>
-             </div>
-          </div>
-        )}
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-primary/10 text-primary rounded-3xl flex items-center justify-center shadow-apple"><MessageCircle size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Problem & Logic.</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField label="Challenge Title" path="home.problem.title" value={formData.home.problem.title} />
+                    <InputField label="Challenge Subtitle" path="home.problem.subtitle" value={formData.home.problem.subtitle} />
+                    <InputField label="Strategic Solution Tag" path="home.solution.tagline" value={formData.home.solution.tagline} />
+                    <InputField label="Solution Headline" path="home.solution.title" value={formData.home.solution.title} />
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "services" && (
+            <motion.div 
+              key="services"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-indigo-500/10 text-indigo-600 rounded-3xl flex items-center justify-center shadow-apple"><Briefcase size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Service Ecosystem.</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField label="Core Section Title" path="services.title" value={formData.services.title} />
+                    <InputField label="Executive Subtitle" path="services.subtitle" value={formData.services.subtitle} type="textarea" />
+                    <InputField label="Comparison Matrix Title" path="services.comparisonTitle" value={formData.services.comparisonTitle} />
+                    <InputField label="Comparison Sub-context" path="services.comparisonSubtitle" value={formData.services.comparisonSubtitle} type="textarea" />
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "portfolio" && (
+            <motion.div 
+              key="portfolio"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-rose-500/10 text-rose-600 rounded-3xl flex items-center justify-center shadow-apple"><List size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Portfolio Strategy.</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField label="Exhibition Title" path="portfolio.title" value={formData.portfolio.title} />
+                    <InputField label="Gallery Subtitle" path="portfolio.subtitle" value={formData.portfolio.subtitle} type="textarea" />
+                    <InputField label="Conversion CTA Title" path="portfolio.cta.title" value={formData.portfolio.cta.title} />
+                    <InputField label="Conversion Sub-context" path="portfolio.cta.subtitle" value={formData.portfolio.cta.subtitle} type="textarea" />
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "about" && (
+            <motion.div 
+              key="about"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-indigo-500/10 text-indigo-600 rounded-3xl flex items-center justify-center shadow-apple"><Users size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Corporate Narrative.</h2>
+                  </div>
+                  <div className="space-y-16">
+                    <div className="grid md:grid-cols-2 gap-12">
+                      <InputField label="Brand Tagline" path="about.hero.tagline" value={formData.about.hero.tagline} />
+                      <InputField label="Executive Story Title" path="about.hero.title" value={formData.about.hero.title} />
+                    </div>
+                    <InputField label="Comprehensive Storytelling" path="about.hero.subtitle" value={formData.about.hero.subtitle} type="textarea" />
+                    <ImageInput label="Operational Visual (Hero)" path="about.hero.image" value={formData.about.hero.image} />
+                    <div className="grid md:grid-cols-2 gap-16 border-t border-outline/5 pt-16">
+                       <InputField label="Visionary Objective" path="about.visionTitle" value={formData.about.visionTitle} />
+                       <InputField label="Vision Statement" path="about.vision" value={formData.about.vision} type="textarea" />
+                       <InputField label="Mission Protocol" path="about.missionTitle" value={formData.about.missionTitle} />
+                    </div>
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {activeTab === "contact" && (
+            <motion.div 
+              key="contact"
+              initial={{ opacity: 0, x: 20 }}
+              animate={{ opacity: 1, x: 0 }}
+              exit={{ opacity: 0, x: -20 }}
+              className="space-y-10"
+            >
+               <div className="bg-surface-container p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <div className="flex items-center gap-8 pb-12 border-b border-outline/5">
+                     <div className="w-16 h-16 bg-rose-500/10 text-rose-600 rounded-3xl flex items-center justify-center shadow-apple"><MapPin size={28} /></div>
+                     <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Contact Protocol.</h2>
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField label="Protocol Title" path="contact.title" value={formData.contact.title} />
+                    <InputField label="Protocol Subtitle" path="contact.subtitle" value={formData.contact.subtitle} type="textarea" />
+                    <InputField label="Corporate Email" path="contact.email" value={formData.contact.email} icon={Globe} />
+                    <InputField label="WhatsApp Interface" path="settings.waNumber" value={formData.settings.waNumber} icon={Phone} />
+                    <InputField label="Instagram Channel" path="contact.instagram" value={formData.contact.instagram} icon={Instagram} />
+                    <InputField label="Operational Studio" path="contact.address" value={formData.contact.address} icon={MapPin} />
+                  </div>
+               </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
 
       </div>
 
-      {/* Floating Save */}
-      <div className="fixed bottom-10 left-1/2 -translate-x-1/2 w-full max-w-4xl px-8 z-[100]">
-        <div className="bg-slate-900/90 backdrop-blur-2xl p-6 rounded-[2.5rem] shadow-2xl border border-white/10 flex items-center justify-between">
-           <div className="flex items-center gap-6 ml-4">
-              <div className="w-12 h-12 bg-primary rounded-2xl flex items-center justify-center text-white shadow-lg shadow-primary/20"><Settings size={24} /></div>
-              <div>
-                 <p className="text-white font-black text-sm uppercase tracking-tight">Configuration Engine</p>
-                 <p className="text-[10px] font-bold text-white/30 uppercase tracking-widest">Global site parameters</p>
+      {/* Floating Save Bar */}
+      <div className="fixed bottom-12 left-1/2 -translate-x-1/2 w-full max-w-5xl px-8 z-[120]">
+        <div className="glass-apple p-8 rounded-[3rem] shadow-apple-hover border border-outline/10 flex items-center justify-between">
+           <div className="flex items-center gap-8 ml-6">
+              <div className="w-14 h-14 bg-on-background text-background rounded-2xl flex items-center justify-center shadow-apple animate-pulse"><Settings size={26} /></div>
+              <div className="hidden sm:block">
+                 <p className="text-on-background font-black text-lg leading-none uppercase tracking-tighter">Content Core Engine</p>
+                 <p className="text-[10px] font-black text-primary uppercase tracking-[0.3em] mt-2">Active Data Synchronization Enabled</p>
               </div>
            </div>
            <button 
               onClick={handleSave}
               disabled={isSaving}
-              className="bg-primary text-white px-12 py-4 rounded-2xl font-black text-xs uppercase tracking-widest hover:scale-105 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-4 shadow-2xl shadow-primary/40"
+              className="bg-on-background text-background px-16 py-6 rounded-[2rem] font-black text-xs uppercase tracking-widest hover:opacity-80 active:scale-95 transition-all disabled:opacity-50 flex items-center gap-6 shadow-apple"
            >
-              {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
-              {isSaving ? "Syncing..." : "Apply Settings"}
+              {isSaving ? <Loader2 size={24} className="animate-spin" /> : <Save size={24} />}
+              {isSaving ? "Syncing Nodes..." : "Deploy Changes"}
            </button>
         </div>
       </div>

@@ -2,9 +2,11 @@
 
 import React from "react";
 import Footer from "@/components/Footer";
-import { Rocket, ShieldCheck, Heart } from "lucide-react";
+import { Rocket, ShieldCheck, ArrowRight } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import Image from "next/image";
+import { motion } from "framer-motion";
+import Link from "next/link";
 
 export default function TentangClient() {
   const { data } = useData();
@@ -12,103 +14,158 @@ export default function TentangClient() {
 
   return (
     <>
-      <main className="bg-background">
+      <main className="bg-background min-h-screen">
         {/* Hero & Story Section */}
-        <section className="pt-40 pb-24 relative overflow-hidden">
-          <div className="absolute top-0 right-0 w-[800px] h-[800px] bg-primary/5 rounded-full blur-[120px] pointer-events-none -translate-y-1/2 translate-x-1/2"></div>
-          <div className="max-w-7xl mx-auto px-6 relative z-10">
-            <div className="flex flex-col lg:flex-row items-center gap-20">
-              <div className="lg:w-1/2 animate-in fade-in slide-in-from-left-8 duration-1000">
-                <span className="text-primary font-black uppercase tracking-[0.3em] mb-6 block text-[10px]">{about.hero.tagline}</span>
-                <h1 className="font-display text-5xl md:text-8xl font-black text-on-surface mb-8 leading-[0.85] tracking-tighter">
-                  {about.hero.title}
-                </h1>
-                <p className="text-xl md:text-2xl text-on-surface-variant mb-12 leading-relaxed font-medium opacity-80">
-                  {about.hero.subtitle}
-                </p>
-                <div className="flex flex-wrap gap-12">
-                  {about.stats.map((stat, i) => (
-                    <div key={i} className="flex flex-col">
-                      <span className="text-5xl font-black text-primary tracking-tighter">{stat.value}</span>
-                      <span className="text-[10px] text-on-surface-variant uppercase tracking-[0.2em] font-black mt-2 opacity-40">{stat.label}</span>
-                    </div>
-                  ))}
-                </div>
+        <section className="pt-40 pb-24 md:pt-60 md:pb-40 relative overflow-hidden">
+          <div className="section-container relative z-10">
+            <div className="flex flex-col lg:flex-row items-center gap-16 md:gap-24">
+              <div className="lg:w-1/2">
+                <motion.div
+                  initial={{ opacity: 0, y: 30 }}
+                  animate={{ opacity: 1, y: 0 }}
+                  transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
+                >
+                  <span className="text-primary font-semibold uppercase tracking-[0.2em] mb-6 block text-[10px] md:text-xs">{about.hero.tagline}</span>
+                  <h1 className="text-5xl md:text-8xl lg:text-9xl font-semibold text-on-surface mb-10 leading-[1.05] tracking-tight md:tracking-[-0.03em] reveal-text">
+                    {about.hero.title}
+                  </h1>
+                  <p className="text-xl md:text-2xl text-secondary mb-14 leading-relaxed font-medium">
+                    {about.hero.subtitle}
+                  </p>
+                  
+                  <div className="flex flex-wrap gap-10 md:gap-16">
+                    {about.stats.map((stat, i) => (
+                      <div key={i} className="flex flex-col">
+                        <span className="text-4xl md:text-6xl font-semibold text-on-background tracking-tighter">{stat.value}</span>
+                        <span className="text-[10px] md:text-xs text-secondary uppercase tracking-[0.2em] font-bold mt-2">{stat.label}</span>
+                      </div>
+                    ))}
+                  </div>
+                </motion.div>
               </div>
-              <div className="lg:w-1/2 relative animate-in fade-in zoom-in-95 duration-1000 delay-300">
-                <div className="aspect-[4/3] rounded-[4rem] overflow-hidden shadow-premium border border-surface-container-highest relative">
+              
+              <motion.div 
+                initial={{ opacity: 0, scale: 0.98 }}
+                animate={{ opacity: 1, scale: 1 }}
+                transition={{ duration: 1.2, delay: 0.2 }}
+                className="lg:w-1/2 relative"
+              >
+                <div className="aspect-[4/3] rounded-[3rem] md:rounded-[4rem] overflow-hidden shadow-apple border border-outline/5 relative bg-surface-container">
                   <Image
                     alt="About Mitralabs"
                     fill
-                    className="object-cover"
+                    priority
+                    className="object-cover transition-transform duration-2000 hover:scale-105"
                     src={about.hero.image}
                   />
                 </div>
-                <div className="absolute -bottom-10 -left-10 bg-on-surface p-12 rounded-[3rem] hidden md:block shadow-2xl max-w-sm">
-                  <p className="text-surface text-xl font-black italic tracking-tight leading-relaxed opacity-90">"{about.vision}"</p>
+                <div className="absolute -bottom-8 -left-8 md:-bottom-12 md:-left-12 glass-apple p-10 md:p-14 rounded-[3rem] hidden md:block shadow-apple-hover border border-outline/10 max-w-sm">
+                  <p className="text-on-background text-xl md:text-2xl font-medium italic tracking-tight leading-relaxed">
+                    "{about.vision}"
+                  </p>
                 </div>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
 
         {/* Mission Section */}
-        <section className="py-32 bg-surface-container-low">
-          <div className="max-w-7xl mx-auto px-6">
+        <section className="py-24 md:py-40 bg-surface-container/30">
+          <div className="section-container">
             <div className="grid grid-cols-1 md:grid-cols-3 gap-10">
-              <div className="p-12 bg-surface-container-lowest rounded-[3.5rem] shadow-premium border border-surface-container-highest group hover:border-primary/20 transition-all duration-500">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-10 text-primary group-hover:scale-110 transition-transform">
-                  <Rocket size={32} />
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                className="p-12 bg-background rounded-[3.5rem] shadow-apple border border-outline/5 group"
+              >
+                <div className="w-14 h-14 bg-surface-container rounded-2xl flex items-center justify-center mb-10 text-on-background transition-all duration-500 group-hover:bg-on-background group-hover:text-background border border-outline/5">
+                  <Rocket size={24} />
                 </div>
-                <h2 className="text-2xl font-black text-on-surface mb-6 tracking-tight uppercase">{about.visionTitle}</h2>
-                <p className="text-on-surface-variant leading-relaxed font-medium opacity-80">
+                <h2 className="text-2xl font-semibold text-on-surface mb-6 tracking-tight uppercase tracking-[0.1em]">{about.visionTitle}</h2>
+                <p className="text-secondary leading-relaxed font-medium text-lg">
                   {about.vision}
                 </p>
-              </div>
-              <div className="p-12 bg-surface-container-lowest rounded-[3.5rem] shadow-premium border border-surface-container-highest md:col-span-2 group hover:border-primary/20 transition-all duration-500">
-                <div className="w-16 h-16 bg-primary/10 rounded-2xl flex items-center justify-center mb-10 text-primary group-hover:scale-110 transition-transform">
-                  <ShieldCheck size={32} />
+              </motion.div>
+              
+              <motion.div 
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="p-12 bg-background rounded-[3.5rem] shadow-apple border border-outline/5 md:col-span-2 group"
+              >
+                <div className="w-14 h-14 bg-surface-container rounded-2xl flex items-center justify-center mb-10 text-on-background transition-all duration-500 group-hover:bg-on-background group-hover:text-background border border-outline/5">
+                  <ShieldCheck size={24} />
                 </div>
-                <h2 className="text-2xl font-black text-on-surface mb-6 tracking-tight uppercase">{about.missionTitle}</h2>
-                <ul className="text-on-surface-variant leading-relaxed font-medium space-y-6">
+                <h2 className="text-2xl font-semibold text-on-surface mb-8 tracking-tight uppercase tracking-[0.1em]">{about.missionTitle}</h2>
+                <ul className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
                   {about.mission.map((m, i) => (
-                    <li key={i} className="flex items-center gap-6">
-                      <div className="w-10 h-10 bg-primary/5 rounded-xl flex items-center justify-center text-primary font-black text-xs shrink-0">{i+1}</div>
-                      <span className="opacity-80">{m}</span>
+                    <li key={i} className="flex items-start gap-5">
+                      <div className="w-8 h-8 bg-surface-container rounded-lg flex items-center justify-center text-secondary font-bold text-[11px] shrink-0 border border-outline/5">{i+1}</div>
+                      <span className="text-secondary font-medium leading-relaxed">{m}</span>
                     </li>
                   ))}
                 </ul>
-              </div>
+              </motion.div>
             </div>
           </div>
         </section>
 
         {/* Team Section */}
-        <section className="py-40 bg-background">
-          <div className="max-w-7xl mx-auto px-6">
-            <div className="text-center mb-32 animate-in fade-in slide-in-from-bottom-4 duration-700">
-              <span className="text-primary font-black uppercase tracking-[0.3em] mb-6 block text-[10px]">The Minds Behind</span>
-              <h2 className="font-display text-4xl md:text-7xl font-black text-on-surface mb-8 tracking-tighter leading-none">{about.teamTitle}</h2>
-              <p className="text-on-surface-variant max-w-2xl mx-auto text-xl font-medium opacity-60 leading-relaxed">{about.teamSubtitle}</p>
+        <section className="py-24 md:py-48 bg-background">
+          <div className="section-container">
+            <div className="text-center mb-32">
+              <span className="text-primary font-semibold uppercase tracking-[0.3em] mb-6 block text-[10px] md:text-xs">Tim Ahli Kami</span>
+              <h2 className="text-5xl md:text-7xl font-semibold text-on-surface mb-8 tracking-tight reveal-text">{about.teamTitle}</h2>
+              <p className="text-secondary max-w-2xl mx-auto text-xl md:text-2xl font-medium leading-relaxed">{about.teamSubtitle}</p>
             </div>
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-20 max-w-5xl mx-auto">
+            
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-16 md:gap-24 max-w-5xl mx-auto">
               {about.team.map((member, idx) => (
-                <div key={member.id} className="group text-center animate-in fade-in slide-in-from-bottom-10" style={{ animationDelay: `${idx * 200}ms` }}>
-                  <div className="aspect-square w-64 h-64 mx-auto rounded-[4rem] overflow-hidden mb-10 shadow-premium group-hover:scale-105 transition-transform duration-700 border border-surface-container-highest relative">
+                <motion.div 
+                  key={member.id}
+                  initial={{ opacity: 0, y: 20 }}
+                  whileInView={{ opacity: 1, y: 0 }}
+                  viewport={{ once: true }}
+                  transition={{ delay: idx * 0.1 }}
+                  className="group text-center"
+                >
+                  <div className="aspect-square w-64 h-64 md:w-80 md:h-80 mx-auto rounded-[4rem] overflow-hidden mb-10 shadow-apple group-hover:shadow-apple-hover transition-all duration-700 border border-outline/5 relative bg-surface-container">
                     <Image
                       alt={member.name}
                       fill
-                      className="object-cover"
+                      className="object-cover transition-transform duration-1000 group-hover:scale-110"
                       src={member.image}
                     />
                   </div>
-                  <h3 className="text-4xl font-black text-on-surface tracking-tighter">{member.name}</h3>
-                  <p className="text-[10px] text-primary uppercase tracking-[0.2em] mt-3 font-black">{member.role}</p>
-                  <p className="text-base text-on-surface-variant mt-8 leading-relaxed px-6 font-medium opacity-60 italic">"{member.bio}"</p>
-                </div>
+                  <h3 className="text-3xl md:text-4xl font-semibold text-on-background tracking-tight">{member.name}</h3>
+                  <p className="text-[10px] md:text-xs text-primary uppercase tracking-[0.2em] mt-4 font-bold">{member.role}</p>
+                  <p className="text-lg text-secondary mt-8 leading-relaxed px-6 font-medium italic opacity-70">"{member.bio}"</p>
+                </motion.div>
               ))}
             </div>
           </div>
+        </section>
+
+        {/* Closing CTA */}
+        <section className="section-container py-24 md:py-48 mb-20">
+           <div className="bg-surface-container p-16 md:p-32 rounded-[4rem] text-center relative overflow-hidden border border-outline/5 shadow-apple">
+              <div className="relative z-10">
+                <h2 className="text-5xl md:text-8xl font-semibold mb-10 text-on-background tracking-tight reveal-text">Siap Berkolaborasi?</h2>
+                <p className="text-xl md:text-2xl text-secondary max-w-2xl mx-auto mb-16 font-medium leading-relaxed">
+                  Mari wujudkan visi digital Anda bersama tim yang berdedikasi dan berpengalaman.
+                </p>
+                <div className="flex flex-col sm:flex-row gap-8 justify-center">
+                  <Link href="/kontak" className="btn-apple text-lg px-12 py-5 flex items-center justify-center gap-3">
+                    Mulai Project <ArrowRight size={20} />
+                  </Link>
+                  <Link href="/layanan" className="btn-apple-secondary text-lg px-12 py-5 border border-outline/20">
+                    Lihat Paket
+                  </Link>
+                </div>
+              </div>
+           </div>
         </section>
       </main>
 

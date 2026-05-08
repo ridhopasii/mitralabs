@@ -85,96 +85,95 @@ export default function TestimonialsAdmin() {
   );
 
   return (
-    <div className="space-y-10 pb-20 animate-in fade-in duration-700">
-      {showSuccess && (
-        <div className="fixed top-10 right-10 z-[200] bg-emerald-500 text-white px-8 py-4 rounded-2xl shadow-2xl flex items-center gap-4 animate-in slide-in-from-right-10 duration-500 font-bold">
-          <CheckCircle2 size={24} />
-          Testimonial Berhasil Diperbarui!
-        </div>
-      )}
+    <div className="max-w-[1200px] mx-auto space-y-12 pb-24">
+      <AnimatePresence>
+        {showSuccess && (
+          <motion.div 
+            initial={{ opacity: 0, y: -20 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -20 }}
+            className="fixed top-8 right-8 z-[500] bg-white border border-slate-200/60 px-6 py-4 rounded-2xl shadow-[0_10px_40px_rgba(0,0,0,0.08)] flex items-center gap-3 backdrop-blur-xl"
+          >
+            <div className="w-8 h-8 bg-emerald-500 rounded-full flex items-center justify-center text-white shadow-lg shadow-emerald-500/20">
+               <CheckCircle2 size={16} />
+            </div>
+            <span className="font-semibold text-slate-900 text-sm tracking-tight">Data Tersimpan.</span>
+          </motion.div>
+        )}
+      </AnimatePresence>
 
-      {/* Header Actions */}
-      <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
-        <div>
-          <h2 className="text-5xl font-black tracking-tighter text-slate-900">Social Proof</h2>
-          <p className="text-slate-500 font-medium mt-2 text-lg">Kelola apresiasi dan feedback dari klien-klien terbaik Anda.</p>
+      {/* Header Area */}
+      <div className="flex flex-col md:flex-row justify-between items-end gap-10 px-4">
+        <div className="space-y-4">
+          <h1 className="text-4xl font-bold tracking-tight text-slate-900">Social Proof</h1>
+          <p className="text-slate-400 font-medium text-lg leading-relaxed max-w-md">
+            Kelola apresiasi dan feedback dari klien-klien terbaik Anda.
+          </p>
         </div>
+        
         <button 
           onClick={() => setEditingTestimonial({ id: 0, name: "", role: "", content: "", rating: 5, image: "" })}
-          className="px-10 py-5 bg-primary text-on-primary rounded-[2rem] font-black flex items-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30"
+          className="h-[60px] px-8 bg-slate-900 text-white rounded-2xl font-semibold text-[13px] flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 active:scale-[0.98]"
         >
-          <Plus size={24} /> Add Testimonial
+          <Plus size={18} /> Add Testimonial
         </button>
       </div>
 
-      {/* Stats Bar */}
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-amber-50 text-amber-500 rounded-2xl flex items-center justify-center">
-            <Star size={28} fill="currentColor" />
+      {/* Stats Cluster */}
+      <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
+        {[
+          { label: "Rata-rata Rating", value: `${(testimonials.reduce((acc: number, t: any) => acc + t.rating, 0) / (testimonials.length || 1)).toFixed(1)} / 5.0`, icon: Star },
+          { label: "Total Ulasan", value: testimonials.length, icon: ThumbsUp },
+          { label: "Ulasan Bintang 5", value: testimonials.filter((t: any) => t.rating === 5).length, icon: Quote },
+        ].map((stat, i) => (
+          <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all">
+             <div className="flex items-center gap-6">
+                <div className="w-12 h-12 bg-slate-50 text-slate-900 rounded-xl flex items-center justify-center">
+                   <stat.icon size={20} strokeWidth={1.5} />
+                </div>
+                <div>
+                   <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-1">{stat.label}</p>
+                   <p className="text-2xl font-bold text-slate-900 tracking-tight">{stat.value}</p>
+                </div>
+             </div>
           </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Average Rating</p>
-            <h4 className="text-3xl font-black text-slate-900">
-              {(testimonials.reduce((acc: number, t: any) => acc + t.rating, 0) / (testimonials.length || 1)).toFixed(1)} / 5.0
-            </h4>
-          </div>
-        </div>
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-emerald-50 text-emerald-500 rounded-2xl flex items-center justify-center">
-            <ThumbsUp size={28} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Total Review</p>
-            <h4 className="text-3xl font-black text-slate-900">{testimonials.length}</h4>
-          </div>
-        </div>
-        <div className="bg-white p-8 rounded-[2.5rem] border border-slate-100 shadow-sm flex items-center gap-6">
-          <div className="w-14 h-14 bg-indigo-50 text-indigo-500 rounded-2xl flex items-center justify-center">
-            <Quote size={28} />
-          </div>
-          <div>
-            <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Featured</p>
-            <h4 className="text-3xl font-black text-slate-900">{testimonials.filter((t: any) => t.rating === 5).length}</h4>
-          </div>
-        </div>
+        ))}
       </div>
 
-      {/* Table Section */}
-      <div className="bg-white rounded-[3rem] border border-slate-100 shadow-xl overflow-hidden">
-        <div className="p-10 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50/50">
+      {/* Main Table Container */}
+      <div className="bg-white rounded-[2.5rem] border border-slate-100 shadow-[0_10px_40px_rgba(0,0,0,0.03)] overflow-hidden mx-4">
+        <div className="p-8 border-b border-slate-50 flex flex-col md:flex-row justify-between items-center gap-6 bg-slate-50/30">
           <div className="relative w-full md:w-96">
-            <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400" size={18} />
+            <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900" size={16} />
             <input 
               type="text" 
-              placeholder="Cari nama, role, atau testimoni..."
+              placeholder="Cari testimoni..."
               value={search}
               onChange={(e) => setSearch(e.target.value)}
-              className="w-full pl-16 pr-8 py-4 bg-white border border-slate-200 rounded-2xl outline-none focus:border-primary font-bold transition-all shadow-sm"
+              className="w-full pl-12 pr-6 py-4 bg-white border border-slate-100 rounded-2xl outline-none focus:ring-1 focus:ring-slate-200 font-medium text-[13px] transition-all shadow-sm"
             />
           </div>
-          <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 rounded-2xl font-bold text-slate-600 hover:border-primary hover:text-primary transition-all">
-            <Filter size={18} />
-            Filter
+          <button className="flex items-center gap-2 px-6 py-4 bg-white border border-slate-200 rounded-2xl font-semibold text-slate-400 text-[12px] hover:text-slate-900 transition-all">
+            <Filter size={16} /> Filter
           </button>
         </div>
 
         <div className="overflow-x-auto">
-          <table className="w-full text-left border-collapse">
+          <table className="w-full text-left">
             <thead>
-              <tr className="border-b border-slate-50 text-[10px] font-black uppercase tracking-[0.2em] text-slate-400">
-                <th className="px-10 py-6">Client Info</th>
-                <th className="px-6 py-6">Content</th>
-                <th className="px-6 py-6 text-center">Rating</th>
-                <th className="px-10 py-6 text-right">Actions</th>
+              <tr className="border-b border-slate-50">
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Client Info</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Content</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">Rating</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-right">Actions</th>
               </tr>
             </thead>
             <tbody className="divide-y divide-slate-50">
               {filteredTestimonials.map((t: any) => (
-                <tr key={t.id} className="group hover:bg-slate-50/50 transition-all">
-                  <td className="px-10 py-6">
-                    <div className="flex items-center gap-6">
-                      <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm border border-slate-200">
+                <tr key={t.id} className="group hover:bg-slate-50/50 transition-all duration-300">
+                  <td className="px-10 py-8">
+                    <div className="flex items-center gap-5">
+                      <div className="w-14 h-14 rounded-2xl overflow-hidden bg-slate-100 relative shadow-sm border border-slate-100 group-hover:scale-105 transition-transform">
                         {t.image ? (
                           <Image src={t.image} alt={t.name} fill className="object-cover" />
                         ) : (
@@ -184,36 +183,36 @@ export default function TestimonialsAdmin() {
                         )}
                       </div>
                       <div>
-                        <h5 className="font-black text-slate-900 group-hover:text-primary transition-colors">{t.name}</h5>
-                        <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">{t.role}</p>
+                        <h5 className="font-bold text-slate-900 tracking-tight leading-none mb-1.5">{t.name}</h5>
+                        <p className="text-[11px] text-slate-400 font-bold uppercase tracking-widest">{t.role}</p>
                       </div>
                     </div>
                   </td>
-                  <td className="px-6 py-6">
-                     <p className="text-sm font-medium text-slate-600 line-clamp-2 italic max-w-xl">
+                  <td className="px-10 py-8">
+                     <p className="text-[13px] font-medium text-slate-500 line-clamp-2 italic max-w-xl leading-relaxed">
                        "{t.content}"
                      </p>
                   </td>
-                  <td className="px-6 py-6">
+                  <td className="px-10 py-8">
                     <div className="flex justify-center gap-1 text-amber-400">
                       {[...Array(5)].map((_, i) => (
-                        <Star key={i} size={14} fill={i < t.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth={3} />
+                        <Star key={i} size={12} fill={i < t.rating ? "currentColor" : "none"} stroke="currentColor" strokeWidth={2.5} />
                       ))}
                     </div>
                   </td>
-                  <td className="px-10 py-6 text-right">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                  <td className="px-10 py-8 text-right">
+                    <div className="flex justify-end gap-2 opacity-0 group-hover:opacity-100 transition-all">
                       <button 
                         onClick={() => setEditingTestimonial(t)}
-                        className="p-3 bg-white border border-slate-200 text-slate-600 rounded-xl hover:border-primary hover:text-primary shadow-sm"
+                        className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all"
                       >
-                        <Edit3 size={18} />
+                        <Edit3 size={16} />
                       </button>
                       <button 
                         onClick={() => handleDelete(t.id)}
-                        className="p-3 bg-rose-50 text-rose-500 rounded-xl hover:bg-rose-500 hover:text-white shadow-sm"
+                        className="p-3 text-slate-300 hover:text-rose-500 rounded-xl transition-all"
                       >
-                        <Trash2 size={18} />
+                        <Trash2 size={16} />
                       </button>
                     </div>
                   </td>
@@ -222,127 +221,138 @@ export default function TestimonialsAdmin() {
             </tbody>
           </table>
           {filteredTestimonials.length === 0 && (
-            <div className="p-20 text-center space-y-4 text-slate-400">
-              <Search size={48} className="mx-auto opacity-20" />
-              <p className="font-bold">Tidak ada testimonial yang ditemukan.</p>
+            <div className="py-40 text-center space-y-4 opacity-10">
+              <Search size={64} className="mx-auto" strokeWidth={1} />
+              <p className="font-bold uppercase tracking-widest text-[10px]">Data tidak ditemukan</p>
             </div>
           )}
         </div>
       </div>
 
-      {/* Edit/Add Modal */}
-      {editingTestimonial && (
-        <div className="fixed inset-0 z-[200] bg-slate-900/60 backdrop-blur-md flex items-center justify-center p-6 animate-in fade-in duration-300">
-          <div className="bg-white w-full max-w-4xl max-h-[90vh] rounded-[3.5rem] shadow-2xl flex flex-col overflow-hidden animate-in zoom-in-95 duration-500 border border-white/20">
-            {/* Modal Header */}
-            <div className="p-10 border-b border-slate-100 flex justify-between items-center bg-slate-50/50">
-               <div className="flex items-center gap-6">
-                  <div className="w-16 h-16 bg-primary text-on-primary rounded-3xl flex items-center justify-center shadow-2xl shadow-primary/40">
-                    <Quote size={32} />
-                  </div>
-                  <div>
-                    <h3 className="text-3xl font-black tracking-tighter text-slate-900 uppercase">
-                      {editingTestimonial.id === 0 ? "Add Social Proof" : "Edit Social Proof"}
-                    </h3>
-                    <p className="text-xs text-slate-400 font-black tracking-[0.2em] uppercase mt-1">Abadikan kepuasan klien Anda</p>
-                  </div>
-               </div>
-               <button onClick={() => setEditingTestimonial(null)} className="p-5 bg-slate-100 text-slate-400 rounded-2xl hover:bg-rose-50 hover:text-rose-500 transition-all">
-                  <X size={24} />
-               </button>
-            </div>
+      {/* Apple-style Modal */}
+      <AnimatePresence>
+        {editingTestimonial && (
+          <div className="fixed inset-0 z-[600] flex items-center justify-center p-4">
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setEditingTestimonial(null)}
+              className="absolute inset-0 bg-slate-900/10 backdrop-blur-md"
+            />
+            <motion.div
+              initial={{ opacity: 0, scale: 0.98, y: 10 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.98, y: 10 }}
+              className="bg-white w-full max-w-4xl max-h-[85vh] rounded-[2.5rem] shadow-[0_30px_100px_rgba(0,0,0,0.15)] flex flex-col overflow-hidden relative z-10 border border-slate-100"
+            >
+              <div className="px-10 py-8 border-b border-slate-50 flex justify-between items-center bg-white/50 backdrop-blur-xl sticky top-0 z-20">
+                 <div className="flex items-center gap-5">
+                    <div className="w-11 h-11 bg-slate-900 text-white rounded-2xl flex items-center justify-center">
+                       <Quote size={20} />
+                    </div>
+                    <div>
+                       <h3 className="text-xl font-bold tracking-tight text-slate-900 uppercase">
+                         {editingTestimonial.id === 0 ? "Add Social Proof" : "Edit Social Proof"}
+                       </h3>
+                       <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mt-1">Registry Feedback</p>
+                    </div>
+                 </div>
+                 <button onClick={() => setEditingTestimonial(null)} className="p-2 text-slate-400 hover:text-slate-900 transition-all">
+                    <X size={20} />
+                 </button>
+              </div>
 
-            {/* Modal Body */}
-            <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
-               <div className="grid lg:grid-cols-2 gap-12">
-                  <div className="space-y-8">
-                     <div className="space-y-4">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Client Avatar</label>
-                        <div className="relative group w-40 h-40 rounded-[2.5rem] overflow-hidden border-4 border-dashed border-slate-100 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:border-primary transition-all mx-auto">
-                          {editingTestimonial.image && <Image src={editingTestimonial.image} alt="Preview" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />}
-                          <div className="relative z-10 bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-2xl flex flex-col items-center gap-2 opacity-0 group-hover:opacity-100 transition-all transform translate-y-2 group-hover:translate-y-0">
-                            {isUploading ? <Loader2 size={24} className="animate-spin text-primary" /> : <ImageIcon size={24} className="text-primary" />}
-                          </div>
-                          {!editingTestimonial.image && (
-                            <div className="flex flex-col items-center gap-2 text-slate-200">
-                               <UserIcon size={48} strokeWidth={1} />
-                               <p className="font-black text-[8px] uppercase tracking-widest text-center px-4">Upload Photo</p>
+              <div className="flex-1 overflow-y-auto p-12 custom-scrollbar">
+                 <div className="grid lg:grid-cols-2 gap-16">
+                    <div className="space-y-12 text-center">
+                       <div className="space-y-4">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Client Visual</label>
+                          <div className="relative group w-48 h-48 rounded-[3rem] overflow-hidden border-2 border-dashed border-slate-100 bg-slate-50 flex flex-col items-center justify-center cursor-pointer hover:border-slate-300 transition-all mx-auto">
+                            {editingTestimonial.image && <Image src={editingTestimonial.image} alt="Preview" fill className="object-cover group-hover:scale-105 transition-transform duration-700" />}
+                            <div className="relative z-10 bg-white/90 backdrop-blur-xl p-4 rounded-2xl shadow-xl flex flex-col items-center gap-2 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100">
+                              {isUploading ? <Loader2 size={24} className="animate-spin text-slate-900" /> : <Upload size={24} className="text-slate-900" />}
                             </div>
-                          )}
-                          <input type="file" accept="image/*" onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
-                        </div>
-                     </div>
+                            {!editingTestimonial.image && (
+                              <div className="flex flex-col items-center gap-3 text-slate-200">
+                                 <UserIcon size={48} strokeWidth={1} />
+                                 <p className="font-bold text-[9px] uppercase tracking-widest">Upload Photo</p>
+                              </div>
+                            )}
+                            <input type="file" accept="image/*" onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
+                          </div>
+                       </div>
 
-                     <div className="space-y-2 text-center">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400">Star Rating</label>
-                        <div className="flex justify-center gap-3">
-                           {[1, 2, 3, 4, 5].map(star => (
-                             <button 
-                               key={star} 
-                               onClick={() => setEditingTestimonial({...editingTestimonial, rating: star})}
-                               className={`transition-all ${editingTestimonial.rating >= star ? "text-amber-400 scale-125" : "text-slate-200"}`}
-                             >
-                               <Star size={32} fill={editingTestimonial.rating >= star ? "currentColor" : "none"} strokeWidth={3} />
-                             </button>
-                           ))}
-                        </div>
-                     </div>
-                  </div>
+                       <div className="space-y-4">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400">Metric Rating</label>
+                          <div className="flex justify-center gap-3">
+                             {[1, 2, 3, 4, 5].map(star => (
+                               <button 
+                                 key={star} 
+                                 onClick={() => setEditingTestimonial({...editingTestimonial, rating: star})}
+                                 className={`transition-all ${editingTestimonial.rating >= star ? "text-amber-400 scale-110" : "text-slate-100"}`}
+                               >
+                                 <Star size={32} fill={editingTestimonial.rating >= star ? "currentColor" : "none"} strokeWidth={2.5} />
+                               </button>
+                             ))}
+                          </div>
+                       </div>
+                    </div>
 
-                  <div className="space-y-6">
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Client Name</label>
-                        <input 
-                           type="text" 
-                           value={editingTestimonial.name}
-                           placeholder="Nama Lengkap Klien"
-                           onChange={(e) => setEditingTestimonial({...editingTestimonial, name: e.target.value})}
-                           className="w-full px-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-black text-lg focus:border-primary transition-all shadow-sm"
-                        />
-                     </div>
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Role / Company</label>
-                        <input 
-                           type="text" 
-                           value={editingTestimonial.role}
-                           placeholder="e.g. CEO of Mitralabs"
-                           onChange={(e) => setEditingTestimonial({...editingTestimonial, role: e.target.value})}
-                           className="w-full px-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none font-bold text-lg focus:border-primary transition-all shadow-sm"
-                        />
-                     </div>
-                     <div className="space-y-2">
-                        <label className="text-[10px] font-black uppercase tracking-widest text-slate-400 ml-2">Client Experience</label>
-                        <textarea 
-                           value={editingTestimonial.content}
-                           placeholder="Tuliskan pengalaman positif klien Anda di sini..."
-                           onChange={(e) => setEditingTestimonial({...editingTestimonial, content: e.target.value})}
-                           className="w-full px-8 py-6 bg-white border border-slate-200 rounded-[2rem] outline-none font-medium text-lg focus:border-primary h-48 transition-all shadow-sm resize-none"
-                        />
-                     </div>
-                  </div>
-               </div>
-            </div>
+                    <div className="space-y-8">
+                       <div className="space-y-3">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Client Legal Name</label>
+                          <input 
+                             type="text" 
+                             value={editingTestimonial.name}
+                             placeholder="Nama Lengkap Klien"
+                             onChange={(e) => setEditingTestimonial({...editingTestimonial, name: e.target.value})}
+                             className="w-full px-6 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-bold text-base focus:bg-white focus:border-slate-200 transition-all"
+                          />
+                       </div>
+                       <div className="space-y-3">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Operational Role</label>
+                          <input 
+                             type="text" 
+                             value={editingTestimonial.role}
+                             placeholder="e.g. CEO of Company"
+                             onChange={(e) => setEditingTestimonial({...editingTestimonial, role: e.target.value})}
+                             className="w-full px-6 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-base focus:bg-white focus:border-slate-200 transition-all"
+                          />
+                       </div>
+                       <div className="space-y-3">
+                          <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Experience Narrative</label>
+                          <textarea 
+                             value={editingTestimonial.content}
+                             placeholder="Tuliskan pengalaman klien..."
+                             onChange={(e) => setEditingTestimonial({...editingTestimonial, content: e.target.value})}
+                             className="w-full px-8 py-8 bg-slate-50 border border-transparent rounded-[2rem] outline-none font-medium text-lg leading-relaxed focus:bg-white focus:border-slate-200 h-64 transition-all resize-none"
+                          />
+                       </div>
+                    </div>
+                 </div>
+              </div>
 
-            {/* Modal Footer */}
-            <div className="p-10 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-6">
-               <button 
-                 onClick={() => setEditingTestimonial(null)}
-                 className="px-12 py-5 bg-white border border-slate-200 text-slate-600 rounded-[2rem] font-black uppercase tracking-widest text-xs hover:bg-slate-100 transition-all shadow-sm"
-               >
-                 Batal
-               </button>
-               <button 
-                 onClick={handleSave}
-                 disabled={isSaving}
-                 className="px-16 py-5 bg-primary text-on-primary rounded-[2rem] font-black uppercase tracking-widest text-xs flex items-center gap-4 hover:scale-105 active:scale-95 transition-all shadow-2xl shadow-primary/30 disabled:opacity-50"
-               >
-                 {isSaving ? <Loader2 size={20} className="animate-spin" /> : <Save size={20} />}
-                 {isSaving ? "Menyimpan..." : "Simpan Testimonial"}
-               </button>
-            </div>
+              <div className="px-10 py-8 border-t border-slate-50 bg-slate-50/20 flex justify-end gap-4">
+                 <button 
+                   onClick={() => setEditingTestimonial(null)}
+                   className="px-8 py-3 text-slate-500 font-bold text-[12px] hover:text-slate-900 transition-all"
+                 >
+                   Discard
+                 </button>
+                 <button 
+                   onClick={handleSave}
+                   disabled={isSaving}
+                   className="px-12 py-3 bg-slate-900 text-white rounded-xl font-bold text-[12px] flex items-center gap-3 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10 disabled:opacity-50"
+                 >
+                   {isSaving ? <Loader2 size={18} className="animate-spin" /> : <Save size={18} />}
+                   {isSaving ? "Synchronizing..." : "Commit Registry"}
+                 </button>
+              </div>
+            </motion.div>
           </div>
-        </div>
-      )}
+        )}
+      </AnimatePresence>
     </div>
   );
 }
