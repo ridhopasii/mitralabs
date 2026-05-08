@@ -1,10 +1,10 @@
 "use client";
 
-import { 
-  LayoutDashboard, 
-  Briefcase, 
-  Settings, 
-  Package, 
+import {
+  LayoutDashboard,
+  Briefcase,
+  Settings,
+  Package,
   LogOut,
   Type,
   FileText,
@@ -55,17 +55,18 @@ export default function AdminLayout({
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
     { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
-    { name: "Site Settings", icon: Settings, href: "/admin/konten", category: "CMS" },
     { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
     { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },
+    { name: "Site Settings", icon: Type, href: "/admin/konten", category: "CMS" },
     { name: "Layanan", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
     { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
     { name: "Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
     { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "CMS" },
     { name: "FAQ", icon: HelpCircle, href: "/admin/faq", category: "CMS" },
+    { name: "Settings", icon: Settings, href: "/admin/settings", category: "Sistem" },
   ];
 
-  const categories = ["Utama", "CMS"];
+  const categories = ["Utama", "CMS", "Sistem"];
 
   if (!isAuthorized) return null;
 
@@ -97,8 +98,8 @@ export default function AdminLayout({
                       key={item.name}
                       href={item.href}
                       className={`flex items-center gap-4 px-5 py-3 rounded-2xl transition-all font-bold text-[13px] ${
-                        isActive 
-                          ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10 translate-x-2" 
+                        isActive
+                          ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10 translate-x-2"
                           : "text-slate-500 hover:bg-slate-50 hover:text-slate-900"
                       }`}
                     >
@@ -110,7 +111,7 @@ export default function AdminLayout({
               </div>
             </div>
           ))}
-          
+
           <div className="pt-6">
              <Link href="/" target="_blank" className="flex items-center justify-between px-6 py-4 bg-slate-50 rounded-2xl text-slate-600 text-[11px] font-bold uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all border border-slate-100">
                 View Site <ExternalLink size={14} />
@@ -138,7 +139,7 @@ export default function AdminLayout({
               <p className="font-bold text-[11px] uppercase tracking-widest">System Control Interface</p>
             </div>
           </div>
-          
+
           <div className="flex items-center gap-6">
             <div className="text-right hidden sm:block">
               <p className="text-sm font-bold text-slate-900">Ridho Robbi Pasi</p>

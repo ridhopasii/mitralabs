@@ -28,14 +28,23 @@ export default function SettingsPage() {
   const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || {
     companyName: "MITRALABS.ID",
     companyTagline: "Precision Web Engineering",
-    companyAddress: "Medan, Sumatera Utara, Indonesia",
+    companyAddress: "Jl. Contoh No. 123",
+    companyCity: "Medan",
+    companyProvince: "Sumatera Utara",
+    companyPostalCode: "20111",
     companyPhone: "+62 823-8111-8520",
     companyEmail: "contact@mitralabs.id",
+    companyWebsite: "www.mitralabs.id",
+    companyNPWP: "00.000.000.0-000.000",
     bankName: "Bank Central Asia (BCA)",
     bankAccountNumber: "8000-7625-12",
     bankAccountName: "Ridho Robbi Pasi",
+    bankBranch: "KCP Medan Petisah",
     taxRate: 0,
-    footerNote: "Verified by Mitralabs Cryptographic Protocol"
+    taxLabel: "PPN (11%)",
+    footerNote: "Verified by Mitralabs Cryptographic Protocol",
+    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
   });
 
   const exportData = () => {
@@ -233,29 +242,74 @@ export default function SettingsPage() {
                   />
                 </div>
               </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Cabang Bank (Opsional)</label>
+                <input
+                  type="text"
+                  value={invoiceSettings.bankBranch}
+                  onChange={(e) => setInvoiceSettings({...invoiceSettings, bankBranch: e.target.value})}
+                  placeholder="KCP Medan Petisah"
+                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                />
+              </div>
             </div>
 
             {/* Additional Settings */}
             <div className="space-y-6 pt-8 border-t border-slate-100">
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Pajak (%) - PPN</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Pajak (%)</label>
                   <input
                     type="number"
                     value={invoiceSettings.taxRate}
                     onChange={(e) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(e.target.value) || 0})}
+                    placeholder="11"
                     className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
                   />
                 </div>
                 <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Catatan Footer</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Label Pajak</label>
                   <input
                     type="text"
-                    value={invoiceSettings.footerNote}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, footerNote: e.target.value})}
+                    value={invoiceSettings.taxLabel}
+                    onChange={(e) => setInvoiceSettings({...invoiceSettings, taxLabel: e.target.value})}
+                    placeholder="PPN (11%)"
                     className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
                   />
                 </div>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Catatan Footer</label>
+                <input
+                  type="text"
+                  value={invoiceSettings.footerNote}
+                  onChange={(e) => setInvoiceSettings({...invoiceSettings, footerNote: e.target.value})}
+                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Instruksi Pembayaran</label>
+                <textarea
+                  value={invoiceSettings.paymentInstructions}
+                  onChange={(e) => setInvoiceSettings({...invoiceSettings, paymentInstructions: e.target.value})}
+                  rows={3}
+                  placeholder="Silakan transfer ke rekening yang tertera..."
+                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
+                />
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Syarat & Ketentuan</label>
+                <textarea
+                  value={invoiceSettings.termsAndConditions}
+                  onChange={(e) => setInvoiceSettings({...invoiceSettings, termsAndConditions: e.target.value})}
+                  rows={5}
+                  placeholder="1. Pembayaran dilakukan maksimal 7 hari..."
+                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
+                />
               </div>
             </div>
 

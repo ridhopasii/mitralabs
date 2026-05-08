@@ -194,13 +194,22 @@ interface AppData {
     companyName: string;
     companyTagline: string;
     companyAddress: string;
+    companyCity: string;
+    companyProvince: string;
+    companyPostalCode: string;
     companyPhone: string;
     companyEmail: string;
+    companyWebsite: string;
+    companyNPWP: string;
     bankName: string;
     bankAccountNumber: string;
     bankAccountName: string;
+    bankBranch: string;
     taxRate: number;
+    taxLabel: string;
     footerNote: string;
+    termsAndConditions: string;
+    paymentInstructions: string;
   };
   blog: {
     title: string;
@@ -442,14 +451,23 @@ const initialData: AppData = {
   invoiceSettings: {
     companyName: "MITRALABS.ID",
     companyTagline: "Precision Web Engineering",
-    companyAddress: "Medan, Sumatera Utara, Indonesia",
+    companyAddress: "Jl. Contoh No. 123",
+    companyCity: "Medan",
+    companyProvince: "Sumatera Utara",
+    companyPostalCode: "20111",
     companyPhone: "+62 823-8111-8520",
     companyEmail: "contact@mitralabs.id",
+    companyWebsite: "www.mitralabs.id",
+    companyNPWP: "00.000.000.0-000.000",
     bankName: "Bank Central Asia (BCA)",
     bankAccountNumber: "8000-7625-12",
     bankAccountName: "Ridho Robbi Pasi",
+    bankBranch: "KCP Medan Petisah",
     taxRate: 0,
-    footerNote: "Verified by Mitralabs Cryptographic Protocol"
+    taxLabel: "PPN (11%)",
+    footerNote: "Verified by Mitralabs Cryptographic Protocol",
+    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
   },
   blog: {
     title: "Edukasi & Wawasan",
