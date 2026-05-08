@@ -28,7 +28,10 @@ import {
   Printer,
   Send,
   ExternalLink,
-  TrendingUp
+  Package,
+  Layers,
+  ArrowUpRight,
+  ChevronDown
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity } from "@/lib/supabase";
