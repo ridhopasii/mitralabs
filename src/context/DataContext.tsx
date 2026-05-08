@@ -226,172 +226,178 @@ const initialData: AppData = {
   },
   home: {
     hero: {
-      tagline: "Mitra Digital Bisnis Mu",
-      promo: "Promo Aktif",
-      title: "Tampil Profesional Tanpa Ribet.",
-      subtitle: "Jasa pembuatan website profesional untuk UMKM, Sekolah, dan Travel. Setiap website dirancang untuk benar-benar bekerja — bukan sekadar terlihat bagus.",
-      image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=800",
-      stats: { label: "Live Projects", value: "150+", desc: "Website Berhasil Online" }
+      tagline: "Precision Tech Agency",
+      promo: "Special Launch Promo",
+      title: "Solusi Digital Presisi Untuk Bisnis Anda.",
+      subtitle: "Kami membangun infrastruktur digital yang tangguh untuk UMKM, Institusi Pendidikan, dan Industri Pariwisata. Fokus kami adalah fungsionalitas, kecepatan, dan konversi nyata.",
+      image: "/mitralabs_hero_premium_1778227502346.png",
+      stats: { label: "Success Projects", value: "240+", desc: "Digital Assets Live" }
     },
     problem: {
-      title: "Masalah yang Sering Dhadap UMKM",
-      subtitle: "Banyak bisnis kehilangan potensi karena kehadiran digital yang kurang optimal.",
+      title: "Masalah Umum Bisnis di Era Digital",
+      subtitle: "Banyak bisnis kehilangan momentum karena infrastruktur digital yang dikelola secara amatir.",
       items: [
-        { id: 1, title: "Tidak Punya Website", desc: "Kehilangan kepercayaan dari calon pembeli." },
-        { id: 2, title: "Website Lambat", desc: "Pengunjung kabur sebelum melihat produk." },
+        { id: 1, title: "Kehilangan Trust", desc: "Calon klien ragu bertransaksi karena website terlihat ketinggalan zaman atau tidak aman." },
+        { id: 2, title: "Konversi Rendah", desc: "Website hanya jadi pajangan tanpa sistem yang memudahkan pelanggan untuk membeli atau memesan." },
       ],
     },
     solution: {
-      tagline: "Solusi Kami",
-      title: "Website Profesional untuk Setiap Lini Bisnis",
-      subtitle: "Kami menghadirkan website yang dirancang khusus sesuai karakteristik dan target market industri Anda.",
+      tagline: "Our Expertise",
+      title: "Arsitektur Digital yang Menghasilkan Pertumbuhan",
+      subtitle: "Setiap baris kode yang kami tulis bertujuan untuk memecahkan masalah spesifik di industri Anda.",
       cards: {
         umkm: {
-          tag: "Terpopuler",
-          title: "Website UMKM & Toko",
-          desc: "Toko, warung, bengkel, laundry, dan usaha kecil lainnya. Solusi cepat dan tepat untuk go-digital dengan sistem pemesanan via WhatsApp.",
-          image: "https://images.unsplash.com/photo-1542838132-92c53300491e?auto=format&fit=crop&q=80&w=800"
+          tag: "Most Requested",
+          title: "Sistem Web UMKM",
+          desc: "Integrasi WhatsApp, katalog produk dinamis, dan dashboard simpel untuk manajemen stok dan pesanan harian.",
+          image: "/mitralabs_umkm_service_1778227528390.png"
         },
         travel: {
-          title: "Website Travel",
-          desc: "Paket wisata, galeri, form booking, dan profil tourguide dalam satu platform interaktif."
+          title: "Portal Travel & Tour",
+          desc: "Sistem manajemen paket wisata, kalender keberangkatan otomatis, dan formulir booking yang terintegrasi.",
+          image: "/mitralabs_travel_service_1778227548373.png"
         },
         school: {
-          title: "Website Sekolah",
-          desc: "Profil, pengumuman, galeri, dan info pendaftaran siswa baru secara online."
+          title: "Platform Akademik",
+          desc: "Pusat informasi sekolah, sistem PPDB Online, dan manajemen konten berita sekolah yang terstruktur.",
+          image: "/mitralabs_school_service_1778227565941.png"
         },
         business: {
-          title: "Website Bisnis",
-          desc: "Company profile, portofolio, dan landing page promosi untuk tingkatkan trust klien."
+          title: "Corporate Identity",
+          desc: "Company profile tingkat tinggi yang mencerminkan otoritas dan profesionalisme brand Anda di pasar global.",
+          image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
         }
       }
     },
     process: {
-      title: "Alur Kerja Profesional Kami",
-      subtitle: "Kami mengikuti standar operasional yang terukur untuk memastikan kualitas dan ketepatan waktu setiap project.",
+      title: "Standard Operational Procedure",
+      subtitle: "Kami bekerja dengan transparansi penuh untuk memastikan setiap ekspektasi Anda terpenuhi melampaui standar.",
       steps: [
-        { id: 1, title: "Onboarding", desc: "Pengisian form brief untuk memahami detail kebutuhan dan tujuan bisnis Anda." },
-        { id: 2, title: "Proposal & Deal", desc: "Penyusunan penawaran harga, konfirmasi kesepakatan, dan pembayaran DP 30%." },
-        { id: 3, title: "Pengerjaan", desc: "Proses development dengan update progres minimal 2x (saat 50% dan mendekati final)." },
-        { id: 4, title: "Revisi", desc: "Pengecekan hasil dan perbaikan sesuai feedback (maksimal 2x revisi gratis)." },
-        { id: 5, title: "Serah Terima", desc: "Pelunasan sisa pembayaran, penyerahan akses/file, dan aktivasi garansi bug 7 hari." },
+        { id: 1, title: "Technical Onboarding", desc: "Pendalaman brief melalui form onboarding strategis untuk memetakan target audiens dan kompetitor." },
+        { id: 2, title: "Agreement & Kickoff", desc: "Finalisasi kontrak, pembayaran DP 30%, dan penyusunan timeline pengerjaan yang ketat." },
+        { id: 3, title: "Sprints & Updates", desc: "Proses development modular dengan laporan progres mingguan melalui grup koordinasi khusus." },
+        { id: 4, title: "Quality Assurance", desc: "Pengujian performa (speed test), keamanan, dan responsivitas di berbagai perangkat." },
+        { id: 5, title: "Handover & Warranty", desc: "Aktivasi website, serah terima aset, dan masa garansi bug untuk ketenangan pikiran Anda." },
       ],
     },
     stats: [
-      { id: 1, label: "Live Projects", value: "150+", desc: "Website Berhasil Online" },
-      { id: 2, label: "Client Puas", value: "99%", desc: "Rating Bintang 5" },
+      { id: 1, label: "Live Projects", value: "240+", desc: "Digital Assets Live" },
+      { id: 2, label: "Client Satisfaction", value: "4.9/5", desc: "Customer Rating" },
     ],
     cta: {
-      title: "Siap Membuat Bisnis Anda Auto-Pilot?",
-      subtitle: "Jangan biarkan keraguan menghambat pertumbuhan Anda. Mari diskusikan bagaimana teknologi bisa bekerja untuk Anda.",
-      buttonText: "Hubungi Kami Sekarang",
-      promoText: "Konsultasi pertama GRATIS senilai Rp 1.500.000",
+      title: "Mulai Transformasi Digital Anda Hari Ini",
+      subtitle: "Tim ahli kami siap membantu Anda membangun kehadiran digital yang dominan di pasar.",
+      buttonText: "Jadwalkan Konsultasi Gratis",
+      promoText: "Sesi Strategi Digital Gratis (Terbatas untuk 5 Klien/Bulan)",
     },
   },
   services: {
-    title: "Pilihan Paket Website Sesuai Kebutuhan Anda",
-    subtitle: "Kami menawarkan harga yang transparan dengan kualitas profesional untuk membantu bisnis Anda bertransformasi digital.",
+    title: "Investasi Strategis Untuk Bisnis Anda",
+    subtitle: "Kami menawarkan paket layanan yang fleksibel namun tetap mengedepankan kualitas teknis terbaik di kelasnya.",
     plans: [
       {
         id: 1,
         name: "Basic",
         price: "Rp 1.500.000",
         tier: "Essential",
-        pages: "1 halaman",
-        duration: "3 hari kerja",
-        features: ["Landing page profesional", "Mobile responsive", "Tombol WhatsApp", "2x revisi", "Garansi bug 7 hari"],
-        missing: ["Semi-custom design", "SEO dasar", "Domain & Hosting"],
+        pages: "1 Halaman",
+        duration: "3-5 Hari",
+        features: ["Landing Page Modern", "Integrasi WhatsApp", "Domain & Hosting (1 Thn)", "Mobile Responsive", "SSL Security"],
+        missing: ["Sistem Booking", "Dashboard Admin", "Custom Features"],
       },
       {
         id: 2,
         name: "Standard",
         price: "Rp 3.500.000",
-        tier: "Growth",
-        pages: "3–5 halaman",
-        duration: "7 hari kerja",
-        highlight: true,
-        features: ["Semi-custom design", "Form kontak", "Google Maps", "Galeri foto", "SEO dasar", "2x revisi", "Garansi bug 7 hari"],
-        missing: ["Full custom design", "Domain & Hosting"],
+        tier: "Professional",
+        pages: "Sampai 5 Halaman",
+        duration: "7-10 Hari",
+        features: ["Multi-page Website", "Dashboard Admin", "Integrasi WhatsApp", "Sistem Galeri Pro", "SEO Basic", "Laporan Bulanan"],
+        missing: ["Custom API Integrasi", "Prioritas Support 24/7"],
+        highlight: true
       },
       {
         id: 3,
         name: "Premium",
         price: "Rp 7.000.000",
         tier: "Enterprise",
-        pages: "7–10 halaman",
-        duration: "14 hari kerja",
-        features: ["Full custom design", "Blog / artikel", "Sistem booking", "Animasi interaktif", "Domain .com (1 thn)", "Hosting (1 thn)", "1 bulan support gratis", "2x revisi", "Garansi bug 7 hari"],
+        pages: "Halaman Unlimited",
+        duration: "14-21 Hari",
+        features: ["Full Custom Website", "Sistem Booking/E-commerce", "High-End SEO", "Prioritas Support", "Custom Integrasi API", "Manual Book"],
         missing: [],
-      },
+      }
     ],
-    notes: [
-      "* Harga belum termasuk domain & hosting kecuali Paket Premium.",
-      "* DP 30% sebelum mulai, pelunasan 70% sebelum serah terima.",
-      "* Perbaikan bug setelah garansi: Rp 100.000 per sesi.",
-    ],
-    comparisonTitle: "Perbandingan Detail",
-    comparisonSubtitle: "Transparansi penuh untuk setiap layanan teknis kami.",
+    notes: ["Semua paket sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance bug selama 3 bulan pertama."],
+    comparisonTitle: "Bandingkan Paket",
+    comparisonSubtitle: "Pilih jalur investasi yang paling sesuai dengan skala pertumbuhan bisnis Anda saat ini."
   },
   portfolio: {
-    title: "Precision-Crafted Solutions.",
-    subtitle: "Explore our curated gallery of digital experiences designed for market leaders and local innovators across diverse sectors.",
-    categories: ["All Works", "UMKM", "School", "Travel", "Business"],
+    title: "Karya Terpilih Kami",
+    subtitle: "Lihat bagaimana kami membantu berbagai industri membangun otoritas digital mereka.",
+    categories: ["All", "UMKM", "Travel", "School", "Corporate"],
     projects: [
       {
         id: 1,
-        slug: "wonderful-toba",
-        title: "Wonderful Toba",
+        slug: "toba-dream-travel",
+        title: "Toba Dream Travel Portal",
         category: "Travel",
-        image: "https://images.unsplash.com/photo-1506744038136-46273834b3fb?auto=format&fit=crop&q=80&w=800",
-        description: "Platform pariwisata terintegrasi untuk Danau Toba.",
-        challenge: "Membangun sistem booking yang kompleks dengan desain visual yang memanjakan mata.",
-        solution: "Implementasi Next.js dengan optimasi gambar dan sistem manajemen konten yang dinamis.",
-        results: ["Peningkatan traffic 300%", "User experience yang lebih smooth", "Booking rate naik 40%"],
-        status: "Published"
+        image: "/mitralabs_travel_service_1778227548373.png",
+        description: "Modernisasi portal wisata Danau Toba dengan sistem booking otomatis dan kalender keberangkatan.",
+        challenge: "Menampilkan puluhan paket wisata dengan navigasi yang simpel namun lengkap.",
+        solution: "Membangun sistem filter dinamis berbasis kategori dan destinasi wisata.",
+        results: ["Peningkatan booking online sebesar 40%", "Waktu load website di bawah 2 detik"],
+        status: "Completed",
+        client_name: "Bpk. Andi Wijaya",
+        project_date: "Januari 2024",
+        live_link: "#",
+        tech_stack: ["Next.js", "Tailwind CSS", "Supabase"],
       },
       {
         id: 2,
-        slug: "mitra-mart",
-        title: "Mitra Mart",
-        category: "UMKM",
-        image: "https://images.unsplash.com/photo-1472851294608-062f824d29cc?auto=format&fit=crop&q=80&w=800",
-        description: "E-commerce lokal untuk kebutuhan sehari-hari.",
-        challenge: "Sinkronisasi stok real-time dan kemudahan transaksi via WhatsApp.",
-        solution: "Integrasi Supabase real-time database dengan checkout WhatsApp otomatis.",
-        results: ["500+ transaksi per bulan", "Operasional lebih efisien", "Retensi pelanggan tinggi"],
-        status: "Published"
-      },
+        slug: "smk-penerbangan-medan",
+        title: "Sistem Informasi SMK Penerbangan",
+        category: "School",
+        image: "/mitralabs_school_service_1778227565941.png",
+        description: "Website profil sekolah yang dilengkapi sistem pendaftaran siswa baru (PPDB) terintegrasi.",
+        challenge: "Mendigitalkan formulir pendaftaran yang kompleks agar mudah diakses wali murid.",
+        solution: "Formulir multi-step dengan validasi real-time dan dashboard admin sekolah.",
+        results: ["500+ Pendaftar online dalam 1 bulan", "Efisiensi admin sekolah meningkat 60%"],
+        status: "Completed",
+        client_name: "Ibu Siti Fatimah",
+        project_date: "Februari 2024",
+        tech_stack: ["React", "Firebase", "Bootstrap"],
+      }
     ],
     cta: {
-      title: "Punya Visi untuk Project Berikutnya?",
-      subtitle: "Mari berkolaborasi membangun pengalaman digital yang mendefinisikan masa depan brand Anda.",
-      buttonText: "Mulai Konsultasi",
+      title: "Ingin Portofolio Anda Ada di Sini?",
+      subtitle: "Mari buat website yang bukan hanya sekadar online, tapi juga menghasilkan profit.",
+      buttonText: "Mulai Diskusi Project",
     },
   },
   about: {
     hero: {
-      tagline: "Tentang Kami",
-      title: "Mitra Digital Bisnis Mu.",
-      subtitle: "Mitralabs.id adalah digital agency yang bergerak di bidang jasa pembuatan website profesional untuk UMKM, sekolah, dan bisnis travel di Indonesia.",
-      image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800",
+      tagline: "About Mitralabs",
+      title: "Mendedikasikan Presisi Teknis Untuk Bisnis Anda.",
+      subtitle: "Kami adalah tim yang percaya bahwa website adalah investasi, bukan sekadar biaya. Kami fokus pada hasil yang bisa diukur.",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=800",
     },
     stats: [
-      { label: "Tahun Berdiri", value: "2026" },
-      { label: "Local Talent", value: "100%" },
+      { label: "Year Founded", value: "2021" },
+      { label: "Team Experts", value: "12+" },
     ],
-    visionTitle: "Visi",
-    vision: "Menjadi mitra digital terpercaya bagi pelaku usaha di Indonesia.",
     missionTitle: "Misi Kami",
     mission: [
-      "Menyediakan jasa website yang profesional, terjangkau, dan tepat sasaran.",
-      "Membangun hubungan jangka panjang berbasis kepercayaan dan transparansi.",
-      "Mendukung pertumbuhan UMKM melalui kehadiran digital yang kuat.",
+      "Memberdayakan UMKM Indonesia dengan teknologi web berstandar global.",
+      "Menyediakan solusi digital yang jujur, transparan, dan berorientasi hasil.",
+      "Membangun kemitraan jangka panjang dengan klien melalui dukungan teknis yang andal."
     ],
-    teamTitle: "Tim Profesional Kami",
-    teamSubtitle: "Dibalik setiap project sukses, ada tim yang berdedikasi tinggi.",
+    visionTitle: "Visi Kami",
+    vision: "Menjadi mitra teknologi pilihan utama bagi bisnis yang ingin mendominasi pasar digital melalui presisi teknik dan desain.",
+    teamTitle: "The Minds Behind Mitralabs",
+    teamSubtitle: "Kombinasi antara kreativitas visual dan ketelitian kode.",
     team: [
-      { id: 1, name: "Ridho Robbi Pasi", role: "Engineer & Founder", bio: "Pengembangan teknis dan kualitas website.", image: "https://images.unsplash.com/photo-1560250097-0b93528c311a?auto=format&fit=crop&q=80&w=400" },
-      { id: 2, name: "Ghazy Muhalla", role: "Marketing", bio: "Strategi pemasaran dan relasi bisnis.", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
+      { id: 1, name: "Ridho Robbi", role: "CEO & Tech Lead", bio: "Fokus pada arsitektur sistem dan strategi pertumbuhan digital.", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
+      { id: 2, name: "Ghazy Muhalla", role: "Head of Operations", bio: "Memastikan setiap project berjalan tepat waktu dengan standar QA tertinggi.", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
     ],
   },
   contact: {
@@ -452,17 +458,17 @@ const initialData: AppData = {
   testimonials: [
     {
       id: 1,
-      name: "Suryo Wijaya",
-      role: "Owner, Toba Travel",
-      content: "Mitralabs membantu kami mendigitalkan paket wisata kami. Sangat profesional!",
+      name: "Bpk. Rahmat Hidayat",
+      role: "Owner, Kopi Toba Signature",
+      content: "Website buatan Mitralabs benar-benar mendongkrak penjualan kami. Sistem integrasi WA-nya sangat memudahkan pelanggan memesan kopi secara langsung.",
       rating: 5,
-      image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400"
+      image: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?auto=format&fit=crop&q=80&w=400"
     },
     {
       id: 2,
-      name: "Linda Kusuma",
-      role: "Kepala Sekolah, SD Harapan",
-      content: "Website sekolah kami sekarang sangat informatif dan mudah diakses orang tua murid.",
+      name: "Ibu Maya Kartika",
+      role: "Direktur, Sekolah Al-Azhar Medan",
+      content: "Proses pengerjaannya sangat transparan. Kami selalu dikasih update setiap minggu. Hasil akhirnya pun sangat elegan dan responsif di HP.",
       rating: 5,
       image: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?auto=format&fit=crop&q=80&w=400"
     }
@@ -470,44 +476,29 @@ const initialData: AppData = {
   faqs: [
     {
       id: 1,
-      question: "Berapa lama pengerjaan website?",
-      answer: "Tergantung paket, biasanya 3-14 hari kerja.",
-      category: "Umum"
+      question: "Apa saja yang perlu saya siapkan?",
+      answer: "Anda hanya perlu menyiapkan Logo, foto produk/bisnis, dan rincian layanan Anda. Selebihnya akan kami bantu susun.",
+      category: "Persiapan"
     },
     {
       id: 2,
-      question: "Apakah ada biaya bulanan?",
-      answer: "Tidak ada biaya bulanan dari kami, hanya biaya tahunan untuk domain dan hosting.",
-      category: "Harga"
+      question: "Apakah website bisa saya edit sendiri nanti?",
+      answer: "Tentu! Kami menyediakan Dashboard Admin yang sangat mudah digunakan bahkan bagi Anda yang tidak paham IT.",
+      category: "Layanan"
     }
   ],
   bookings: [
     {
       id: 1,
-      customer_name: "John Doe",
-      customer_email: "john@example.com",
-      customer_phone: "628123456789",
+      customer_name: "Budi Santoso",
+      customer_email: "budi@kedaikopi.com",
+      customer_phone: "6281234567890",
       service_type: "UMKM Website",
       plan_name: "Standard",
-      project_brief: "Membangun landing page untuk toko roti saya.",
-      status: "Pending",
+      project_brief: "Saya butuh website untuk kedai kopi saya di Medan. Ingin ada menu online dan tombol WA.",
+      status: "Confirmed",
       created_at: new Date().toISOString(),
       total_price: 3500000,
-      invoices: [
-        {
-          id: 101,
-          invoice_number: "INV-2026-9000",
-          amount: 3500000,
-          status: "Unpaid",
-          due_date: "2026-05-15",
-          items: [
-            { desc: "Website Standard Package", price: 3500000, qty: 1 }
-          ],
-          client_name: "John Doe",
-          client_email: "john@example.com",
-          created_at: new Date().toISOString()
-        }
-      ]
     }
   ]
 };
