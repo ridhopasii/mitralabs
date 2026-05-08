@@ -594,10 +594,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           // Merge complex structural data from json_content if available
           if (configRes.data.json_content) {
             try {
-              const structural = typeof configRes.data.json_content === 'string' 
-                ? JSON.parse(configRes.data.json_content) 
+              const structural = typeof configRes.data.json_content === 'string'
+                ? JSON.parse(configRes.data.json_content)
                 : configRes.data.json_content;
-              
+
               // Deep merge structural content to preserve defaults for new fields
               if (structural.home) merged.home = mergeData(merged.home, structural.home);
               if (structural.services) merged.services = mergeData(merged.services, structural.services);
@@ -653,12 +653,22 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           }));
         }
         if (faqsRes.data) merged.faqs = faqsRes.data;
-        
+
         if (bookingsRes.data) {
-          merged.bookings = bookingsRes.data.map((b: any) => ({
+          const supabaseBookings = bookingsRes.data.map((b: any) => ({
             ...b,
             invoices: b.Invoice || []
           }));
+
+          // Merge with existing bookings from localStorage to prevent data loss
+          const existingBookings = data.bookings || [];
+          const bookingIds = new Set(supabaseBookings.map((b: any) => b.id));
+
+          // Keep bookings from localStorage that are not yet in Supabase (newly added)
+          const newLocalBookings = existingBookings.filter((b: any) => !bookingIds.has(b.id));
+
+          // Combine: new local bookings first, then Supabase bookings
+          merged.bookings = [...newLocalBookings, ...supabaseBookings];
         }
 
         setData(merged);

@@ -70,8 +70,8 @@ export default function PesanSekarang() {
 
     const saveAndRedirect = async () => {
       try {
-        // 1. Save to Supabase
-        const { error } = await supabase.from("Booking").insert([{
+        // 1. Save to Supabase and get the inserted data back
+        const { data: insertedData, error } = await supabase.from("Booking").insert([{
           customer_name: formData.name,
           customer_email: formData.email,
           customer_phone: formData.phone,
@@ -90,15 +90,15 @@ export default function PesanSekarang() {
           biggest_expectation: formData.expectation,
           status: "Pending",
           total_price: getPrice()
-        }]);
+        }]).select();
 
         if (error) {
-          console.error("Booking insert error (non-blocking):", error);
+          console.error("Booking insert error:", error);
         }
 
-        // 2. ALSO save to DataContext so it appears in admin panel immediately
+        // 2. Save to DataContext using the actual ID from Supabase (if available)
         const newBooking = {
-          id: Date.now(),
+          id: insertedData?.[0]?.id || Date.now(),
           customer_name: formData.name,
           customer_email: formData.email,
           customer_phone: formData.phone,
@@ -117,7 +117,7 @@ export default function PesanSekarang() {
           biggest_expectation: formData.expectation,
           status: "Pending" as const,
           total_price: getPrice(),
-          created_at: new Date().toISOString(),
+          created_at: insertedData?.[0]?.created_at || new Date().toISOString(),
           invoices: []
         };
 
