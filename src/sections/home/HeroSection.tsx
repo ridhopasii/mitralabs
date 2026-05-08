@@ -13,7 +13,7 @@ export default function HeroSection() {
   const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
 
   return (
-    <section className="relative pt-24 pb-16 md:pt-60 md:pb-40 overflow-hidden bg-background">
+    <section className="relative pt-20 pb-16 md:pt-44 md:pb-40 overflow-hidden bg-background">
       <div className="section-container text-center flex flex-col items-center">
         <motion.div
           initial={{ opacity: 0, y: 20 }}
