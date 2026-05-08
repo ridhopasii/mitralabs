@@ -12,7 +12,8 @@ import {
   Clock,
   Loader2,
   ShieldCheck,
-  AlertCircle
+  AlertCircle,
+  ChevronRight
 } from "lucide-react";
 
 interface LogEntry {
