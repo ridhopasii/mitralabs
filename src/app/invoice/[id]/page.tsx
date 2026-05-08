@@ -2,11 +2,11 @@
 
 import { useData } from "@/context/DataContext";
 import { useParams } from "next/navigation";
-import { 
-  Printer, 
-  Download, 
-  CheckCircle2, 
-  Clock, 
+import {
+  Printer,
+  Download,
+  CheckCircle2,
+  Clock,
   AlertCircle,
   ChevronLeft,
   Mail,
@@ -23,15 +23,28 @@ import { motion } from "framer-motion";
 export default function PublicInvoicePage() {
   const { id } = useParams();
   const { data } = useData();
-  
+
   const invoice = data.bookings
     ?.flatMap(b => b.invoices || [])
     .find(inv => inv.invoice_number === id || inv.id.toString() === id);
 
+  const invoiceSettings = data.invoiceSettings || {
+    companyName: "MITRALABS.ID",
+    companyTagline: "Precision Web Engineering",
+    companyAddress: "Medan, Sumatera Utara, Indonesia",
+    companyPhone: "+62 823-8111-8520",
+    companyEmail: "contact@mitralabs.id",
+    bankName: "Bank Central Asia (BCA)",
+    bankAccountNumber: "8000-7625-12",
+    bankAccountName: "Ridho Robbi Pasi",
+    taxRate: 0,
+    footerNote: "Verified by Mitralabs Cryptographic Protocol"
+  };
+
   if (!invoice) {
     return (
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="w-24 h-24 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mb-10 shadow-sm"
@@ -63,15 +76,15 @@ export default function PublicInvoicePage() {
               </div>
               <span className="text-sm uppercase tracking-widest">Exit to Dashboard</span>
             </Link>
-            
+
             <div className="flex items-center gap-3">
-              <button 
+              <button
                 onClick={() => window.print()}
                 className="px-10 py-5 bg-white text-slate-900 border border-slate-200/60 rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:bg-slate-50 transition-all shadow-sm"
               >
                 <Printer size={18} strokeWidth={1.5} /> Print
               </button>
-              <button 
+              <button
                 onClick={() => window.print()}
                 className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20"
               >
@@ -81,7 +94,7 @@ export default function PublicInvoicePage() {
           </div>
 
           {/* Premium Invoice Canvas */}
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
@@ -100,14 +113,14 @@ export default function PublicInvoicePage() {
                       <Receipt size={28} strokeWidth={1.5} />
                     </div>
                     <div>
-                      <h1 className="text-3xl font-bold tracking-tighter text-slate-900">MITRALABS.ID</h1>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">Precision Web Engineering</p>
+                      <h1 className="text-3xl font-bold tracking-tighter text-slate-900">{invoiceSettings.companyName}</h1>
+                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">{invoiceSettings.companyTagline}</p>
                     </div>
                   </div>
                   <div className="space-y-1 text-sm text-slate-500 font-medium">
-                    <p>Medan, Sumatera Utara, ID</p>
-                    <p>+62 823-8111-8520</p>
-                    <p>contact@mitralabs.id</p>
+                    <p>{invoiceSettings.companyAddress}</p>
+                    <p>{invoiceSettings.companyPhone}</p>
+                    <p>{invoiceSettings.companyEmail}</p>
                   </div>
                 </div>
 
@@ -236,7 +249,7 @@ export default function PublicInvoicePage() {
           </div>
         </div>
       </div>
-      
+
       <style jsx global>{`
         @media print {
           .no-print {

@@ -190,6 +190,18 @@ interface AppData {
     businessMode: string;
     waPromoMessage: string;
   };
+  invoiceSettings: {
+    companyName: string;
+    companyTagline: string;
+    companyAddress: string;
+    companyPhone: string;
+    companyEmail: string;
+    bankName: string;
+    bankAccountNumber: string;
+    bankAccountName: string;
+    taxRate: number;
+    footerNote: string;
+  };
   blog: {
     title: string;
     subtitle: string;
@@ -426,6 +438,18 @@ const initialData: AppData = {
     waNumber: "6282381118520",
     businessMode: "agresif",
     waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial.",
+  },
+  invoiceSettings: {
+    companyName: "MITRALABS.ID",
+    companyTagline: "Precision Web Engineering",
+    companyAddress: "Medan, Sumatera Utara, Indonesia",
+    companyPhone: "+62 823-8111-8520",
+    companyEmail: "contact@mitralabs.id",
+    bankName: "Bank Central Asia (BCA)",
+    bankAccountNumber: "8000-7625-12",
+    bankAccountName: "Ridho Robbi Pasi",
+    taxRate: 0,
+    footerNote: "Verified by Mitralabs Cryptographic Protocol"
   },
   blog: {
     title: "Edukasi & Wawasan",
