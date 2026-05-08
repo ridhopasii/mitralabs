@@ -20,6 +20,7 @@ import {
   Tag
 } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function FAQAdmin() {
   const { data, updateData } = useData();
