@@ -57,16 +57,16 @@ export default function AdminLayout({
     { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
     { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
     { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },
+    { name: "Settings", icon: Settings, href: "/admin/settings", category: "Utama" },
     { name: "Site Settings", icon: Type, href: "/admin/konten", category: "CMS" },
     { name: "Layanan", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
     { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
     { name: "Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
     { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "CMS" },
     { name: "FAQ", icon: HelpCircle, href: "/admin/faq", category: "CMS" },
-    { name: "Settings", icon: Settings, href: "/admin/settings", category: "Sistem" },
   ];
 
-  const categories = ["Utama", "CMS", "Sistem"];
+  const categories = ["Utama", "CMS"];
 
   if (!isAuthorized) return null;
 
