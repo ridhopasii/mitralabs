@@ -282,13 +282,6 @@ export default function PesanSekarang() {
 
                 <div className="grid md:grid-cols-2 gap-8">
                    <div className="space-y-3">
-                      <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Nama Instansi / Perusahaan</label>
-                      <div className="relative group">
-                         <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                         <input type="text" placeholder="" value={formData.organization} onChange={(e) => setFormData({...formData, organization: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
-                      </div>
-                   </div>
-                   <div className="space-y-3">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Jabatan / Role</label>
                       <div className="relative group">
                          <Award className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
@@ -296,6 +289,7 @@ export default function PesanSekarang() {
                       </div>
                    </div>
                 </div>
+              </div>
 
               {/* Section 2: Project Strategy */}
               <div className="space-y-10">
