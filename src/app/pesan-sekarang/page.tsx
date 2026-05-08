@@ -2,14 +2,14 @@
 
 import { useState } from "react";
 import { useData } from "@/context/DataContext";
-import { 
-  CheckCircle2, 
-  Send, 
-  User, 
-  Mail, 
-  Phone, 
-  MessageSquare, 
-  Layers, 
+import {
+  CheckCircle2,
+  Send,
+  User,
+  Mail,
+  Phone,
+  MessageSquare,
+  Layers,
   ChevronRight,
   ArrowRight,
   Loader2,
@@ -70,6 +70,7 @@ export default function PesanSekarang() {
 
     const saveAndRedirect = async () => {
       try {
+        // 1. Save to Supabase
         const { error } = await supabase.from("Booking").insert([{
           customer_name: formData.name,
           customer_email: formData.email,
@@ -95,6 +96,35 @@ export default function PesanSekarang() {
           console.error("Booking insert error (non-blocking):", error);
         }
 
+        // 2. ALSO save to DataContext so it appears in admin panel immediately
+        const newBooking = {
+          id: Date.now(),
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          organization_name: formData.organization,
+          position: formData.position,
+          service_type: formData.service,
+          plan_name: formData.plan,
+          project_brief: formData.brief,
+          desired_domain: formData.desiredDomain,
+          business_industry: formData.businessIndustry,
+          reference_websites: formData.referenceWeb,
+          target_audience: formData.targetAudience,
+          primary_cta: formData.primaryCTA,
+          competitors_list: formData.competitors,
+          integrations_needed: formData.integrations,
+          biggest_expectation: formData.expectation,
+          status: "Pending" as const,
+          total_price: getPrice(),
+          created_at: new Date().toISOString(),
+          invoices: []
+        };
+
+        const newData = { ...data };
+        newData.bookings = [newBooking, ...(data.bookings || [])];
+        updateData(newData);
+
         await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
       } catch (err) {
         console.error("Submission error (non-blocking):", err);
@@ -103,7 +133,7 @@ export default function PesanSekarang() {
         setIsSubmitting(false);
         setShowSuccess(true);
         window.scrollTo({ top: 0, behavior: 'smooth' });
-        
+
         // Automatic redirect after 2 seconds
         setTimeout(() => {
           window.open(waUrl, "_blank");
@@ -121,7 +151,7 @@ export default function PesanSekarang() {
 
     return (
       <div className="min-h-screen bg-background flex items-center justify-center p-6 pt-32 pb-20">
-        <motion.div 
+        <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
           className="max-w-2xl w-full bg-surface-container p-20 rounded-[4rem] text-center space-y-10 border border-outline/5 shadow-apple"
@@ -133,23 +163,23 @@ export default function PesanSekarang() {
             <h2 className="text-5xl font-black tracking-tighter text-on-background uppercase">Order Transmitted!</h2>
             <p className="text-secondary text-xl font-medium">Data Anda telah masuk ke sistem kami. Kami sedang mengarahkan Anda ke WhatsApp untuk konsultasi langsung.</p>
           </div>
-          
+
           <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
-            <a 
+            <a
               href={waUrl}
               target="_blank"
               className="w-full sm:w-auto px-12 py-6 bg-emerald-500 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3"
             >
               <Phone size={18} /> Hubungi via WhatsApp
             </a>
-            <button 
+            <button
               onClick={() => window.location.href = "/"}
               className="w-full sm:w-auto px-12 py-6 bg-on-background text-background rounded-full font-black text-sm uppercase tracking-widest hover:opacity-80 transition-all shadow-apple"
             >
               Back to Home
             </button>
           </div>
-          
+
           <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em] opacity-40">
             Redirecting automatically in a few seconds...
           </p>
@@ -161,7 +191,7 @@ export default function PesanSekarang() {
   return (
     <div className="min-h-screen bg-background pt-40 pb-32">
       <div className="max-w-7xl mx-auto px-6 lg:px-12 grid lg:grid-cols-12 gap-20">
-        
+
         {/* Left Side: Strategic Info */}
         <div className="lg:col-span-4 space-y-12">
           <div className="space-y-6">
@@ -202,20 +232,20 @@ export default function PesanSekarang() {
 
         {/* Right Side: The Form */}
         <div className="lg:col-span-8">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: 50 }}
             animate={{ opacity: 1, x: 0 }}
             className="bg-surface-container p-12 md:p-20 rounded-[4rem] border border-outline/5 shadow-apple relative overflow-hidden"
           >
             <form onSubmit={handleSubmit} className="space-y-20 relative z-10">
-              
+
               {/* Section 1: Personal & Organization */}
               <div className="space-y-10">
                 <div className="flex items-center gap-4">
                    <div className="w-10 h-10 bg-on-background text-background rounded-2xl flex items-center justify-center font-bold">01</div>
                    <h3 className="text-2xl font-black tracking-tight">Identitas & Instansi</h3>
                 </div>
-                
+
                 <div className="grid md:grid-cols-2 gap-8">
                    <div className="space-y-3">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Full Name</label>
@@ -225,10 +255,27 @@ export default function PesanSekarang() {
                       </div>
                    </div>
                    <div className="space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Email Address</label>
+                      <div className="relative group">
+                         <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
+                         <input required type="email" placeholder="" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                      </div>
+                   </div>
+                </div>
+
+                <div className="grid md:grid-cols-2 gap-8">
+                   <div className="space-y-3">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">WhatsApp Number</label>
                       <div className="relative group">
                          <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                         <input type="tel" placeholder="" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                         <input required type="tel" placeholder="" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                      </div>
+                   </div>
+                   <div className="space-y-3">
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Nama Instansi / Perusahaan</label>
+                      <div className="relative group">
+                         <Building2 className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
+                         <input type="text" placeholder="" value={formData.organization} onChange={(e) => setFormData({...formData, organization: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
                       </div>
                    </div>
                 </div>
@@ -249,7 +296,6 @@ export default function PesanSekarang() {
                       </div>
                    </div>
                 </div>
-              </div>
 
               {/* Section 2: Project Strategy */}
               <div className="space-y-10">
@@ -348,12 +394,12 @@ export default function PesanSekarang() {
                     <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Budget / Penawaran Harga (Opsional)</label>
                     <div className="relative group">
                        <DollarSign className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                       <input 
-                        type="number" 
-                        placeholder="" 
-                        value={formData.customPrice} 
-                        onChange={(e) => setFormData({...formData, customPrice: e.target.value})} 
-                        className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" 
+                       <input
+                        type="number"
+                        placeholder=""
+                        value={formData.customPrice}
+                        onChange={(e) => setFormData({...formData, customPrice: e.target.value})}
+                        className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative"
                        />
                     </div>
                     <p className="text-[9px] text-secondary font-medium ml-4 italic opacity-60">*Jika dikosongkan, harga akan mengikuti paket yang dipilih.</p>
