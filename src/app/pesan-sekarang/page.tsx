@@ -96,18 +96,26 @@ export default function PesanSekarang() {
     const waMessage = `Halo Mitralabs! Saya ingin melakukan pemesanan website.\n\n*Detail Klien:*\n- Nama: ${formData.name}\n- Instansi: ${formData.organization}\n- Jabatan: ${formData.position}\n\n*Detail Project:*\n- Layanan: ${formData.service}\n- Paket: ${formData.plan} (Rp ${getPrice().toLocaleString()})\n- Domain: ${formData.desiredDomain || '-'}\n- Industri: ${formData.businessIndustry || '-'}\n- Target Audiens: ${formData.targetAudience || '-'}\n- Utama CTA: ${formData.primaryCTA || '-'}\n- Kompetitor: ${formData.competitors || '-'}\n- Integrasi: ${formData.integrations || '-'}\n- Harapan: ${formData.expectation || '-'}\n- Brief: ${formData.brief}`;
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-    setTimeout(async () => {
-      updateData(newData);
-      await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
-      setIsSubmitting(false);
-      setShowSuccess(true);
-      window.scrollTo({ top: 0, behavior: 'smooth' });
-      
-      // Automatic redirect after 2 seconds
-      setTimeout(() => {
-        window.open(waUrl, "_blank");
-      }, 2000);
-    }, 1500);
+    const saveAndRedirect = async () => {
+      try {
+        await updateData(newData);
+        await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
+        setIsSubmitting(false);
+        setShowSuccess(true);
+        window.scrollTo({ top: 0, behavior: 'smooth' });
+        
+        // Automatic redirect after 2 seconds
+        setTimeout(() => {
+          window.open(waUrl, "_blank");
+        }, 2000);
+      } catch (err) {
+        console.error("Submission error:", err);
+        setIsSubmitting(false);
+        alert("Terjadi kesalahan saat mengirim data. Silakan coba lagi.");
+      }
+    };
+
+    saveAndRedirect();
   };
 
   if (showSuccess) {

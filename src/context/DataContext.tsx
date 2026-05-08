@@ -683,7 +683,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const allInvoices = newData.bookings.flatMap(b => (b.invoices || []).map(inv => ({ ...inv, booking_id: b.id })));
         const allProjectInvoices = newData.portfolio.projects.flatMap(p => (p.invoices || []).map(inv => ({ ...inv, project_id: p.id })));
 
-        await Promise.all([
+        return await Promise.all([
           supabase.from("SiteConfig").upsert({
             id: 1,
             logo_text: newData.navbar.logo,
