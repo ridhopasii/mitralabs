@@ -652,9 +652,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             image: t.image_url
           }));
         }
-        if (faqsRes.data && faqsRes.data.length > 0) merged.faqs = faqsRes.data;
+        if (faqsRes.data) merged.faqs = faqsRes.data;
         
-        if (bookingsRes.data && bookingsRes.data.length > 0) {
+        if (bookingsRes.data) {
           merged.bookings = bookingsRes.data.map((b: any) => ({
             ...b,
             invoices: b.Invoice || []
@@ -665,7 +665,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(merged));
         setHasSynced(true);
       } catch (err: any) {
-        console.warn("Relational sync failed:", err.message);
+        console.error("Relational sync critical error:", err.message);
         setHasSynced(true);
       }
     };
