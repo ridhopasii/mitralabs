@@ -28,7 +28,7 @@ import {
   DollarSign
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
-import { logActivity } from "@/lib/supabase";
+import { logActivity, supabase } from "@/lib/supabase";
 
 export default function PesanSekarang() {
   const { data, updateData } = useData();
@@ -63,34 +63,6 @@ export default function PesanSekarang() {
     e.preventDefault();
     setIsSubmitting(true);
 
-    const bookingId = Date.now();
-    const newBooking = {
-      id: bookingId,
-      customer_name: formData.name,
-      customer_email: formData.email,
-      customer_phone: formData.phone,
-      organization_name: formData.organization,
-      position: formData.position,
-      service_type: formData.service,
-      plan_name: formData.plan,
-      project_brief: formData.brief,
-      desired_domain: formData.desiredDomain,
-      business_industry: formData.businessIndustry,
-      reference_websites: formData.referenceWeb,
-      target_audience: formData.targetAudience,
-      primary_cta: formData.primaryCTA,
-      competitors_list: formData.competitors,
-      integrations_needed: formData.integrations,
-      biggest_expectation: formData.expectation,
-      status: "Pending" as const,
-      created_at: new Date().toISOString(),
-      total_price: getPrice(),
-      invoices: []
-    };
-
-    const newData = { ...data };
-    newData.bookings = [newBooking, ...(data.bookings || [])];
-
     // WhatsApp Redirect Logic
     const waNumber = data.settings?.waNumber || "6282381118520";
     const waMessage = `Halo Mitralabs! Saya ingin melakukan pemesanan website.\n\n*Detail Klien:*\n- Nama: ${formData.name}\n- Instansi: ${formData.organization}\n- Jabatan: ${formData.position}\n\n*Detail Project:*\n- Layanan: ${formData.service}\n- Paket: ${formData.plan} (Rp ${getPrice().toLocaleString()})\n- Domain: ${formData.desiredDomain || '-'}\n- Industri: ${formData.businessIndustry || '-'}\n- Target Audiens: ${formData.targetAudience || '-'}\n- Utama CTA: ${formData.primaryCTA || '-'}\n- Kompetitor: ${formData.competitors || '-'}\n- Integrasi: ${formData.integrations || '-'}\n- Harapan: ${formData.expectation || '-'}\n- Brief: ${formData.brief}`;
@@ -98,7 +70,29 @@ export default function PesanSekarang() {
 
     const saveAndRedirect = async () => {
       try {
-        await updateData(newData);
+        const { error } = await supabase.from("Booking").insert([{
+          customer_name: formData.name,
+          customer_email: formData.email,
+          customer_phone: formData.phone,
+          organization_name: formData.organization,
+          position: formData.position,
+          service_type: formData.service,
+          plan_name: formData.plan,
+          project_brief: formData.brief,
+          desired_domain: formData.desiredDomain,
+          business_industry: formData.businessIndustry,
+          reference_websites: formData.referenceWeb,
+          target_audience: formData.targetAudience,
+          primary_cta: formData.primaryCTA,
+          competitors_list: formData.competitors,
+          integrations_needed: formData.integrations,
+          biggest_expectation: formData.expectation,
+          status: "Pending",
+          total_price: getPrice()
+        }]);
+
+        if (error) throw error;
+
         await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
         setIsSubmitting(false);
         setShowSuccess(true);
