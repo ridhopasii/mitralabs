@@ -683,7 +683,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const allInvoices = newData.bookings.flatMap(b => (b.invoices || []).map(inv => ({ ...inv, booking_id: b.id })));
         const allProjectInvoices = newData.portfolio.projects.flatMap(p => (p.invoices || []).map(inv => ({ ...inv, project_id: p.id })));
 
-        return await Promise.all([
+        const results = await Promise.all([
           supabase.from("SiteConfig").upsert({
             id: 1,
             logo_text: newData.navbar.logo,
@@ -775,8 +775,14 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             project_id: inv.project_id
           }))
         ]);
+
+        const firstError = results.find(r => r.error);
+        if (firstError) throw firstError.error;
+
+        return results;
       } catch (e) {
-        console.error("Supabase relational update error", e);
+        console.error("Supabase persistent update error:", e);
+        throw e;
       }
     }
   };
