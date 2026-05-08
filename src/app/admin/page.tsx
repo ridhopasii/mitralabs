@@ -21,7 +21,8 @@ import {
   Sparkles,
   ShieldCheck,
   MousePointer2,
-  Clock
+  Clock,
+  Mail
 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { supabase } from "@/lib/supabase";
