@@ -1,8 +1,7 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import { useRouter } from "next/navigation";
-import Link from "next/link";
 import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 
@@ -15,16 +14,30 @@ export default function LoginPage() {
 
   const isConfigured = isSupabaseConfigured();
 
-  // Bypass login completely
-  useEffect(() => {
-    router.push("/admin");
-  }, [router]);
-
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault();
+    setError(null);
+
+    if (!isConfigured) {
+      setError("Supabase belum dikonfigurasi. Atur env NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.");
+      return;
+    }
+
     setLoading(true);
-    // Bypass authentication
-    router.push("/admin");
+    const { error: loginError } = await supabase.auth.signInWithPassword({
+      email,
+      password,
+    });
+
+    setLoading(false);
+
+    if (loginError) {
+      setError(loginError.message);
+      return;
+    }
+
+    router.replace("/admin");
+    router.refresh();
   };
 
   return (
@@ -54,18 +67,43 @@ export default function LoginPage() {
             )}
           </div>
 
-          <div className="text-center mt-8">
-            <Link
-              href="/admin"
-              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40"
+          <form onSubmit={handleLogin} className="space-y-5">
+            <input
+              type="email"
+              required
+              autoComplete="email"
+              value={email}
+              onChange={(event) => setEmail(event.target.value)}
+              placeholder="Email admin"
+              className="w-full px-6 py-5 bg-surface border border-surface-container-highest rounded-2xl outline-none focus:border-primary font-bold"
+            />
+            <input
+              type="password"
+              required
+              autoComplete="current-password"
+              value={password}
+              onChange={(event) => setPassword(event.target.value)}
+              placeholder="Password"
+              className="w-full px-6 py-5 bg-surface border border-surface-container-highest rounded-2xl outline-none focus:border-primary font-bold"
+            />
+            {error && (
+              <p className="text-error text-xs font-bold text-left bg-error/10 border border-error/20 rounded-2xl p-4">
+                {error}
+              </p>
+            )}
+            <button
+              type="submit"
+              disabled={loading}
+              className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 disabled:opacity-50"
             >
-              Masuk Dashboard <ArrowRight size={24} />
-            </Link>
-          </div>
+              {loading ? <Loader2 className="animate-spin" size={24} /> : <ArrowRight size={24} />}
+              Masuk Dashboard
+            </button>
+          </form>
 
           <div className="mt-12 pt-8 border-t border-surface-container-highest text-center">
             <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-20">
-              <ShieldCheck size={14} /> Dev Mode Bypass Active
+              <ShieldCheck size={14} /> Protected by Supabase Auth
             </div>
           </div>
         </div>

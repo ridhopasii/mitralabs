@@ -2,22 +2,27 @@ import { createServerClient, type CookieOptions } from '@supabase/ssr'
 import { NextResponse, type NextRequest } from 'next/server'
 
 export async function proxy(request: NextRequest) {
-  let response = NextResponse.next({
+  const response = NextResponse.next({
     request: {
       headers: request.headers,
     },
   })
 
   const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL
-  const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
+  const supabasePublishableKey = process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 
-  if (!supabaseUrl || !supabaseAnonKey) {
-    return NextResponse.next()
+  if (!supabaseUrl || !supabasePublishableKey) {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/login'
+    loginUrl.searchParams.set('reason', 'supabase_not_configured')
+    return request.nextUrl.pathname.startsWith('/admin')
+      ? NextResponse.redirect(loginUrl)
+      : response
   }
 
   const supabase = createServerClient(
     supabaseUrl,
-    supabaseAnonKey,
+    supabasePublishableKey,
     {
       cookies: {
         get(name: string) {
@@ -35,12 +40,24 @@ export async function proxy(request: NextRequest) {
     }
   )
 
-  const { data: { session } } = await supabase.auth.getSession()
-  
-  console.log('Proxy path:', request.nextUrl.pathname);
-  console.log('Session exists:', !!session);
+  const {
+    data: { user },
+  } = await supabase.auth.getUser()
 
-  // Bypass all proxy redirects for development
+  if (request.nextUrl.pathname.startsWith('/admin') && !user) {
+    const loginUrl = request.nextUrl.clone()
+    loginUrl.pathname = '/login'
+    loginUrl.searchParams.set('redirectedFrom', request.nextUrl.pathname)
+    return NextResponse.redirect(loginUrl)
+  }
+
+  if (request.nextUrl.pathname === '/login' && user) {
+    const adminUrl = request.nextUrl.clone()
+    adminUrl.pathname = '/admin'
+    adminUrl.search = ''
+    return NextResponse.redirect(adminUrl)
+  }
+
   return response
 }
 

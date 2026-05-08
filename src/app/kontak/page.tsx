@@ -228,7 +228,7 @@ export default function ContactPage() {
                     <div className="flex flex-col md:flex-row items-center justify-between gap-10">
                       <div className="w-full md:w-auto">
                         <HCaptcha
-                          sitekey="10000000-ffff-ffff-ffff-000000000001"
+                          sitekey={process.env.NEXT_PUBLIC_HCAPTCHA_SITE_KEY || "10000000-ffff-ffff-ffff-000000000001"}
                           onVerify={(token) => setHcaptchaToken(token)}
                         />
                       </div>

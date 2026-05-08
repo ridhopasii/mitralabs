@@ -20,6 +20,7 @@ model SiteConfig {
   instagram        String   @default("@mitralabs.id")
   address          String   @default("Medan, Indonesia")
   maps_url         String   @default("")
+  json_content     Json?
   updated_at       DateTime @default(now()) @updatedAt
 }
 
@@ -70,17 +71,50 @@ model Project {
   invoices      Invoice[]
 }
 
+model Booking {
+  id                   Int       @id @default(autoincrement())
+  customer_name        String
+  customer_email       String
+  customer_phone       String
+  organization_name    String?
+  position             String?
+  service_type         String
+  plan_name            String
+  project_brief        String    @db.Text
+  desired_domain       String?
+  business_industry    String?
+  reference_websites   String?
+  target_audience      String?
+  primary_cta          String?
+  competitors_list     String?
+  integrations_needed  String?
+  biggest_expectation  String?
+  status               String    @default("Pending")
+  total_price          Float
+  scheduled_date       DateTime?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  invoices             Invoice[]
+}
+
 model Invoice {
   id             Int      @id @default(autoincrement())
-  project_id     Int
-  project        Project  @relation(fields: [project_id], references: [id])
+  project_id     Int?
+  project        Project? @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  booking_id     Int?
+  booking        Booking? @relation(fields: [booking_id], references: [id], onDelete: Cascade)
   invoice_number String   @unique
   amount         Float
-  status         String   @default("Pending") // Pending, Paid, Cancelled
+  status         String   @default("Unpaid") // Unpaid, Partial, Paid, Cancelled
   due_date       DateTime
   items          Json     // Array of { desc: string, price: number }
+  client_name    String?
+  client_email   String?
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
+
+  @@index([project_id])
+  @@index([booking_id])
 }
 
 model BlogPost {

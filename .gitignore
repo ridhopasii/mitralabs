@@ -59,7 +59,7 @@ next-env.d.ts
 
 # Prisma
 /src/generated/prisma
-prisma/migrations/*_migration.sql
+# Keep Prisma migrations tracked so database changes are reproducible.
 
 # Supabase
 .supabase
@@ -86,7 +86,7 @@ logs
 *.sublime-workspace
 
 # Package Manager
-package-lock.json
+# Keep npm lockfile tracked because CI uses npm ci.
 yarn.lock
 pnpm-lock.yaml
 

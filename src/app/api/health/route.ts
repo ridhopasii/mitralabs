@@ -23,7 +23,7 @@ export async function GET() {
     }
 
     // Check database connection
-    const { error: dbError } = await supabase.from("SiteData").select("id").limit(1);
+    const { error: dbError } = await supabase.from("SiteConfig").select("id").limit(1);
 
     if (dbError) {
       return NextResponse.json(

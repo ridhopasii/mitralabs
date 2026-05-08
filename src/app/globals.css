@@ -1,5 +1,10 @@
 @import "tailwindcss";
 
+:root {
+  --font-inter: "Aptos", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-manrope: "Aptos Display", "Segoe UI", "Helvetica Neue", sans-serif;
+}
+
 @theme {
   /* Apple-inspired Minimalist Palette */
   --color-background: #ffffff;
