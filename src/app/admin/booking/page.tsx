@@ -31,7 +31,8 @@ import {
   Package,
   Layers,
   ArrowUpRight,
-  ChevronDown
+  ChevronDown,
+  TrendingUp
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity } from "@/lib/supabase";
