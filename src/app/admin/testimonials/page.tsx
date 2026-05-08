@@ -21,6 +21,7 @@ import {
 } from "lucide-react";
 import { logActivity, uploadImage } from "@/lib/supabase";
 import Image from "next/image";
+import { motion, AnimatePresence } from "framer-motion";
 
 export default function TestimonialsAdmin() {
   const { data, updateData } = useData();
