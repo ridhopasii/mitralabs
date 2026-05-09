@@ -45,10 +45,43 @@ export default function BookingCMS() {
   const [showSuccess, setShowSuccess] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState("logistics");
+  const [isRefreshing, setIsRefreshing] = useState(false);
 
   useEffect(() => {
     setBookings(data.bookings || []);
   }, [data.bookings]);
+
+  // Auto-refresh on mount to get latest data from Supabase
+  useEffect(() => {
+    const refreshData = async () => {
+      setIsRefreshing(true);
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const { data: bookingsData, error } = await supabase
+          .from("Booking")
+          .select("*, Invoice(*)")
+          .order("created_at", { ascending: false });
+
+        if (!error && bookingsData) {
+          const formattedBookings = bookingsData.map((b: any) => ({
+            ...b,
+            invoices: b.Invoice || []
+          }));
+
+          const newData = { ...data };
+          newData.bookings = formattedBookings;
+          updateData(newData);
+          setBookings(formattedBookings);
+        }
+      } catch (err) {
+        console.error("Error refreshing bookings:", err);
+      } finally {
+        setIsRefreshing(false);
+      }
+    };
+
+    refreshData();
+  }, []); // Run once on mount
 
   const handleSaveBooking = () => {
     if (!editingBooking) return;
@@ -135,19 +168,55 @@ export default function BookingCMS() {
             Manage your project pipelines and financial operations with precision.
           </p>
         </div>
-        
+
         <div className="flex items-center gap-3 w-full md:w-auto">
           <div className="relative group flex-grow md:flex-grow-0">
              <Search className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-slate-900 transition-colors" size={16} />
-             <input 
-               type="text" 
+             <input
+               type="text"
                placeholder="Search orders..."
                value={search}
                onChange={(e) => setSearch(e.target.value)}
                className="pl-12 pr-6 py-4 bg-slate-100 border-none rounded-2xl outline-none focus:bg-white focus:ring-1 focus:ring-slate-200 font-medium text-[13px] w-full md:w-72 transition-all"
              />
           </div>
-          <button 
+          <button
+            onClick={async () => {
+              setIsRefreshing(true);
+              try {
+                const { supabase } = await import("@/lib/supabase");
+                const { data: bookingsData, error } = await supabase
+                  .from("Booking")
+                  .select("*, Invoice(*)")
+                  .order("created_at", { ascending: false });
+
+                if (!error && bookingsData) {
+                  const formattedBookings = bookingsData.map((b: any) => ({
+                    ...b,
+                    invoices: b.Invoice || []
+                  }));
+
+                  const newData = { ...data };
+                  newData.bookings = formattedBookings;
+                  updateData(newData);
+                  setBookings(formattedBookings);
+                  setShowSuccess(true);
+                  setTimeout(() => setShowSuccess(false), 2000);
+                }
+              } catch (err) {
+                console.error("Error refreshing bookings:", err);
+              } finally {
+                setIsRefreshing(false);
+              }
+            }}
+            disabled={isRefreshing}
+            className="h-[52px] px-6 bg-blue-600 text-white rounded-2xl font-semibold text-[13px] flex items-center gap-2 hover:bg-blue-700 transition-all shadow-lg shadow-blue-600/10 active:scale-[0.98] disabled:opacity-50"
+            title="Refresh data from database"
+          >
+            {isRefreshing ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
+            {isRefreshing ? "Syncing..." : "Refresh"}
+          </button>
+          <button
             onClick={() => { setEditingBooking({
               id: 0,
               customer_name: "",
@@ -232,9 +301,9 @@ export default function BookingCMS() {
                        <p className="text-[14px] font-bold text-slate-900 tracking-tight leading-none">Rp {booking.total_price.toLocaleString()}</p>
                        <div className="flex gap-1.5">
                           {booking.invoices?.slice(0, 1).map(inv => (
-                             <Link 
-                               key={inv.id} 
-                               href={`/invoice/${inv.invoice_number}`} 
+                             <Link
+                               key={inv.id}
+                               href={`/invoice/${inv.invoice_number}`}
                                target="_blank"
                                className="text-[10px] font-bold text-blue-500 hover:underline"
                              >
@@ -319,8 +388,8 @@ export default function BookingCMS() {
                        { id: "technical", label: "Project", icon: FileText },
                        { id: "financial", label: "Financials", icon: CreditCard }
                      ].map((tab) => (
-                       <button 
-                        key={tab.id} 
+                       <button
+                        key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`w-full text-left px-5 py-3 rounded-xl text-[12px] font-bold transition-all flex items-center gap-4 ${activeTab === tab.id ? "bg-slate-900 text-white shadow-lg shadow-slate-900/10" : "text-slate-400 hover:bg-slate-50 hover:text-slate-900"}`}
                        >
@@ -332,18 +401,18 @@ export default function BookingCMS() {
                   <div className="flex-1 overflow-y-auto p-10 custom-scrollbar">
                      <AnimatePresence mode="wait">
                         {activeTab === "logistics" && (
-                          <motion.div 
+                          <motion.div
                             key="logistics"
-                            initial={{ opacity: 0, x: 10 }} 
-                            animate={{ opacity: 1, x: 0 }} 
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
                             className="space-y-10"
                           >
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Client Name</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.customer_name}
                                       onChange={(e) => setEditingBooking({...editingBooking, customer_name: e.target.value})}
                                       className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
@@ -351,8 +420,8 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Email Address</label>
-                                   <input 
-                                      type="email" 
+                                   <input
+                                      type="email"
                                       value={editingBooking.customer_email}
                                       onChange={(e) => setEditingBooking({...editingBooking, customer_email: e.target.value})}
                                       className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
@@ -363,8 +432,8 @@ export default function BookingCMS() {
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Phone</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.customer_phone}
                                       onChange={(e) => setEditingBooking({...editingBooking, customer_phone: e.target.value})}
                                       className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
@@ -372,7 +441,7 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Status</label>
-                                   <select 
+                                   <select
                                       value={editingBooking.status}
                                       onChange={(e) => setEditingBooking({...editingBooking, status: e.target.value as any})}
                                       className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-bold text-[12px] uppercase tracking-widest appearance-none cursor-pointer focus:bg-white focus:border-slate-200"
@@ -389,17 +458,17 @@ export default function BookingCMS() {
                         )}
 
                          {activeTab === "technical" && (
-                           <motion.div 
+                           <motion.div
                              key="technical"
-                             initial={{ opacity: 0, x: 10 }} 
-                             animate={{ opacity: 1, x: 0 }} 
+                             initial={{ opacity: 0, x: 10 }}
+                             animate={{ opacity: 1, x: 0 }}
                              exit={{ opacity: 0, x: -10 }}
                              className="space-y-10"
                            >
                               <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Service Type</label>
-                                   <select 
+                                   <select
                                      value={editingBooking.service_type}
                                      onChange={(e) => setEditingBooking({...editingBooking, service_type: e.target.value})}
                                      className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-bold text-[12px] uppercase tracking-widest focus:bg-white focus:border-slate-200 transition-all"
@@ -412,7 +481,7 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Plan Tier</label>
-                                   <select 
+                                   <select
                                      value={editingBooking.plan_name}
                                      onChange={(e) => setEditingBooking({...editingBooking, plan_name: e.target.value})}
                                      className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-bold text-[12px] uppercase tracking-widest focus:bg-white focus:border-slate-200 transition-all"
@@ -427,8 +496,8 @@ export default function BookingCMS() {
                               <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Desired Domain</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.desired_domain || ""}
                                       placeholder="e.g. www.toko.com"
                                       onChange={(e) => setEditingBooking({...editingBooking, desired_domain: e.target.value})}
@@ -437,8 +506,8 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Industry</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.business_industry || ""}
                                       placeholder="e.g. F&B, Retail"
                                       onChange={(e) => setEditingBooking({...editingBooking, business_industry: e.target.value})}
@@ -450,8 +519,8 @@ export default function BookingCMS() {
                               <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Target Audience</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.target_audience || ""}
                                       placeholder="e.g. Gen Z, Business Owners"
                                       onChange={(e) => setEditingBooking({...editingBooking, target_audience: e.target.value})}
@@ -460,8 +529,8 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Primary CTA</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.primary_cta || ""}
                                       placeholder="e.g. Buy Now, Contact WA"
                                       onChange={(e) => setEditingBooking({...editingBooking, primary_cta: e.target.value})}
@@ -473,8 +542,8 @@ export default function BookingCMS() {
                               <div className="grid grid-cols-2 gap-8">
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Competitors</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.competitors_list || ""}
                                       placeholder="e.g. Brand X, Brand Y"
                                       onChange={(e) => setEditingBooking({...editingBooking, competitors_list: e.target.value})}
@@ -483,8 +552,8 @@ export default function BookingCMS() {
                                 </div>
                                 <div className="space-y-3">
                                    <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">System Integrations</label>
-                                   <input 
-                                      type="text" 
+                                   <input
+                                      type="text"
                                       value={editingBooking.integrations_needed || ""}
                                       placeholder="e.g. Payment Gateway, CRM"
                                       onChange={(e) => setEditingBooking({...editingBooking, integrations_needed: e.target.value})}
@@ -495,8 +564,8 @@ export default function BookingCMS() {
 
                               <div className="space-y-3">
                                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Biggest Success Expectation</label>
-                                 <input 
-                                    type="text" 
+                                 <input
+                                    type="text"
                                     value={editingBooking.biggest_expectation || ""}
                                     placeholder="What does success look like for this project?"
                                     onChange={(e) => setEditingBooking({...editingBooking, biggest_expectation: e.target.value})}
@@ -506,7 +575,7 @@ export default function BookingCMS() {
 
                               <div className="space-y-3">
                                  <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Project Brief</label>
-                                 <textarea 
+                                 <textarea
                                     value={editingBooking.project_brief}
                                     onChange={(e) => setEditingBooking({...editingBooking, project_brief: e.target.value})}
                                     className="w-full px-6 py-6 bg-slate-50 border border-transparent rounded-2xl outline-none font-medium text-base leading-relaxed focus:bg-white focus:border-slate-200 h-48 transition-all resize-none"
@@ -517,17 +586,17 @@ export default function BookingCMS() {
                          )}
 
                         {activeTab === "financial" && (
-                          <motion.div 
+                          <motion.div
                             key="financial"
-                            initial={{ opacity: 0, x: 10 }} 
-                            animate={{ opacity: 1, x: 0 }} 
+                            initial={{ opacity: 0, x: 10 }}
+                            animate={{ opacity: 1, x: 0 }}
                             exit={{ opacity: 0, x: -10 }}
                             className="space-y-10"
                           >
                              <div className="space-y-3">
                                 <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Total Valuation (IDR)</label>
-                                <input 
-                                   type="number" 
+                                <input
+                                   type="number"
                                    value={editingBooking.total_price}
                                    onChange={(e) => setEditingBooking({...editingBooking, total_price: Number(e.target.value)})}
                                    className="w-full px-6 py-4 bg-slate-100 border-none rounded-2xl outline-none font-bold text-3xl text-slate-900 focus:bg-white transition-all"
@@ -553,7 +622,7 @@ export default function BookingCMS() {
                                          </div>
                                       </div>
                                    ))}
-                                   <button 
+                                   <button
                                       onClick={() => generateInvoice(editingBooking)}
                                       className="w-full py-4 border border-dashed border-slate-200 rounded-xl text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:border-slate-900 transition-all flex items-center justify-center gap-2"
                                    >
@@ -568,13 +637,13 @@ export default function BookingCMS() {
               </div>
 
               <div className="px-10 py-8 border-t border-slate-50 bg-slate-50/20 flex justify-end gap-4">
-                 <button 
+                 <button
                    onClick={() => setEditingBooking(null)}
                    className="px-6 py-3 text-slate-500 font-bold text-[12px] hover:text-slate-900 transition-all"
                  >
                    Discard
                  </button>
-                 <button 
+                 <button
                    onClick={handleSaveBooking}
                    disabled={isSaving}
                    className="px-10 py-3 bg-slate-900 text-white rounded-xl font-bold text-[12px] flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shadow-slate-900/10"
