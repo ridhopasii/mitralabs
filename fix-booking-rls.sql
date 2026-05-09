@@ -20,6 +20,9 @@ ALTER TABLE "Booking" ENABLE ROW LEVEL SECURITY;
 DROP POLICY IF EXISTS "Booking_public_insert" ON "Booking";
 DROP POLICY IF EXISTS "Booking_admin_all" ON "Booking";
 DROP POLICY IF EXISTS "Booking_public_select" ON "Booking";
+DROP POLICY IF EXISTS "Booking_admin_select" ON "Booking";
+DROP POLICY IF EXISTS "Booking_admin_update" ON "Booking";
+DROP POLICY IF EXISTS "Booking_admin_delete" ON "Booking";
 
 -- STEP 6: Create policy to allow public inserts (for the booking form)
 CREATE POLICY "Booking_public_insert" ON "Booking"
@@ -27,16 +30,33 @@ CREATE POLICY "Booking_public_insert" ON "Booking"
   TO anon, authenticated
   WITH CHECK (true);
 
--- STEP 7: Create policy to allow authenticated users (admins) to read all bookings
-CREATE POLICY "Booking_admin_all" ON "Booking"
-  FOR ALL
+-- STEP 7: Create policy to allow authenticated users (admins) to SELECT all bookings
+CREATE POLICY "Booking_admin_select" ON "Booking"
+  FOR SELECT
+  TO authenticated
+  USING (true);
+
+-- STEP 8: Create policy to allow authenticated users (admins) to UPDATE bookings
+CREATE POLICY "Booking_admin_update" ON "Booking"
+  FOR UPDATE
   TO authenticated
   USING (true)
   WITH CHECK (true);
 
--- STEP 8: Verify permissions
+-- STEP 9: Create policy to allow authenticated users (admins) to DELETE bookings
+CREATE POLICY "Booking_admin_delete" ON "Booking"
+  FOR DELETE
+  TO authenticated
+  USING (true);
+
+-- STEP 10: Verify permissions
 SELECT
   grantee,
   privilege_type
 FROM information_schema.role_table_grants
 WHERE table_name='Booking';
+
+-- STEP 11: Verify policies
+SELECT schemaname, tablename, policyname, permissive, roles, cmd
+FROM pg_policies
+WHERE tablename = 'Booking';
