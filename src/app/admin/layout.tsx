@@ -12,13 +12,15 @@ import {
   History,
   Star,
   HelpCircle,
-  ExternalLink
+  ExternalLink,
+  Image
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
+import GlobalSearch from "@/components/admin/GlobalSearch";
 
 export default function AdminLayout({
   children,
@@ -62,6 +64,7 @@ export default function AdminLayout({
     { name: "Layanan", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
     { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
     { name: "Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
+    { name: "Media", icon: Image, href: "/admin/media", category: "CMS" },
     { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "CMS" },
     { name: "FAQ", icon: HelpCircle, href: "/admin/faq", category: "CMS" },
   ];
@@ -129,29 +132,34 @@ export default function AdminLayout({
 
       {/* Clean Main Content Area */}
       <main className="flex-grow overflow-y-auto h-screen p-10 lg:p-16">
-        <header className="flex justify-between items-center mb-16">
-          <div className="space-y-1">
-            <h1 className="text-3xl font-bold tracking-tight text-slate-900">
-              {menuItems.find(i => i.href === pathname)?.name || "Overview"}
-            </h1>
-            <div className="flex items-center gap-2 text-slate-400">
-              <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
-              <p className="font-bold text-[11px] uppercase tracking-widest">System Control Interface</p>
+        <header className="flex flex-col gap-6 mb-16">
+          <div className="flex justify-between items-center">
+            <div className="space-y-1">
+              <h1 className="text-3xl font-bold tracking-tight text-slate-900">
+                {menuItems.find(i => i.href === pathname)?.name || "Overview"}
+              </h1>
+              <div className="flex items-center gap-2 text-slate-400">
+                <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full"></div>
+                <p className="font-bold text-[11px] uppercase tracking-widest">System Control Interface</p>
+              </div>
+            </div>
+
+            <div className="flex items-center gap-6">
+              <div className="text-right hidden sm:block">
+                <p className="text-sm font-bold text-slate-900">Ridho Robbi Pasi</p>
+                <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Master Admin</p>
+              </div>
+              <div className="relative group">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-bold text-slate-900 shadow-sm border border-slate-200 group-hover:border-primary transition-all">
+                  RP
+                </div>
+                <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full"></div>
+              </div>
             </div>
           </div>
 
-          <div className="flex items-center gap-6">
-            <div className="text-right hidden sm:block">
-              <p className="text-sm font-bold text-slate-900">Ridho Robbi Pasi</p>
-              <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Master Admin</p>
-            </div>
-            <div className="relative group">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center font-bold text-slate-900 shadow-sm border border-slate-200 group-hover:border-primary transition-all">
-                RP
-              </div>
-              <div className="absolute -bottom-1 -right-1 w-4 h-4 bg-emerald-500 border-4 border-white rounded-full"></div>
-            </div>
-          </div>
+          {/* Global Search */}
+          <GlobalSearch />
         </header>
 
         <div className="animate-in fade-in slide-in-from-bottom-4 duration-1000">

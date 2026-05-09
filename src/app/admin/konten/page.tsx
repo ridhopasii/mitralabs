@@ -29,6 +29,53 @@ import {
 import { uploadImage } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 
+const InputField = ({ label, path, value, type = "text", placeholder = "", icon: Icon, onChange }: any) => (
+  <div className="space-y-3">
+    <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
+    <div className="relative group">
+      {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary/40 group-focus-within:text-primary transition-colors" size={18} />}
+      {type === "textarea" ? (
+        <textarea 
+          value={value || ""} 
+          placeholder={placeholder}
+          onChange={(e) => onChange(path, e.target.value)}
+          className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm h-32 resize-none`}
+        />
+      ) : (
+        <input 
+          type={type}
+          value={value || ""}
+          placeholder={placeholder}
+          onChange={(e) => onChange(path, e.target.value)}
+          className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm`}
+        />
+      )}
+    </div>
+  </div>
+);
+
+const ImageInput = ({ label, path, value, isUploading, onUpload }: any) => {
+  return (
+    <div className="space-y-4">
+      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
+      <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-outline/10 bg-background/50 flex flex-col items-center justify-center cursor-pointer hover:border-primary/30 transition-all group shadow-inner">
+        {value ? <img src={value} className="absolute inset-0 w-full h-full object-cover" alt="" /> : null}
+        <div className="relative z-10 glass-apple p-5 rounded-2xl shadow-apple-hover flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 border border-outline/10">
+          {isUploading ? <Loader2 size={24} className="animate-spin text-primary" /> : <Upload size={24} className="text-primary" />}
+          <span className="font-bold text-[10px] uppercase tracking-widest">{isUploading ? "Uploading..." : "Ganti Gambar"}</span>
+        </div>
+        <input 
+          type="file" 
+          accept="image/*"
+          disabled={isUploading}
+          onChange={(e) => e.target.files && onUpload(path, e.target.files[0])}
+          className="absolute inset-0 opacity-0 cursor-pointer" 
+        />
+      </div>
+    </div>
+  );
+};
+
 export default function SiteSettingsCMS() {
   const { data, updateData } = useData();
   const [activeTab, setActiveTab] = useState("branding");
@@ -68,54 +115,6 @@ export default function SiteSettingsCMS() {
     const publicUrl = await uploadImage(file);
     if (publicUrl) updateField(path, publicUrl);
     setUploadingPath(null);
-  };
-
-  const InputField = ({ label, path, value, type = "text", placeholder = "", icon: Icon }: any) => (
-    <div className="space-y-3">
-      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
-      <div className="relative group">
-        {Icon && <Icon className="absolute left-6 top-1/2 -translate-y-1/2 text-secondary/40 group-focus-within:text-primary transition-colors" size={18} />}
-        {type === "textarea" ? (
-          <textarea 
-            value={value || ""} 
-            placeholder={placeholder}
-            onChange={(e) => updateField(path, e.target.value)}
-            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm h-32 resize-none`}
-          />
-        ) : (
-          <input 
-            type={type}
-            value={value || ""}
-            placeholder={placeholder}
-            onChange={(e) => updateField(path, e.target.value)}
-            className={`w-full ${Icon ? 'pl-16' : 'px-8'} py-5 bg-background border border-outline/10 rounded-[1.5rem] outline-none font-medium text-sm focus:border-primary/30 transition-all shadow-sm`}
-          />
-        )}
-      </div>
-    </div>
-  );
-
-  const ImageInput = ({ label, path, value }: any) => {
-    const isUploading = uploadingPath === path;
-    return (
-      <div className="space-y-4">
-        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">{label}</label>
-        <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-outline/10 bg-background/50 flex flex-col items-center justify-center cursor-pointer hover:border-primary/30 transition-all group shadow-inner">
-          {value ? <img src={value} className="absolute inset-0 w-full h-full object-cover" /> : null}
-          <div className="relative z-10 glass-apple p-5 rounded-2xl shadow-apple-hover flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all scale-90 group-hover:scale-100 border border-outline/10">
-            {isUploading ? <Loader2 size={24} className="animate-spin text-primary" /> : <Upload size={24} className="text-primary" />}
-            <span className="font-bold text-[10px] uppercase tracking-widest">{isUploading ? "Uploading..." : "Ganti Gambar"}</span>
-          </div>
-          <input 
-            type="file" 
-            accept="image/*"
-            disabled={isUploading}
-            onChange={(e) => e.target.files && handleImageUpload(path, e.target.files[0])}
-            className="absolute inset-0 opacity-0 cursor-pointer" 
-          />
-        </div>
-      </div>
-    );
   };
 
   const tabs = [
@@ -186,10 +185,10 @@ export default function SiteSettingsCMS() {
                      </div>
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField label="Master Logo Label" path="navbar.logo" value={formData.navbar.logo} icon={Type} />
-                    <InputField label="Primary CTA Label" path="navbar.buttonText" value={formData.navbar.buttonText} icon={Zap} />
+                    <InputField onChange={updateField} label="Master Logo Label" path="navbar.logo" value={formData.navbar.logo} icon={Type} />
+                    <InputField onChange={updateField} label="Primary CTA Label" path="navbar.buttonText" value={formData.navbar.buttonText} icon={Zap} />
                   </div>
-                  <InputField label="Corporate Mission Statement (Footer)" path="footer.description" value={formData.footer.description} type="textarea" />
+                  <InputField onChange={updateField} label="Corporate Mission Statement (Footer)" path="footer.description" value={formData.footer.description} type="textarea" />
                </div>
             </motion.div>
           )}
@@ -280,16 +279,16 @@ export default function SiteSettingsCMS() {
                   </div>
                   <div className="grid md:grid-cols-2 gap-16">
                     <div className="space-y-10">
-                      <InputField label="Hero Signal (Promo)" path="home.hero.promo" value={formData.home.hero.promo} />
-                      <InputField label="Strategic Tagline" path="home.hero.tagline" value={formData.home.hero.tagline} />
-                      <InputField label="Executive Headline" path="home.hero.title" value={formData.home.hero.title} type="textarea" />
-                      <InputField label="Sub-strategic Context" path="home.hero.subtitle" value={formData.home.hero.subtitle} type="textarea" />
+                      <InputField onChange={updateField} label="Hero Signal (Promo)" path="home.hero.promo" value={formData.home.hero.promo} />
+                      <InputField onChange={updateField} label="Strategic Tagline" path="home.hero.tagline" value={formData.home.hero.tagline} />
+                      <InputField onChange={updateField} label="Executive Headline" path="home.hero.title" value={formData.home.hero.title} type="textarea" />
+                      <InputField onChange={updateField} label="Sub-strategic Context" path="home.hero.subtitle" value={formData.home.hero.subtitle} type="textarea" />
                     </div>
                     <div className="space-y-10">
-                      <ImageInput label="Master Hero Visual" path="home.hero.image" value={formData.home.hero.image} />
+                      <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === formData.home?.hero?.image || uploadingPath === formData.about?.hero?.image || uploadingPath === "home.hero.image" || uploadingPath === "about.hero.image"} label="Master Hero Visual" path="home.hero.image" value={formData.home.hero.image} />
                       <div className="p-12 bg-background rounded-[3.5rem] border border-outline/5 grid grid-cols-2 gap-12 shadow-inner">
-                         <InputField label="Core KPI Label" path="home.hero.stats.label" value={formData.home.hero.stats.label} />
-                         <InputField label="KPI Metric Value" path="home.hero.stats.value" value={formData.home.hero.stats.value} />
+                         <InputField onChange={updateField} label="Core KPI Label" path="home.hero.stats.label" value={formData.home.hero.stats.label} />
+                         <InputField onChange={updateField} label="KPI Metric Value" path="home.hero.stats.value" value={formData.home.hero.stats.value} />
                       </div>
                     </div>
                   </div>
@@ -301,10 +300,10 @@ export default function SiteSettingsCMS() {
                      <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Problem & Logic.</h2>
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField label="Challenge Title" path="home.problem.title" value={formData.home.problem.title} />
-                    <InputField label="Challenge Subtitle" path="home.problem.subtitle" value={formData.home.problem.subtitle} />
-                    <InputField label="Strategic Solution Tag" path="home.solution.tagline" value={formData.home.solution.tagline} />
-                    <InputField label="Solution Headline" path="home.solution.title" value={formData.home.solution.title} />
+                    <InputField onChange={updateField} label="Challenge Title" path="home.problem.title" value={formData.home.problem.title} />
+                    <InputField onChange={updateField} label="Challenge Subtitle" path="home.problem.subtitle" value={formData.home.problem.subtitle} />
+                    <InputField onChange={updateField} label="Strategic Solution Tag" path="home.solution.tagline" value={formData.home.solution.tagline} />
+                    <InputField onChange={updateField} label="Solution Headline" path="home.solution.title" value={formData.home.solution.title} />
                   </div>
                </div>
             </motion.div>
@@ -324,10 +323,10 @@ export default function SiteSettingsCMS() {
                      <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Service Ecosystem.</h2>
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField label="Core Section Title" path="services.title" value={formData.services.title} />
-                    <InputField label="Executive Subtitle" path="services.subtitle" value={formData.services.subtitle} type="textarea" />
-                    <InputField label="Comparison Matrix Title" path="services.comparisonTitle" value={formData.services.comparisonTitle} />
-                    <InputField label="Comparison Sub-context" path="services.comparisonSubtitle" value={formData.services.comparisonSubtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Core Section Title" path="services.title" value={formData.services.title} />
+                    <InputField onChange={updateField} label="Executive Subtitle" path="services.subtitle" value={formData.services.subtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Comparison Matrix Title" path="services.comparisonTitle" value={formData.services.comparisonTitle} />
+                    <InputField onChange={updateField} label="Comparison Sub-context" path="services.comparisonSubtitle" value={formData.services.comparisonSubtitle} type="textarea" />
                   </div>
                </div>
             </motion.div>
@@ -347,10 +346,10 @@ export default function SiteSettingsCMS() {
                      <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Portfolio Strategy.</h2>
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField label="Exhibition Title" path="portfolio.title" value={formData.portfolio.title} />
-                    <InputField label="Gallery Subtitle" path="portfolio.subtitle" value={formData.portfolio.subtitle} type="textarea" />
-                    <InputField label="Conversion CTA Title" path="portfolio.cta.title" value={formData.portfolio.cta.title} />
-                    <InputField label="Conversion Sub-context" path="portfolio.cta.subtitle" value={formData.portfolio.cta.subtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Exhibition Title" path="portfolio.title" value={formData.portfolio.title} />
+                    <InputField onChange={updateField} label="Gallery Subtitle" path="portfolio.subtitle" value={formData.portfolio.subtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Conversion CTA Title" path="portfolio.cta.title" value={formData.portfolio.cta.title} />
+                    <InputField onChange={updateField} label="Conversion Sub-context" path="portfolio.cta.subtitle" value={formData.portfolio.cta.subtitle} type="textarea" />
                   </div>
                </div>
             </motion.div>
@@ -371,15 +370,15 @@ export default function SiteSettingsCMS() {
                   </div>
                   <div className="space-y-16">
                     <div className="grid md:grid-cols-2 gap-12">
-                      <InputField label="Brand Tagline" path="about.hero.tagline" value={formData.about.hero.tagline} />
-                      <InputField label="Executive Story Title" path="about.hero.title" value={formData.about.hero.title} />
+                      <InputField onChange={updateField} label="Brand Tagline" path="about.hero.tagline" value={formData.about.hero.tagline} />
+                      <InputField onChange={updateField} label="Executive Story Title" path="about.hero.title" value={formData.about.hero.title} />
                     </div>
-                    <InputField label="Comprehensive Storytelling" path="about.hero.subtitle" value={formData.about.hero.subtitle} type="textarea" />
-                    <ImageInput label="Operational Visual (Hero)" path="about.hero.image" value={formData.about.hero.image} />
+                    <InputField onChange={updateField} label="Comprehensive Storytelling" path="about.hero.subtitle" value={formData.about.hero.subtitle} type="textarea" />
+                    <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === formData.home?.hero?.image || uploadingPath === formData.about?.hero?.image || uploadingPath === "home.hero.image" || uploadingPath === "about.hero.image"} label="Operational Visual (Hero)" path="about.hero.image" value={formData.about.hero.image} />
                     <div className="grid md:grid-cols-2 gap-16 border-t border-outline/5 pt-16">
-                       <InputField label="Visionary Objective" path="about.visionTitle" value={formData.about.visionTitle} />
-                       <InputField label="Vision Statement" path="about.vision" value={formData.about.vision} type="textarea" />
-                       <InputField label="Mission Protocol" path="about.missionTitle" value={formData.about.missionTitle} />
+                       <InputField onChange={updateField} label="Visionary Objective" path="about.visionTitle" value={formData.about.visionTitle} />
+                       <InputField onChange={updateField} label="Vision Statement" path="about.vision" value={formData.about.vision} type="textarea" />
+                       <InputField onChange={updateField} label="Mission Protocol" path="about.missionTitle" value={formData.about.missionTitle} />
                     </div>
                   </div>
                </div>
@@ -400,12 +399,12 @@ export default function SiteSettingsCMS() {
                      <h2 className="text-3xl font-black tracking-tighter text-on-background uppercase leading-none">Contact Protocol.</h2>
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField label="Protocol Title" path="contact.title" value={formData.contact.title} />
-                    <InputField label="Protocol Subtitle" path="contact.subtitle" value={formData.contact.subtitle} type="textarea" />
-                    <InputField label="Corporate Email" path="contact.email" value={formData.contact.email} icon={Globe} />
-                    <InputField label="WhatsApp Interface" path="settings.waNumber" value={formData.settings.waNumber} icon={Phone} />
-                    <InputField label="Instagram Channel" path="contact.instagram" value={formData.contact.instagram} icon={Instagram} />
-                    <InputField label="Operational Studio" path="contact.address" value={formData.contact.address} icon={MapPin} />
+                    <InputField onChange={updateField} label="Protocol Title" path="contact.title" value={formData.contact.title} />
+                    <InputField onChange={updateField} label="Protocol Subtitle" path="contact.subtitle" value={formData.contact.subtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Corporate Email" path="contact.email" value={formData.contact.email} icon={Globe} />
+                    <InputField onChange={updateField} label="WhatsApp Interface" path="settings.waNumber" value={formData.settings.waNumber} icon={Phone} />
+                    <InputField onChange={updateField} label="Instagram Channel" path="contact.instagram" value={formData.contact.instagram} icon={Instagram} />
+                    <InputField onChange={updateField} label="Operational Studio" path="contact.address" value={formData.contact.address} icon={MapPin} />
                   </div>
                </div>
             </motion.div>
