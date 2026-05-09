@@ -3,13 +3,13 @@
 import { motion, AnimatePresence } from "framer-motion";
 import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
-import { 
-  Plus, 
-  Trash2, 
-  Edit3, 
-  Eye, 
-  Save, 
-  X, 
+import {
+  Plus,
+  Trash2,
+  Edit3,
+  Eye,
+  Save,
+  X,
   Image as ImageIcon,
   FileText,
   Search,
@@ -31,6 +31,7 @@ import {
 import { z } from "zod";
 import { uploadImage, logActivity } from "@/lib/supabase";
 import Image from "next/image";
+import ImageUploader from "@/components/admin/ImageUploader";
 
 // Validation Schema
 const blogPostSchema = z.object({
@@ -56,7 +57,7 @@ export default function BlogManagement() {
   const [errors, setErrors] = useState<string[]>([]);
   const [showSuccess, setShowSuccess] = useState(false);
   const [activeTab, setActiveTab] = useState("identity");
-  
+
   useEffect(() => {
     setPosts(data.blog.posts);
   }, [data.blog.posts]);
@@ -85,13 +86,13 @@ export default function BlogManagement() {
 
     setIsSaving(true);
     const isNew = !posts.some(p => p.id === postWithSlug.id);
-    const newPosts = isNew 
+    const newPosts = isNew
       ? [{ ...postWithSlug, id: Date.now() }, ...posts]
       : posts.map(p => p.id === postWithSlug.id ? postWithSlug : p);
-    
+
     const newData = { ...data };
     newData.blog.posts = newPosts;
-    
+
     setTimeout(() => {
       updateData(newData);
       setPosts(newPosts);
@@ -122,8 +123,8 @@ export default function BlogManagement() {
     setIsUploading(false);
   };
 
-  const filteredPosts = posts.filter(p => 
-    p.title.toLowerCase().includes(search.toLowerCase()) || 
+  const filteredPosts = posts.filter(p =>
+    p.title.toLowerCase().includes(search.toLowerCase()) ||
     p.category.toLowerCase().includes(search.toLowerCase()) ||
     p.author.toLowerCase().includes(search.toLowerCase())
   );
@@ -132,7 +133,7 @@ export default function BlogManagement() {
     <div className="space-y-10 pb-20">
       <AnimatePresence>
         {showSuccess && (
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, y: -20 }}
             animate={{ opacity: 1, y: 0 }}
             exit={{ opacity: 0, y: -20 }}
@@ -153,15 +154,15 @@ export default function BlogManagement() {
         <div className="flex items-center gap-4 w-full md:w-auto">
            <div className="relative group flex-grow md:flex-grow-0">
               <Search className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-400 group-focus-within:text-primary transition-colors" size={18} />
-              <input 
-                type="text" 
+              <input
+                type="text"
                 placeholder="Cari artikel..."
                 value={search}
                 onChange={(e) => setSearch(e.target.value)}
                 className="pl-16 pr-8 py-5 bg-white border border-slate-200 rounded-2xl outline-none focus:border-primary/30 font-bold text-sm w-full md:w-80 transition-all shadow-sm"
               />
            </div>
-           <button 
+           <button
             onClick={() => { setEditingPost({
               id: 0,
               title: "",
@@ -211,15 +212,15 @@ export default function BlogManagement() {
                </div>
                <h4 className="text-xl font-bold text-slate-900 tracking-tight leading-tight mb-4 group-hover:text-primary transition-colors line-clamp-2">{post.title}</h4>
                <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase mb-8">/{post.slug}</p>
-               
+
                <div className="mt-auto pt-8 border-t border-slate-100 flex justify-between items-center">
-                  <button 
+                  <button
                     onClick={() => { setEditingPost(post); setActiveTab("identity"); }}
                     className="flex items-center gap-2 text-[10px] font-bold uppercase tracking-widest text-slate-900 hover:text-primary transition-colors"
                   >
                     Edit Details <Edit3 size={14} />
                   </button>
-                  <button 
+                  <button
                     onClick={() => deletePost(post.id)}
                     className="p-3 text-slate-300 hover:text-rose-500 transition-colors"
                   >
@@ -243,14 +244,14 @@ export default function BlogManagement() {
       <AnimatePresence>
         {editingPost && (
           <div className="fixed inset-0 z-[400] flex items-center justify-center p-6">
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
               onClick={() => setEditingPost(null)}
               className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
             />
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, scale: 0.98, y: 20 }}
               animate={{ opacity: 1, scale: 1, y: 0 }}
               exit={{ opacity: 0, scale: 0.98, y: 20 }}
@@ -285,8 +286,8 @@ export default function BlogManagement() {
                        { id: "narrative", label: "Narrative", icon: Type },
                        { id: "media", label: "Visual Hub", icon: ImageIcon }
                      ].map((tab) => (
-                       <button 
-                        key={tab.id} 
+                       <button
+                        key={tab.id}
                         onClick={() => setActiveTab(tab.id)}
                         className={`w-full text-left px-5 py-3.5 rounded-xl text-[11px] font-bold uppercase tracking-widest transition-all flex items-center gap-4 ${activeTab === tab.id ? "bg-slate-900 text-white shadow-xl shadow-slate-900/10" : "text-slate-500 hover:bg-white hover:text-slate-900"}`}
                        >
@@ -302,8 +303,8 @@ export default function BlogManagement() {
                            <div className="grid md:grid-cols-2 gap-10">
                               <div className="space-y-3">
                                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Article Headline</label>
-                                 <input 
-                                    type="text" 
+                                 <input
+                                    type="text"
                                     value={editingPost.title}
                                     onChange={(e) => setEditingPost({...editingPost, title: e.target.value})}
                                     className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-lg focus:border-primary/50 focus:bg-white transition-all"
@@ -314,14 +315,14 @@ export default function BlogManagement() {
                                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Logic Path (Slug)</label>
                                  <div className="relative group">
                                     <span className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 font-bold text-sm">/</span>
-                                    <input 
-                                      type="text" 
+                                    <input
+                                      type="text"
                                       value={editingPost.slug}
                                       onChange={(e) => setEditingPost({...editingPost, slug: e.target.value})}
                                       className="w-full pl-10 pr-16 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-sm focus:border-primary/50 focus:bg-white transition-all text-primary"
                                       placeholder="article-unique-slug"
                                     />
-                                    <button 
+                                    <button
                                       onClick={() => setEditingPost({...editingPost, slug: generateSlug(editingPost.title)})}
                                       className="absolute right-4 top-1/2 -translate-y-1/2 p-2 text-slate-300 hover:text-primary transition-all"
                                       title="Auto-generate from title"
@@ -335,8 +336,8 @@ export default function BlogManagement() {
                            <div className="grid md:grid-cols-3 gap-8">
                               <div className="space-y-3">
                                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Classification</label>
-                                 <input 
-                                    type="text" 
+                                 <input
+                                    type="text"
                                     value={editingPost.category}
                                     onChange={(e) => setEditingPost({...editingPost, category: e.target.value})}
                                     className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
@@ -345,8 +346,8 @@ export default function BlogManagement() {
                               </div>
                               <div className="space-y-3">
                                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Intellectual Author</label>
-                                 <input 
-                                    type="text" 
+                                 <input
+                                    type="text"
                                     value={editingPost.author}
                                     onChange={(e) => setEditingPost({...editingPost, author: e.target.value})}
                                     className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
@@ -355,8 +356,8 @@ export default function BlogManagement() {
                               </div>
                               <div className="space-y-3">
                                  <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Release Date</label>
-                                 <input 
-                                    type="text" 
+                                 <input
+                                    type="text"
                                     value={editingPost.date}
                                     onChange={(e) => setEditingPost({...editingPost, date: e.target.value})}
                                     className="w-full px-6 py-4 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-bold text-[11px] uppercase tracking-widest focus:border-primary/50"
@@ -381,7 +382,7 @@ export default function BlogManagement() {
                         <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                            <div className="space-y-3">
                               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Executive Summary (Excerpt)</label>
-                              <textarea 
+                              <textarea
                                  value={editingPost.excerpt}
                                  onChange={(e) => setEditingPost({...editingPost, excerpt: e.target.value})}
                                  className="w-full px-8 py-6 bg-slate-50 border border-slate-200 rounded-2xl outline-none font-medium text-sm leading-relaxed focus:border-primary/50 h-32 transition-all resize-none"
@@ -390,7 +391,7 @@ export default function BlogManagement() {
                            </div>
                            <div className="space-y-3">
                               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Full Narrative Body</label>
-                              <textarea 
+                              <textarea
                                  value={editingPost.content}
                                  onChange={(e) => setEditingPost({...editingPost, content: e.target.value})}
                                  className="w-full px-8 py-8 bg-slate-50 border border-slate-200 rounded-[2.5rem] outline-none font-medium text-lg leading-relaxed focus:border-primary/50 h-[500px] transition-all resize-none custom-scrollbar"
@@ -404,14 +405,14 @@ export default function BlogManagement() {
                         <div className="space-y-10 animate-in fade-in slide-in-from-right-4 duration-500">
                            <div className="space-y-4">
                               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-500 ml-1">Hero Asset (Cover)</label>
-                              <div className="relative aspect-video rounded-[2.5rem] overflow-hidden border border-slate-200 bg-slate-50 flex items-center justify-center cursor-pointer hover:border-primary/50 transition-all group">
-                                 {editingPost.image && <Image src={editingPost.image} alt="Hero" fill className="object-cover" />}
-                                 <div className="relative z-10 bg-white/90 backdrop-blur-md px-8 py-4 rounded-full shadow-xl flex items-center gap-4 opacity-0 group-hover:opacity-100 transition-all">
-                                    {isUploading ? <Loader2 size={20} className="animate-spin text-primary" /> : <Upload size={20} className="text-primary" />}
-                                    <span className="font-bold text-[11px] uppercase tracking-widest">Update Publication Media</span>
-                                 </div>
-                                 <input type="file" accept="image/*" onChange={(e) => e.target.files && handleImageUpload(e.target.files[0])} className="absolute inset-0 opacity-0 cursor-pointer" />
-                              </div>
+                              <ImageUploader
+                                currentImage={editingPost.image}
+                                onUploadSuccess={(url, filename) => {
+                                  setEditingPost({ ...editingPost, image: url });
+                                  logActivity("Upload Image", `Blog cover: ${filename}`);
+                                }}
+                                folder="blog"
+                              />
                            </div>
                         </div>
                      )}
@@ -420,13 +421,13 @@ export default function BlogManagement() {
 
               {/* Modal Footer */}
               <div className="p-8 lg:p-10 border-t border-slate-100 bg-slate-50/50 flex justify-end gap-6">
-                 <button 
+                 <button
                    onClick={() => setEditingPost(null)}
                    className="px-10 py-4 bg-white border border-slate-200 text-slate-500 rounded-xl font-bold uppercase tracking-widest text-[10px] hover:text-slate-900 transition-all"
                  >
                    Discard
                  </button>
-                 <button 
+                 <button
                    onClick={handleSave}
                    disabled={isSaving}
                    className="px-16 py-4 bg-slate-900 text-white rounded-xl font-bold uppercase tracking-widest text-[10px] flex items-center gap-3 hover:opacity-90 active:scale-95 transition-all shadow-xl disabled:opacity-50"
