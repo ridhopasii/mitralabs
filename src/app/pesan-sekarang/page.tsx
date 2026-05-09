@@ -81,6 +81,7 @@ export default function PesanSekarang() {
         });
 
         // 1. Save to Supabase and get the inserted data back
+        const now = new Date().toISOString();
         const { data: insertedData, error } = await supabase.from("Booking").insert([{
           customer_name: formData.name,
           customer_email: formData.email,
@@ -99,7 +100,9 @@ export default function PesanSekarang() {
           integrations_needed: formData.integrations,
           biggest_expectation: formData.expectation,
           status: "Pending",
-          total_price: getPrice()
+          total_price: getPrice(),
+          created_at: now,
+          updated_at: now
         }]).select();
 
         if (error) {
