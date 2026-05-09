@@ -46,14 +46,46 @@ export default function BookingCMS() {
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState("logistics");
   const [isRefreshing, setIsRefreshing] = useState(false);
+  const [fetchError, setFetchError] = useState<string | null>(null);
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+
+  // Check authentication status
+  useEffect(() => {
+    const checkAuth = async () => {
+      const { supabase } = await import("@/lib/supabase");
+      const { data: { user }, error } = await supabase.auth.getUser();
+
+      console.log("🔐 Auth check:", { user: user?.email, error });
+      setIsAuthenticated(!!user);
+
+      if (!user) {
+        setFetchError("Not authenticated. Please login first.");
+      }
+    };
+
+    checkAuth();
+  }, []);
 
   // Auto-refresh on mount to get latest data from Supabase
   useEffect(() => {
     const refreshData = async () => {
       console.log("🔄 Admin: Auto-refreshing bookings from Supabase...");
       setIsRefreshing(true);
+      setFetchError(null);
+
       try {
         const { supabase } = await import("@/lib/supabase");
+
+        // Check auth first
+        const { data: { user } } = await supabase.auth.getUser();
+        console.log("👤 Current user:", user?.email || "Not logged in");
+
+        if (!user) {
+          setFetchError("Not authenticated. Please login to view bookings.");
+          setIsRefreshing(false);
+          return;
+        }
+
         const { data: bookingsData, error } = await supabase
           .from("Booking")
           .select("*, Invoice(*)")
@@ -62,9 +94,15 @@ export default function BookingCMS() {
         if (error) {
           console.error("❌ Admin: Error fetching bookings:", error);
           console.error("Error details:", JSON.stringify(error, null, 2));
+          setFetchError(`Database error: ${error.message}`);
+          alert(`❌ Error fetching bookings:\n\n${error.message}\n\nCode: ${error.code}\n\nCheck console for details.`);
         } else {
           console.log(`✅ Admin: Fetched ${bookingsData?.length || 0} bookings from Supabase`);
           console.log("Bookings data:", bookingsData);
+
+          if (bookingsData && bookingsData.length === 0) {
+            setFetchError("No bookings found in database. Try submitting a test booking.");
+          }
         }
 
         if (!error && bookingsData) {
@@ -75,9 +113,12 @@ export default function BookingCMS() {
 
           setBookings(formattedBookings);
           console.log("✅ Admin: Updated state with bookings");
+          setFetchError(null);
         }
-      } catch (err) {
+      } catch (err: any) {
         console.error("❌ Admin: Error refreshing bookings:", err);
+        setFetchError(`Unexpected error: ${err.message}`);
+        alert(`❌ Unexpected error:\n\n${err.message}\n\nCheck console for details.`);
       } finally {
         setIsRefreshing(false);
       }
@@ -338,10 +379,60 @@ export default function BookingCMS() {
           </table>
           {filteredBookings.length === 0 && (
              <div className="py-40 text-center">
-                <div className="flex flex-col items-center gap-4 opacity-10">
-                   <Package size={64} strokeWidth={1} />
-                   <p className="font-bold uppercase tracking-widest text-[10px]">No orders in queue</p>
-                </div>
+                {fetchError ? (
+                  <div className="flex flex-col items-center gap-6">
+                    <div className="w-20 h-20 bg-rose-100 text-rose-500 rounded-3xl flex items-center justify-center">
+                      <AlertCircle size={40} />
+                    </div>
+                    <div className="space-y-2">
+                      <p className="font-bold text-lg text-slate-900">Error Loading Bookings</p>
+                      <p className="text-sm text-slate-500 max-w-md mx-auto">{fetchError}</p>
+                      {isAuthenticated === false && (
+                        <p className="text-xs text-rose-500 font-bold mt-4">Please logout and login again</p>
+                      )}
+                    </div>
+                    <button
+                      onClick={async () => {
+                        setIsRefreshing(true);
+                        setFetchError(null);
+                        try {
+                          const { supabase } = await import("@/lib/supabase");
+                          const { data: { user } } = await supabase.auth.getUser();
+
+                          if (!user) {
+                            setFetchError("Not authenticated");
+                            return;
+                          }
+
+                          const { data: bookingsData, error } = await supabase
+                            .from("Booking")
+                            .select("*, Invoice(*)")
+                            .order("created_at", { ascending: false });
+
+                          if (error) {
+                            setFetchError(`Error: ${error.message}`);
+                            alert(`Error: ${error.message}\nCode: ${error.code}`);
+                          } else if (bookingsData) {
+                            setBookings(bookingsData.map((b: any) => ({ ...b, invoices: b.Invoice || [] })));
+                            setFetchError(null);
+                          }
+                        } catch (err: any) {
+                          setFetchError(`Error: ${err.message}`);
+                        } finally {
+                          setIsRefreshing(false);
+                        }
+                      }}
+                      className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center gap-2"
+                    >
+                      <Download size={18} /> Retry Fetch
+                    </button>
+                  </div>
+                ) : (
+                  <div className="flex flex-col items-center gap-4 opacity-10">
+                     <Package size={64} strokeWidth={1} />
+                     <p className="font-bold uppercase tracking-widest text-[10px]">No orders in queue</p>
+                  </div>
+                )}
              </div>
           )}
         </div>
