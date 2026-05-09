@@ -54,6 +54,7 @@ export default function BookingCMS() {
   // Auto-refresh on mount to get latest data from Supabase
   useEffect(() => {
     const refreshData = async () => {
+      console.log("🔄 Admin: Auto-refreshing bookings from Supabase...");
       setIsRefreshing(true);
       try {
         const { supabase } = await import("@/lib/supabase");
@@ -61,6 +62,14 @@ export default function BookingCMS() {
           .from("Booking")
           .select("*, Invoice(*)")
           .order("created_at", { ascending: false });
+
+        if (error) {
+          console.error("❌ Admin: Error fetching bookings:", error);
+          console.error("Error details:", JSON.stringify(error, null, 2));
+        } else {
+          console.log(`✅ Admin: Fetched ${bookingsData?.length || 0} bookings from Supabase`);
+          console.log("Bookings data:", bookingsData);
+        }
 
         if (!error && bookingsData) {
           const formattedBookings = bookingsData.map((b: any) => ({
@@ -72,9 +81,10 @@ export default function BookingCMS() {
           newData.bookings = formattedBookings;
           updateData(newData);
           setBookings(formattedBookings);
+          console.log("✅ Admin: Updated state with bookings");
         }
       } catch (err) {
-        console.error("Error refreshing bookings:", err);
+        console.error("❌ Admin: Error refreshing bookings:", err);
       } finally {
         setIsRefreshing(false);
       }

@@ -70,6 +70,16 @@ export default function PesanSekarang() {
 
     const saveAndRedirect = async () => {
       try {
+        console.log("🚀 Starting booking submission...");
+        console.log("📝 Form data:", {
+          name: formData.name,
+          email: formData.email,
+          phone: formData.phone,
+          service: formData.service,
+          plan: formData.plan,
+          price: getPrice()
+        });
+
         // 1. Save to Supabase and get the inserted data back
         const { data: insertedData, error } = await supabase.from("Booking").insert([{
           customer_name: formData.name,
@@ -93,7 +103,11 @@ export default function PesanSekarang() {
         }]).select();
 
         if (error) {
-          console.error("Booking insert error:", error);
+          console.error("❌ Booking insert error:", error);
+          console.error("Error details:", JSON.stringify(error, null, 2));
+          alert(`Error saving booking: ${error.message}\n\nCheck browser console for details.`);
+        } else {
+          console.log("✅ Booking saved to Supabase:", insertedData);
         }
 
         // 2. Save to DataContext using the actual ID from Supabase (if available)
@@ -121,13 +135,17 @@ export default function PesanSekarang() {
           invoices: []
         };
 
+        console.log("💾 Saving to localStorage...");
         const newData = { ...data };
         newData.bookings = [newBooking, ...(data.bookings || [])];
         updateData(newData);
+        console.log("✅ Saved to localStorage");
 
         await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
+        console.log("✅ Activity logged");
       } catch (err) {
-        console.error("Submission error (non-blocking):", err);
+        console.error("❌ Submission error (non-blocking):", err);
+        alert(`Unexpected error: ${err}\n\nData will still be saved to localStorage.`);
       } finally {
         // Always redirect to WhatsApp even if DB logging fails
         setIsSubmitting(false);
