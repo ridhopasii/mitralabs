@@ -39,17 +39,13 @@ import { logActivity } from "@/lib/supabase";
 
 export default function BookingCMS() {
   const { data, updateData } = useData();
-  const [bookings, setBookings] = useState<Booking[]>(data.bookings || []);
+  const [bookings, setBookings] = useState<Booking[]>([]);
   const [search, setSearch] = useState("");
   const [isSaving, setIsSaving] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
   const [editingBooking, setEditingBooking] = useState<Booking | null>(null);
   const [activeTab, setActiveTab] = useState("logistics");
   const [isRefreshing, setIsRefreshing] = useState(false);
-
-  useEffect(() => {
-    setBookings(data.bookings || []);
-  }, [data.bookings]);
 
   // Auto-refresh on mount to get latest data from Supabase
   useEffect(() => {
@@ -77,9 +73,6 @@ export default function BookingCMS() {
             invoices: b.Invoice || []
           }));
 
-          const newData = { ...data };
-          newData.bookings = formattedBookings;
-          updateData(newData);
           setBookings(formattedBookings);
           console.log("✅ Admin: Updated state with bookings");
         }
@@ -206,9 +199,6 @@ export default function BookingCMS() {
                     invoices: b.Invoice || []
                   }));
 
-                  const newData = { ...data };
-                  newData.bookings = formattedBookings;
-                  updateData(newData);
                   setBookings(formattedBookings);
                   setShowSuccess(true);
                   setTimeout(() => setShowSuccess(false), 2000);
