@@ -88,7 +88,7 @@ export default function BookingCMS() {
 
         const { data: bookingsData, error } = await supabase
           .from("Booking")
-          .select("*, Invoice(*)")
+          .select("*")
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -108,7 +108,7 @@ export default function BookingCMS() {
         if (!error && bookingsData) {
           const formattedBookings = bookingsData.map((b: any) => ({
             ...b,
-            invoices: b.Invoice || []
+            invoices: []
           }));
 
           setBookings(formattedBookings);
@@ -231,13 +231,13 @@ export default function BookingCMS() {
                 const { supabase } = await import("@/lib/supabase");
                 const { data: bookingsData, error } = await supabase
                   .from("Booking")
-                  .select("*, Invoice(*)")
+                  .select("*")
                   .order("created_at", { ascending: false });
 
                 if (!error && bookingsData) {
                   const formattedBookings = bookingsData.map((b: any) => ({
                     ...b,
-                    invoices: b.Invoice || []
+                    invoices: []
                   }));
 
                   setBookings(formattedBookings);
@@ -406,14 +406,14 @@ export default function BookingCMS() {
 
                           const { data: bookingsData, error } = await supabase
                             .from("Booking")
-                            .select("*, Invoice(*)")
+                            .select("*")
                             .order("created_at", { ascending: false });
 
                           if (error) {
                             setFetchError(`Error: ${error.message}`);
                             alert(`Error: ${error.message}\nCode: ${error.code}`);
                           } else if (bookingsData) {
-                            setBookings(bookingsData.map((b: any) => ({ ...b, invoices: b.Invoice || [] })));
+                            setBookings(bookingsData.map((b: any) => ({ ...b, invoices: [] })));
                             setFetchError(null);
                           }
                         } catch (err: any) {
