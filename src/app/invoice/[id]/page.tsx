@@ -243,10 +243,13 @@ export default function PublicInvoicePage() {
                    <div className="space-y-3">
                       <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Bank Settlement Protocol</h4>
                       <div className="space-y-1">
-                        <p className="font-bold text-slate-900 text-xl tracking-tight">Bank Central Asia (BCA)</p>
-                        <p className="text-primary font-bold text-2xl tracking-tighter">8000-7625-12</p>
+                        <p className="font-bold text-slate-900 text-xl tracking-tight">{invoiceSettings.bankName}</p>
+                        <p className="text-primary font-bold text-2xl tracking-tighter">{invoiceSettings.bankAccountNumber}</p>
                       </div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Account Name: Ridho Robbi Pasi</p>
+                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Account Name: {invoiceSettings.bankAccountName}</p>
+                      {invoiceSettings.bankBranch && (
+                        <p className="text-xs text-slate-400 font-medium">Branch: {invoiceSettings.bankBranch}</p>
+                      )}
                    </div>
                 </div>
 
@@ -256,25 +259,49 @@ export default function PublicInvoicePage() {
                       <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Strategic Subtotal</span>
                       <span className="font-bold text-slate-900">Rp {invoice.amount.toLocaleString()}</span>
                    </div>
-                   <div className="flex justify-between items-center px-4">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Value Added Tax (0%)</span>
-                      <span className="font-bold text-slate-900">Rp 0</span>
-                   </div>
+                   {invoiceSettings.taxRate > 0 && (
+                     <div className="flex justify-between items-center px-4">
+                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{invoiceSettings.taxLabel || `Tax (${invoiceSettings.taxRate}%)`}</span>
+                        <span className="font-bold text-slate-900">Rp {Math.round(invoice.amount * (invoiceSettings.taxRate / 100)).toLocaleString()}</span>
+                     </div>
+                   )}
                    <div className="pt-8 px-8 pb-8 bg-slate-900 text-white rounded-[2rem] flex justify-between items-center shadow-2xl shadow-slate-900/10">
                       <div className="space-y-1">
                         <span className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-50">Total Amount Due</span>
-                        <p className="text-3xl font-bold tracking-tighter">Rp {invoice.amount.toLocaleString()}</p>
+                        <p className="text-3xl font-bold tracking-tighter">
+                          Rp {(invoice.amount + (invoiceSettings.taxRate > 0 ? Math.round(invoice.amount * (invoiceSettings.taxRate / 100)) : 0)).toLocaleString()}
+                        </p>
                       </div>
                       <ShieldCheck size={40} className="opacity-20" strokeWidth={1} />
                    </div>
                 </div>
               </div>
 
+              {/* Payment Instructions Section */}
+              {invoiceSettings.paymentInstructions && (
+                <div className="mt-16 p-10 bg-blue-50 border border-blue-100 rounded-[2.5rem]">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-4">Payment Instructions</h4>
+                  <p className="text-sm text-slate-700 font-medium leading-relaxed whitespace-pre-line">
+                    {invoiceSettings.paymentInstructions}
+                  </p>
+                </div>
+              )}
+
+              {/* Terms & Conditions Section */}
+              {invoiceSettings.termsAndConditions && (
+                <div className="mt-12 p-10 bg-slate-50 border border-slate-100 rounded-[2.5rem]">
+                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Terms & Conditions</h4>
+                  <div className="text-xs text-slate-600 font-medium leading-relaxed whitespace-pre-line">
+                    {invoiceSettings.termsAndConditions}
+                  </div>
+                </div>
+              )}
+
               {/* Secure Verification Footer */}
               <div className="mt-24 pt-12 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-8">
                 <div className="flex items-center gap-3 text-slate-300">
                   <ShieldCheck size={20} strokeWidth={1.5} />
-                  <p className="text-[9px] font-bold uppercase tracking-[0.4em]">Verified by Mitralabs Cryptographic Protocol</p>
+                  <p className="text-[9px] font-bold uppercase tracking-[0.4em]">{invoiceSettings.footerNote}</p>
                 </div>
                 <div className="flex gap-8 text-slate-400 hover:text-slate-900 transition-colors">
                    <Globe size={18} strokeWidth={1.5} />
