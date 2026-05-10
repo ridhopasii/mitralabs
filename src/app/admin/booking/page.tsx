@@ -86,39 +86,60 @@ export default function BookingCMS() {
           return;
         }
 
+        // Try to fetch with Invoice relation first
         const { data: bookingsData, error } = await supabase
           .from("Booking")
-          .select("*")
+          .select(`
+            *,
+            Invoice (*)
+          `)
           .order("created_at", { ascending: false });
 
         if (error) {
           console.error("❌ Admin: Error fetching bookings:", error);
-          console.error("Error details:", JSON.stringify(error, null, 2));
-          setFetchError(`Database error: ${error.message}`);
-          alert(`❌ Error fetching bookings:\n\n${error.message}\n\nCode: ${error.code}\n\nCheck console for details.`);
+
+          // If Invoice permission error, fallback to bookings only
+          if (error.code === "42501" && error.message.includes("Invoice")) {
+            console.warn("⚠️ Invoice permission denied, fetching bookings only...");
+            const { data: bookingsOnly, error: bookingsError } = await supabase
+              .from("Booking")
+              .select("*")
+              .order("created_at", { ascending: false });
+
+            if (bookingsError) {
+              setFetchError(`Database error: ${bookingsError.message}`);
+            } else if (bookingsOnly) {
+              const formattedBookings = bookingsOnly.map((b: any) => ({
+                ...b,
+                invoices: []
+              }));
+              setBookings(formattedBookings);
+              setFetchError(null);
+              console.log(`✅ Admin: Fetched ${formattedBookings.length} bookings (without invoices)`);
+            }
+          } else {
+            setFetchError(`Database error: ${error.message}`);
+          }
         } else {
-          console.log(`✅ Admin: Fetched ${bookingsData?.length || 0} bookings from Supabase`);
-          console.log("Bookings data:", bookingsData);
+          console.log(`✅ Admin: Fetched ${bookingsData?.length || 0} bookings with invoices`);
 
           if (bookingsData && bookingsData.length === 0) {
             setFetchError("No bookings found in database. Try submitting a test booking.");
           }
-        }
 
-        if (!error && bookingsData) {
-          const formattedBookings = bookingsData.map((b: any) => ({
-            ...b,
-            invoices: []
-          }));
+          if (bookingsData) {
+            const formattedBookings = bookingsData.map((b: any) => ({
+              ...b,
+              invoices: b.Invoice || []
+            }));
 
-          setBookings(formattedBookings);
-          console.log("✅ Admin: Updated state with bookings");
-          setFetchError(null);
+            setBookings(formattedBookings);
+            setFetchError(null);
+          }
         }
       } catch (err: any) {
         console.error("❌ Admin: Error refreshing bookings:", err);
         setFetchError(`Unexpected error: ${err.message}`);
-        alert(`❌ Unexpected error:\n\n${err.message}\n\nCheck console for details.`);
       } finally {
         setIsRefreshing(false);
       }
@@ -227,17 +248,35 @@ export default function BookingCMS() {
           <button
             onClick={async () => {
               setIsRefreshing(true);
+              setFetchError(null);
               try {
                 const { supabase } = await import("@/lib/supabase");
+
+                // Try with Invoice relation first
                 const { data: bookingsData, error } = await supabase
                   .from("Booking")
-                  .select("*")
+                  .select(`
+                    *,
+                    Invoice (*)
+                  `)
                   .order("created_at", { ascending: false });
 
-                if (!error && bookingsData) {
+                if (error && error.code === "42501" && error.message.includes("Invoice")) {
+                  // Fallback to bookings only
+                  const { data: bookingsOnly, error: bookingsError } = await supabase
+                    .from("Booking")
+                    .select("*")
+                    .order("created_at", { ascending: false });
+
+                  if (!bookingsError && bookingsOnly) {
+                    setBookings(bookingsOnly.map((b: any) => ({ ...b, invoices: [] })));
+                    setShowSuccess(true);
+                    setTimeout(() => setShowSuccess(false), 2000);
+                  }
+                } else if (!error && bookingsData) {
                   const formattedBookings = bookingsData.map((b: any) => ({
                     ...b,
-                    invoices: []
+                    invoices: b.Invoice || []
                   }));
 
                   setBookings(formattedBookings);
@@ -404,10 +443,40 @@ export default function BookingCMS() {
                             return;
                           }
 
+                          // Try with Invoice relation first
                           const { data: bookingsData, error } = await supabase
                             .from("Booking")
-                            .select("*")
+                            .select(`
+                              *,
+                              Invoice (*)
+                            `)
                             .order("created_at", { ascending: false });
+
+                          if (error && error.code === "42501" && error.message.includes("Invoice")) {
+                            // Fallback to bookings only
+                            const { data: bookingsOnly, error: bookingsError } = await supabase
+                              .from("Booking")
+                              .select("*")
+                              .order("created_at", { ascending: false });
+
+                            if (bookingsError) {
+                              setFetchError(`Error: ${bookingsError.message}`);
+                            } else if (bookingsOnly) {
+                              setBookings(bookingsOnly.map((b: any) => ({ ...b, invoices: [] })));
+                              setFetchError(null);
+                            }
+                          } else if (error) {
+                            setFetchError(`Error: ${error.message}`);
+                          } else if (bookingsData) {
+                            setBookings(bookingsData.map((b: any) => ({ ...b, invoices: b.Invoice || [] })));
+                            setFetchError(null);
+                          }
+                        } catch (err: any) {
+                          setFetchError(`Error: ${err.message}`);
+                        } finally {
+                          setIsRefreshing(false);
+                        }
+                      }}
 
                           if (error) {
                             setFetchError(`Error: ${error.message}`);
