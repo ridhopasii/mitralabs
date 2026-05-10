@@ -49,7 +49,7 @@ export default function PublicInvoicePage() {
   const searchParams = useSearchParams();
   const isAutoDownload = searchParams.get("download") === "true";
   const isSilent = searchParams.get("silent_download") === "true";
-  
+
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
@@ -102,13 +102,12 @@ export default function PublicInvoicePage() {
 
       pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Invoice-${id}.pdf`);
-      
+
       return true;
     } catch (error) {
       console.error("PDF Generation Error:", error);
-      // Fallback to print if JS generation fails
-      window.print();
-      return true; 
+      // Return false instead of fallback to print
+      return false;
     }
   };
 
@@ -178,21 +177,20 @@ export default function PublicInvoicePage() {
       const timer = setTimeout(async () => {
         // Set a safety timeout for the entire process
         const safetyTimeout = setTimeout(() => {
-          console.warn("PDF generation taking too long, falling back...");
+          console.warn("PDF generation taking too long...");
           if (isSilent) {
             window.parent.postMessage({ type: 'PDF_DOWNLOAD_ERROR', invoiceNumber: id }, '*');
-          } else {
-            window.print();
           }
+          // Don't fallback to print dialog - just show error
         }, 15000);
 
         const success = await handleDownloadPDF();
         clearTimeout(safetyTimeout);
-        
+
         if (isSilent) {
-           window.parent.postMessage({ 
-             type: success ? 'PDF_DOWNLOAD_COMPLETE' : 'PDF_DOWNLOAD_ERROR', 
-             invoiceNumber: id 
+           window.parent.postMessage({
+             type: success ? 'PDF_DOWNLOAD_COMPLETE' : 'PDF_DOWNLOAD_ERROR',
+             invoiceNumber: id
            }, '*');
         } else if (success && isAuto) {
            setTimeout(() => window.close(), 1500);
@@ -214,7 +212,7 @@ export default function PublicInvoicePage() {
 
   // Special overlay when downloading
   const DownloadOverlay = () => (
-    <motion.div 
+    <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center no-print"
