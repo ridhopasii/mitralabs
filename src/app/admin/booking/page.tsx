@@ -48,6 +48,8 @@ export default function BookingCMS() {
   const [isRefreshing, setIsRefreshing] = useState(false);
   const [fetchError, setFetchError] = useState<string | null>(null);
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+  const [selectedBookings, setSelectedBookings] = useState<Set<number>>(new Set());
+  const [selectAll, setSelectAll] = useState(false);
 
   // Check authentication status
   useEffect(() => {
@@ -148,27 +150,112 @@ export default function BookingCMS() {
     refreshData();
   }, []); // Run once on mount
 
-  const handleSaveBooking = () => {
+  const handleSaveBooking = async () => {
     if (!editingBooking) return;
     setIsSaving(true);
 
-    const isNew = !bookings.some(b => b.id === editingBooking.id);
-    const newBookings = isNew
-      ? [{ ...editingBooking, id: Date.now(), created_at: new Date().toISOString() }, ...bookings]
-      : bookings.map(b => b.id === editingBooking.id ? editingBooking : b);
+    try {
+      const { supabase } = await import("@/lib/supabase");
 
-    const newData = { ...data };
-    newData.bookings = newBookings;
+      const isNew = !bookings.some(b => b.id === editingBooking.id);
 
-    setTimeout(() => {
-      updateData(newData);
-      setBookings(newBookings);
-      setIsSaving(false);
+      if (isNew) {
+        // Create new booking
+        const now = new Date().toISOString();
+        const { data: insertedData, error } = await supabase.from("Booking").insert([{
+          ...editingBooking,
+          created_at: now,
+          updated_at: now
+        }]).select();
+
+        if (!error && insertedData) {
+          setBookings([insertedData[0], ...bookings]);
+        }
+      } else {
+        // Update existing booking
+        const { error } = await supabase
+          .from("Booking")
+          .update({
+            ...editingBooking,
+            updated_at: new Date().toISOString()
+          })
+          .eq("id", editingBooking.id);
+
+        if (!error) {
+          setBookings(bookings.map(b => b.id === editingBooking.id ? editingBooking : b));
+        }
+      }
+
       setShowSuccess(true);
       setEditingBooking(null);
       setTimeout(() => setShowSuccess(false), 3000);
-      logActivity(isNew ? "Create Booking" : "Update Booking", `Customer: ${editingBooking.customer_name}`);
-    }, 800);
+      await logActivity(isNew ? "Create Booking" : "Update Booking", `Customer: ${editingBooking.customer_name}`);
+    } catch (err) {
+      console.error("Error saving booking:", err);
+    } finally {
+      setIsSaving(false);
+    }
+  };
+
+  const handleDeleteBooking = async (bookingId: number) => {
+    if (!confirm("Are you sure you want to delete this booking?")) return;
+
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const { error } = await supabase.from("Booking").delete().eq("id", bookingId);
+
+      if (!error) {
+        setBookings(bookings.filter(b => b.id !== bookingId));
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+        await logActivity("Delete Booking", `Booking ID: ${bookingId}`);
+      }
+    } catch (err) {
+      console.error("Error deleting booking:", err);
+    }
+  };
+
+  const handleSelectAll = () => {
+    if (selectAll) {
+      setSelectedBookings(new Set());
+    } else {
+      setSelectedBookings(new Set(filteredBookings.map(b => b.id)));
+    }
+    setSelectAll(!selectAll);
+  };
+
+  const handleSelectBooking = (bookingId: number) => {
+    const newSelected = new Set(selectedBookings);
+    if (newSelected.has(bookingId)) {
+      newSelected.delete(bookingId);
+    } else {
+      newSelected.add(bookingId);
+    }
+    setSelectedBookings(newSelected);
+    setSelectAll(newSelected.size === filteredBookings.length);
+  };
+
+  const handleBulkDelete = async () => {
+    if (selectedBookings.size === 0) return;
+    if (!confirm(`Delete ${selectedBookings.size} selected bookings?`)) return;
+
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const ids = Array.from(selectedBookings);
+
+      const { error } = await supabase.from("Booking").delete().in("id", ids);
+
+      if (!error) {
+        setBookings(bookings.filter(b => !selectedBookings.has(b.id)));
+        setSelectedBookings(new Set());
+        setSelectAll(false);
+        setShowSuccess(true);
+        setTimeout(() => setShowSuccess(false), 2000);
+        await logActivity("Bulk Delete", `Deleted ${ids.length} bookings`);
+      }
+    } catch (err) {
+      console.error("Error bulk deleting:", err);
+    }
   };
 
   const generateInvoice = (booking: Booking) => {
@@ -296,6 +383,15 @@ export default function BookingCMS() {
             {isRefreshing ? <Loader2 size={18} className="animate-spin" /> : <Download size={18} />}
             {isRefreshing ? "Syncing..." : "Refresh"}
           </button>
+          {selectedBookings.size > 0 && (
+            <button
+              onClick={handleBulkDelete}
+              className="h-[52px] px-6 bg-rose-600 text-white rounded-2xl font-semibold text-[13px] flex items-center gap-2 hover:bg-rose-700 transition-all shadow-lg shadow-rose-600/10 active:scale-[0.98]"
+              title={`Delete ${selectedBookings.size} selected bookings`}
+            >
+              <Trash2 size={18} /> Delete ({selectedBookings.size})
+            </button>
+          )}
           <button
             onClick={() => { setEditingBooking({
               id: 0,
@@ -345,6 +441,14 @@ export default function BookingCMS() {
           <table className="w-full text-left">
             <thead>
               <tr className="border-b border-slate-50">
+                <th className="px-6 py-6">
+                  <input
+                    type="checkbox"
+                    checked={selectAll}
+                    onChange={handleSelectAll}
+                    className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                  />
+                </th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Order ID</th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Client</th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Project</th>
@@ -356,6 +460,14 @@ export default function BookingCMS() {
             <tbody className="divide-y divide-slate-50">
               {filteredBookings.map((booking) => (
                 <tr key={booking.id} className="group hover:bg-slate-50/50 transition-all duration-300">
+                  <td className="px-6 py-8">
+                    <input
+                      type="checkbox"
+                      checked={selectedBookings.has(booking.id)}
+                      onChange={() => handleSelectBooking(booking.id)}
+                      className="w-4 h-4 rounded border-slate-300 text-slate-900 focus:ring-slate-900"
+                    />
+                  </td>
                   <td className="px-10 py-8">
                     <span className="text-[11px] font-mono font-bold text-slate-300 group-hover:text-slate-900 transition-colors">#{booking.id.toString().slice(-6)}</span>
                   </td>
@@ -401,13 +513,50 @@ export default function BookingCMS() {
                   </td>
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-2">
+                       {/* View Invoice Button */}
+                       {booking.invoices && booking.invoices.length > 0 && (
+                         <Link
+                           href={`/invoice/${booking.invoices[0].invoice_number}`}
+                           target="_blank"
+                           className="p-3 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                           title="View Invoice"
+                         >
+                           <FileText size={16} />
+                         </Link>
+                       )}
+
+                       {/* Download Invoice Button */}
+                       {booking.invoices && booking.invoices.length > 0 && (
+                         <a
+                           href={`/invoice/${booking.invoices[0].invoice_number}`}
+                           target="_blank"
+                           onClick={(e) => {
+                             e.preventDefault();
+                             window.open(`/invoice/${booking.invoices[0].invoice_number}`, '_blank');
+                             setTimeout(() => window.print(), 500);
+                           }}
+                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                           title="Download Invoice PDF"
+                         >
+                           <Download size={16} />
+                         </a>
+                       )}
+
+                       {/* Edit Button */}
                        <button
                          onClick={() => { setEditingBooking(booking); setActiveTab("logistics"); }}
                          className="p-3 text-slate-400 hover:text-slate-900 hover:bg-white rounded-xl transition-all"
+                         title="Edit Booking"
                        >
                          <Edit3 size={16} />
                        </button>
-                       <button className="p-3 text-slate-300 hover:text-rose-500 rounded-xl transition-all">
+
+                       {/* Delete Button */}
+                       <button
+                         onClick={() => handleDeleteBooking(booking.id)}
+                         className="p-3 text-slate-300 hover:text-rose-500 hover:bg-rose-50 rounded-xl transition-all"
+                         title="Delete Booking"
+                       >
                          <Trash2 size={16} />
                        </button>
                     </div>
