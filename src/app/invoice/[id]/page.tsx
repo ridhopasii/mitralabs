@@ -64,15 +64,35 @@ export default function PublicInvoicePage() {
   const invoiceSettings = data.invoiceSettings || {
     companyName: "MITRALABS.ID",
     companyTagline: "Precision Web Engineering",
-    companyAddress: "Medan, Sumatera Utara, Indonesia",
+    companyAddress: "Jl. Contoh No. 123, Medan, Sumatera Utara, Indonesia",
+    companyCity: "Medan",
+    companyProvince: "Sumatera Utara",
+    companyPostalCode: "20111",
     companyPhone: "+62 823-8111-8520",
     companyEmail: "contact@mitralabs.id",
+    companyWebsite: "www.mitralabs.id",
+    companyNPWP: "00.000.000.0-000.000",
     bankName: "Bank Central Asia (BCA)",
     bankAccountNumber: "8000-7625-12",
     bankAccountName: "Ridho Robbi Pasi",
+    bankBranch: "KCP Medan Petisah",
     taxRate: 0,
-    footerNote: "Verified by Mitralabs Cryptographic Protocol"
+    taxLabel: "PPN (11%)",
+    footerNote: "Verified by Mitralabs Cryptographic Protocol",
+    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
   };
+
+  // Debug: Log invoice settings to console
+  useEffect(() => {
+    console.log("📄 Invoice Settings Loaded:", {
+      hasCustomSettings: !!data.invoiceSettings,
+      bankName: invoiceSettings.bankName,
+      bankAccount: invoiceSettings.bankAccountNumber,
+      companyName: invoiceSettings.companyName,
+      taxRate: invoiceSettings.taxRate
+    });
+  }, [data.invoiceSettings, invoiceSettings]);
 
   if (isLoading) {
     return (
