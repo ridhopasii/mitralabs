@@ -37,23 +37,35 @@ export async function proxy(request: NextRequest) {
   // Protect Admin Routes
   if (path.startsWith("/admin")) {
     if (!user) {
-      return NextResponse.redirect(new URL("/login", request.url));
+      console.log("🚩 No user found, redirecting to /login");
+      const loginUrl = new URL("/login", request.url);
+      loginUrl.searchParams.set("redirectedFrom", path);
+      return NextResponse.redirect(loginUrl);
     }
 
-    // Strict RBAC Check
-    // Special bypass for the first admin (ridhorobbipasi@gmail.com)
-    if (user.email === "ridhorobbipasi@gmail.com") {
+    // Temporary: Allow primary admin directly via email string check
+    // This is safer for initial setup when database sync might be delayed
+    const primaryAdmin = "ridhorobbipasi@gmail.com";
+    
+    if (user.email?.toLowerCase() === primaryAdmin.toLowerCase()) {
       return response;
     }
 
-    const { data: userData } = await supabase
-      .from("User")
-      .select("role")
-      .eq("email", user.email)
-      .single();
+    // Database check for other users
+    try {
+      const { data: userData, error } = await supabase
+        .from("User")
+        .select("role")
+        .eq("email", user.email)
+        .single();
 
-    if (!userData || (userData.role !== "admin" && userData.role !== "editor")) {
-      console.warn(`🚫 Unauthorized admin access attempt by ${user.email}`);
+      if (error || !userData || (userData.role !== "admin" && userData.role !== "editor")) {
+        console.warn(`🚫 Unauthorized admin access attempt by ${user.email}`);
+        return NextResponse.redirect(new URL("/", request.url));
+      }
+    } catch (e) {
+      console.error("🔒 RBAC Database Error:", e);
+      // Fallback to home if database is unreachable
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
