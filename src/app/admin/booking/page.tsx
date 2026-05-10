@@ -52,6 +52,12 @@ export default function BookingCMS() {
   const [selectedBookings, setSelectedBookings] = useState<Set<number>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
 
+  // Pagination State
+  const [page, setPage] = useState(1);
+  const [pageSize] = useState(10);
+  const [totalPages, setTotalPages] = useState(1);
+  const [totalCount, setTotalCount] = useState(0);
+
   // Check authentication status
   useEffect(() => {
     const checkAuth = async () => {
@@ -90,12 +96,13 @@ export default function BookingCMS() {
         }
 
         // Try to fetch with Invoice relation first
-        const { data: bookingsData, error } = await supabase
+        const { data: bookingsData, error, count } = await supabase
           .from("Booking")
           .select(`
             *,
             Invoice (*)
-          `)
+          `, { count: "exact" })
+          .range((page - 1) * pageSize, page * pageSize - 1)
           .order("created_at", { ascending: false });
 
         if (error) {
@@ -104,9 +111,10 @@ export default function BookingCMS() {
           // If Invoice permission error, fallback to bookings only
           if (error.code === "42501" && error.message.includes("Invoice")) {
             console.warn("⚠️ Invoice permission denied, fetching bookings only...");
-            const { data: bookingsOnly, error: bookingsError } = await supabase
+            const { data: bookingsOnly, error: bookingsError, count: countOnly } = await supabase
               .from("Booking")
-              .select("*")
+              .select("*", { count: "exact" })
+              .range((page - 1) * pageSize, page * pageSize - 1)
               .order("created_at", { ascending: false });
 
             if (bookingsError) {
@@ -117,6 +125,8 @@ export default function BookingCMS() {
                 invoices: []
               }));
               setBookings(formattedBookings);
+              setTotalCount(countOnly || 0);
+              setTotalPages(Math.ceil((countOnly || 0) / pageSize));
               setFetchError(null);
               console.log(`✅ Admin: Fetched ${formattedBookings.length} bookings (without invoices)`);
             }
@@ -137,6 +147,8 @@ export default function BookingCMS() {
             }));
 
             setBookings(formattedBookings);
+            setTotalCount(count || 0);
+            setTotalPages(Math.ceil((count || 0) / pageSize));
             setFetchError(null);
           }
         }
@@ -149,42 +161,23 @@ export default function BookingCMS() {
     };
 
     refreshData();
-  }, []); // Run once on mount
+  }, [page, pageSize]); // Run when pagination changes
 
   const handleSaveBooking = async () => {
     if (!editingBooking) return;
     setIsSaving(true);
 
     try {
-      const { supabase } = await import("@/lib/supabase");
+      // Use granular sync from context
+      const { syncBooking } = useData();
+      await syncBooking(editingBooking);
 
       const isNew = !bookings.some(b => b.id === editingBooking.id);
-
+      
       if (isNew) {
-        // Create new booking
-        const now = new Date().toISOString();
-        const { data: insertedData, error } = await supabase.from("Booking").insert([{
-          ...editingBooking,
-          created_at: now,
-          updated_at: now
-        }]).select();
-
-        if (!error && insertedData) {
-          setBookings([insertedData[0], ...bookings]);
-        }
+        setBookings([editingBooking, ...bookings]);
       } else {
-        // Update existing booking
-        const { error } = await supabase
-          .from("Booking")
-          .update({
-            ...editingBooking,
-            updated_at: new Date().toISOString()
-          })
-          .eq("id", editingBooking.id);
-
-        if (!error) {
-          setBookings(bookings.map(b => b.id === editingBooking.id ? editingBooking : b));
-        }
+        setBookings(bookings.map(b => b.id === editingBooking.id ? editingBooking : b));
       }
 
       setShowSuccess(true);
@@ -193,6 +186,7 @@ export default function BookingCMS() {
       await logActivity(isNew ? "Create Booking" : "Update Booking", `Customer: ${editingBooking.customer_name}`);
     } catch (err) {
       console.error("Error saving booking:", err);
+      alert("Failed to sync with database. Changes saved locally.");
     } finally {
       setIsSaving(false);
     }
@@ -570,6 +564,35 @@ export default function BookingCMS() {
               ))}
             </tbody>
           </table>
+
+          {/* Enhanced Pagination Controls */}
+          {totalPages > 0 && (
+            <div className="flex items-center justify-between p-6 border-t border-slate-100 bg-slate-50/50">
+              <div className="text-xs font-bold text-slate-500 uppercase tracking-widest">
+                Showing {((page - 1) * pageSize) + 1} - {Math.min(page * pageSize, totalCount)} of {totalCount} total bookings
+              </div>
+              <div className="flex items-center gap-2">
+                <button
+                  onClick={() => setPage(Math.max(1, page - 1))}
+                  disabled={page === 1 || isRefreshing}
+                  className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-xs font-bold text-slate-600 disabled:opacity-50 transition-all hover:bg-slate-50 uppercase tracking-widest"
+                >
+                  Prev
+                </button>
+                <div className="px-4 py-2 border border-slate-200 bg-white rounded-xl text-xs font-bold text-primary">
+                  {page} / {totalPages}
+                </div>
+                <button
+                  onClick={() => setPage(Math.min(totalPages, page + 1))}
+                  disabled={page === totalPages || isRefreshing}
+                  className="px-4 py-2 bg-slate-900 border border-slate-900 text-white rounded-xl text-xs font-bold disabled:opacity-50 transition-all hover:opacity-90 uppercase tracking-widest"
+                >
+                  Next
+                </button>
+              </div>
+            </div>
+          )}
+
           {filteredBookings.length === 0 && (
              <div className="py-40 text-center">
                 {fetchError ? (
@@ -598,31 +621,37 @@ export default function BookingCMS() {
                           }
 
                           // Try with Invoice relation first
-                          const { data: bookingsData, error } = await supabase
+                          const { data: bookingsData, error, count } = await supabase
                             .from("Booking")
                             .select(`
                               *,
                               Invoice (*)
-                            `)
+                            `, { count: "exact" })
+                            .range((page - 1) * pageSize, page * pageSize - 1)
                             .order("created_at", { ascending: false });
 
                           if (error && error.code === "42501" && error.message.includes("Invoice")) {
                             // Fallback to bookings only
-                            const { data: bookingsOnly, error: bookingsError } = await supabase
+                            const { data: bookingsOnly, error: bookingsError, count: countOnly } = await supabase
                               .from("Booking")
-                              .select("*")
+                              .select("*", { count: "exact" })
+                              .range((page - 1) * pageSize, page * pageSize - 1)
                               .order("created_at", { ascending: false });
 
                             if (bookingsError) {
                               setFetchError(`Error: ${bookingsError.message}`);
                             } else if (bookingsOnly) {
                               setBookings(bookingsOnly.map((b: any) => ({ ...b, invoices: [] })));
+                              setTotalCount(countOnly || 0);
+                              setTotalPages(Math.ceil((countOnly || 0) / pageSize));
                               setFetchError(null);
                             }
                           } else if (error) {
                             setFetchError(`Error: ${error.message}`);
                           } else if (bookingsData) {
                             setBookings(bookingsData.map((b: any) => ({ ...b, invoices: b.Invoice || [] })));
+                            setTotalCount(count || 0);
+                            setTotalPages(Math.ceil((count || 0) / pageSize));
                             setFetchError(null);
                           }
                         } catch (err: any) {

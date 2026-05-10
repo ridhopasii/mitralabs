@@ -29,11 +29,33 @@ import {
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity, supabase } from "@/lib/supabase";
+import { z } from "zod";
+
+const bookingSchema = z.object({
+  name: z.string().min(3, "Nama minimal 3 karakter"),
+  email: z.string().email("Format email tidak valid"),
+  phone: z.string().min(10, "Nomor telepon minimal 10 digit"),
+  organization: z.string().optional(),
+  position: z.string().optional(),
+  service: z.string(),
+  plan: z.string(),
+  desiredDomain: z.string().optional(),
+  businessIndustry: z.string().optional(),
+  referenceWeb: z.string().optional(),
+  targetAudience: z.string().optional(),
+  primaryCTA: z.string().optional(),
+  competitors: z.string().optional(),
+  integrations: z.string().optional(),
+  expectation: z.string().optional(),
+  customPrice: z.string().optional(),
+  brief: z.string().min(10, "Brief minimal 10 karakter untuk hasil terbaik")
+});
 
 export default function PesanSekarang() {
   const { data, updateData } = useData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
     email: "",
@@ -59,8 +81,21 @@ export default function PesanSekarang() {
     return formData.plan === "Premium" ? 7000000 : formData.plan === "Standard" ? 3500000 : 1500000;
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
+    setErrors({});
+
+    // 1. Validate with Zod
+    const result = bookingSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
     setIsSubmitting(true);
 
     // WhatsApp Redirect Logic
@@ -68,136 +103,72 @@ export default function PesanSekarang() {
     const waMessage = `Halo Mitralabs! Saya ingin melakukan pemesanan website.\n\n*Detail Klien:*\n- Nama: ${formData.name}\n- Instansi: ${formData.organization}\n- Jabatan: ${formData.position}\n\n*Detail Project:*\n- Layanan: ${formData.service}\n- Paket: ${formData.plan} (Rp ${getPrice().toLocaleString()})\n- Domain: ${formData.desiredDomain || '-'}\n- Industri: ${formData.businessIndustry || '-'}\n- Target Audiens: ${formData.targetAudience || '-'}\n- Utama CTA: ${formData.primaryCTA || '-'}\n- Kompetitor: ${formData.competitors || '-'}\n- Integrasi: ${formData.integrations || '-'}\n- Harapan: ${formData.expectation || '-'}\n- Brief: ${formData.brief}`;
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
-    const saveAndRedirect = async () => {
-      try {
-        console.log("🚀 Starting booking submission...");
-        console.log("📝 Form data:", {
-          name: formData.name,
-          email: formData.email,
-          phone: formData.phone,
-          service: formData.service,
-          plan: formData.plan,
-          price: getPrice()
-        });
+    try {
+      // 2. Save to Supabase
+      const now = new Date().toISOString();
+      const { data: insertedData, error } = await supabase.from("Booking").insert([{
+        customer_name: formData.name,
+        customer_email: formData.email,
+        customer_phone: formData.phone,
+        organization_name: formData.organization,
+        position: formData.position,
+        service_type: formData.service,
+        plan_name: formData.plan,
+        project_brief: formData.brief,
+        desired_domain: formData.desiredDomain,
+        business_industry: formData.businessIndustry,
+        reference_websites: formData.referenceWeb,
+        target_audience: formData.targetAudience,
+        primary_cta: formData.primaryCTA,
+        competitors_list: formData.competitors,
+        integrations_needed: formData.integrations,
+        biggest_expectation: formData.expectation,
+        status: "Pending",
+        total_price: getPrice(),
+        created_at: now,
+        updated_at: now
+      }]).select();
 
-        // 1. Save to Supabase and get the inserted data back
-        const now = new Date().toISOString();
-        const { data: insertedData, error } = await supabase.from("Booking").insert([{
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          organization_name: formData.organization,
-          position: formData.position,
-          service_type: formData.service,
-          plan_name: formData.plan,
-          project_brief: formData.brief,
-          desired_domain: formData.desiredDomain,
-          business_industry: formData.businessIndustry,
-          reference_websites: formData.referenceWeb,
-          target_audience: formData.targetAudience,
-          primary_cta: formData.primaryCTA,
-          competitors_list: formData.competitors,
-          integrations_needed: formData.integrations,
-          biggest_expectation: formData.expectation,
-          status: "Pending",
-          total_price: getPrice(),
+      if (error) throw error;
+
+      // 3. Auto-generate invoice
+      if (insertedData?.[0]) {
+        const bookingId = insertedData[0].id;
+        const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+        const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+        await supabase.from("Invoice").insert([{
+          booking_id: bookingId,
+          invoice_number: invoiceNumber,
+          amount: getPrice(),
+          status: "Unpaid",
+          due_date: dueDate,
+          items: [
+            {
+              desc: `${formData.service} - ${formData.plan} Package`,
+              price: getPrice(),
+              qty: 1
+            }
+          ],
+          client_name: formData.name,
+          client_email: formData.email,
           created_at: now,
           updated_at: now
-        }]).select();
-
-        if (error) {
-          console.error("❌ Booking insert error:", error);
-          console.error("Error details:", JSON.stringify(error, null, 2));
-          alert(`Error saving booking: ${error.message}\n\nCheck browser console for details.`);
-        } else {
-          console.log("✅ Booking saved to Supabase:", insertedData);
-
-          // Auto-generate invoice for this booking
-          if (insertedData && insertedData[0]) {
-            const bookingId = insertedData[0].id;
-            const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
-            const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-
-            console.log("📄 Auto-generating invoice:", invoiceNumber);
-
-            const { data: invoiceData, error: invoiceError } = await supabase.from("Invoice").insert([{
-              booking_id: bookingId,
-              invoice_number: invoiceNumber,
-              amount: getPrice(),
-              status: "Unpaid",
-              due_date: dueDate,
-              items: JSON.stringify([
-                {
-                  desc: `${formData.service} - ${formData.plan} Package`,
-                  price: getPrice(),
-                  qty: 1
-                }
-              ]),
-              client_name: formData.name,
-              client_email: formData.email,
-              created_at: now,
-              updated_at: now
-            }]).select();
-
-            if (invoiceError) {
-              console.error("⚠️ Invoice auto-generation failed:", invoiceError);
-              // Non-blocking - booking still succeeds even if invoice fails
-            } else {
-              console.log("✅ Invoice auto-generated:", invoiceData);
-            }
-          }
-        }
-
-        // 2. Save to DataContext using the actual ID from Supabase (if available)
-        const newBooking = {
-          id: insertedData?.[0]?.id || Date.now(),
-          customer_name: formData.name,
-          customer_email: formData.email,
-          customer_phone: formData.phone,
-          organization_name: formData.organization,
-          position: formData.position,
-          service_type: formData.service,
-          plan_name: formData.plan,
-          project_brief: formData.brief,
-          desired_domain: formData.desiredDomain,
-          business_industry: formData.businessIndustry,
-          reference_websites: formData.referenceWeb,
-          target_audience: formData.targetAudience,
-          primary_cta: formData.primaryCTA,
-          competitors_list: formData.competitors,
-          integrations_needed: formData.integrations,
-          biggest_expectation: formData.expectation,
-          status: "Pending" as const,
-          total_price: getPrice(),
-          created_at: insertedData?.[0]?.created_at || new Date().toISOString(),
-          invoices: []
-        };
-
-        console.log("💾 Saving to localStorage...");
-        const newData = { ...data };
-        newData.bookings = [newBooking, ...(data.bookings || [])];
-        updateData(newData);
-        console.log("✅ Saved to localStorage");
-
-        await logActivity("New Web Order", `Pemesanan dari ${formData.name} (${formData.organization})`);
-        console.log("✅ Activity logged");
-      } catch (err) {
-        console.error("❌ Submission error (non-blocking):", err);
-        alert(`Unexpected error: ${err}\n\nData will still be saved to localStorage.`);
-      } finally {
-        // Always redirect to WhatsApp even if DB logging fails
-        setIsSubmitting(false);
-        setShowSuccess(true);
-        window.scrollTo({ top: 0, behavior: 'smooth' });
-
-        // Automatic redirect after 2 seconds
-        setTimeout(() => {
-          window.open(waUrl, "_blank");
-        }, 2000);
+        }]);
       }
-    };
 
-    saveAndRedirect();
+      setShowSuccess(true);
+      setTimeout(() => {
+        window.open(waUrl, "_blank");
+        setIsSubmitting(false);
+      }, 2000);
+
+    } catch (err: any) {
+      console.error("🔥 Submission error:", err);
+      alert(`Gagal mengirim pesanan: ${err.message}`);
+      setIsSubmitting(false);
+
+    }
   };
 
   if (showSuccess) {
@@ -307,15 +278,17 @@ export default function PesanSekarang() {
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Full Name</label>
                       <div className="relative group">
                          <User className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                         <input required type="text" placeholder="" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                         <input required type="text" placeholder="" value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border ${errors.name ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative`} />
                       </div>
+                      {errors.name && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.name}</p>}
                    </div>
                    <div className="space-y-3">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Email Address</label>
                       <div className="relative group">
                          <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                         <input required type="email" placeholder="" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                         <input required type="email" placeholder="" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border ${errors.email ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative`} />
                       </div>
+                      {errors.email && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.email}</p>}
                    </div>
                 </div>
 
@@ -324,8 +297,9 @@ export default function PesanSekarang() {
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">WhatsApp Number</label>
                       <div className="relative group">
                          <Phone className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                         <input required type="tel" placeholder="" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className="w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative" />
+                         <input required type="tel" placeholder="" value={formData.phone} onChange={(e) => setFormData({...formData, phone: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border ${errors.phone ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative`} />
                       </div>
+                      {errors.phone && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.phone}</p>}
                    </div>
                    <div className="space-y-3">
                       <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Nama Instansi / Perusahaan</label>
@@ -459,8 +433,9 @@ export default function PesanSekarang() {
                   <label className="text-[10px] font-bold uppercase tracking-widest text-secondary ml-4">Project Brief & Details</label>
                   <div className="relative group">
                      <MessageSquare className="absolute left-6 top-8 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
-                     <textarea placeholder="" value={formData.brief} onChange={(e) => setFormData({...formData, brief: e.target.value})} className="w-full pl-16 pr-8 py-8 bg-background border border-outline/10 rounded-[2.5rem] outline-none focus:border-primary/30 font-medium text-lg leading-relaxed h-48 transition-all shadow-inner relative resize-none" />
+                     <textarea required placeholder="Contoh: Saya ingin website untuk toko furnitur dengan fitur katalog produk dan kalkulator ongkir..." value={formData.brief} onChange={(e) => setFormData({...formData, brief: e.target.value})} className={`w-full pl-16 pr-8 py-8 bg-background border ${errors.brief ? 'border-error/50' : 'border-outline/10'} rounded-[2.5rem] outline-none focus:border-primary/30 font-medium text-lg leading-relaxed h-48 transition-all shadow-inner relative resize-none`} />
                   </div>
+                  {errors.brief && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.brief}</p>}
                 </div>
               </div>
 

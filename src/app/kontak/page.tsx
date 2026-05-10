@@ -7,12 +7,20 @@ import { useData } from "@/context/DataContext";
 import { supabase } from "@/lib/supabase";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
 import { motion, AnimatePresence } from "framer-motion";
+import { z } from "zod";
+
+const contactSchema = z.object({
+  name: z.string().min(3, "Nama minimal 3 karakter"),
+  email: z.string().email("Format email tidak valid"),
+  message: z.string().min(10, "Pesan minimal 10 karakter")
+});
 
 export default function ContactPage() {
   const { data } = useData();
   const { contact, settings } = data;
-  
+
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
+  const [errors, setErrors] = useState<Record<string, string>>({});
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [isSuccess, setIsSuccess] = useState(false);
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
@@ -22,12 +30,24 @@ export default function ContactPage() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    
-    if (!hcaptchaToken) {
+    setErrors({});
+
+    // 1. Zod Validation
+    const result = contactSchema.safeParse(formData);
+    if (!result.success) {
+      const fieldErrors: Record<string, string> = {};
+      result.error.errors.forEach((err) => {
+        if (err.path[0]) fieldErrors[err.path[0] as string] = err.message;
+      });
+      setErrors(fieldErrors);
+      return;
+    }
+
+    if (!hcaptchaToken && process.env.NODE_ENV === 'production') {
       alert("Mohon selesaikan tantangan Captcha.");
       return;
     }
-    
+
     const now = Date.now();
     if (now - lastSubmitTime < 60000) {
       const remaining = Math.ceil((60000 - (now - lastSubmitTime)) / 1000);
@@ -40,9 +60,9 @@ export default function ContactPage() {
     try {
       const { error } = await supabase
         .from('SiteMessage')
-        .insert([{ 
-          name: formData.name, 
-          email: formData.email, 
+        .insert([{
+          name: formData.name,
+          email: formData.email,
           message: formData.message,
           created_at: new Date().toISOString()
         }]);
@@ -52,6 +72,7 @@ export default function ContactPage() {
       setIsSuccess(true);
       setLastSubmitTime(Date.now());
       setFormData({ name: "", email: "", message: "" });
+      setHcaptchaToken(null);
       setTimeout(() => setIsSuccess(false), 5000);
     } catch (error) {
       console.error("Error submitting form:", error);
@@ -86,11 +107,11 @@ export default function ContactPage() {
         {/* Main Content Grid */}
         <section className="section-container pb-40 px-6">
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-10 md:gap-16">
-            
+
             {/* Contact Sidebar (Bento) */}
             <div className="lg:col-span-5 space-y-10">
               {/* Direct Connect Card */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -132,7 +153,7 @@ export default function ContactPage() {
               </motion.div>
 
               {/* Location Card */}
-              <motion.div 
+              <motion.div
                 initial={{ opacity: 0, x: -20 }}
                 whileInView={{ opacity: 1, x: 0 }}
                 viewport={{ once: true }}
@@ -158,7 +179,7 @@ export default function ContactPage() {
             </div>
 
             {/* Form Section */}
-            <motion.div 
+            <motion.div
               initial={{ opacity: 0, x: 20 }}
               whileInView={{ opacity: 1, x: 0 }}
               viewport={{ once: true }}
@@ -166,7 +187,7 @@ export default function ContactPage() {
             >
               <AnimatePresence mode="wait">
                 {isSuccess ? (
-                  <motion.div 
+                  <motion.div
                     key="success"
                     initial={{ opacity: 0, scale: 0.95 }}
                     animate={{ opacity: 1, scale: 1 }}
@@ -180,7 +201,7 @@ export default function ContactPage() {
                     <p className="text-secondary font-medium text-xl max-w-sm">
                       Terima kasih sudah menghubungi kami. Tim kami akan segera merespon pesan Anda.
                     </p>
-                    <button 
+                    <button
                       onClick={() => setIsSuccess(false)}
                       className="text-primary font-bold uppercase tracking-[0.2em] text-[11px] hover:opacity-70 transition-all flex items-center gap-2"
                     >
@@ -189,42 +210,47 @@ export default function ContactPage() {
                   </motion.div>
                 ) : (
                   <form key="form" onSubmit={handleSubmit} className="space-y-12 relative z-10">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-10">
-                      <div className="space-y-4">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">Nama Lengkap</label>
+                    <div className="space-y-8">
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary ml-4">Nama Lengkap</label>
                         <input
-                          required
                           type="text"
+                          required
                           value={formData.name}
                           onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                          className="w-full px-8 py-5 rounded-[1.5rem] bg-background border border-outline/5 focus:border-primary/30 transition-all outline-none font-medium text-lg placeholder:text-secondary/30"
-                          placeholder="John Doe"
+                          className={`w-full bg-background border ${errors.name ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] px-8 py-6 outline-none focus:border-primary/30 font-bold transition-all shadow-inner`}
+                          placeholder="Siapa nama Anda?"
                         />
+                        {errors.name && <p className="text-[10px] text-error font-bold ml-6 mt-1 uppercase tracking-widest">{errors.name}</p>}
                       </div>
-                      <div className="space-y-4">
-                        <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">Alamat Email</label>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary ml-4">Alamat Email</label>
                         <input
-                          required
                           type="email"
+                          required
                           value={formData.email}
                           onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                          className="w-full px-8 py-5 rounded-[1.5rem] bg-background border border-outline/5 focus:border-primary/30 transition-all outline-none font-medium text-lg placeholder:text-secondary/30"
-                          placeholder="john@company.com"
+                          className={`w-full bg-background border ${errors.email ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] px-8 py-6 outline-none focus:border-primary/30 font-bold transition-all shadow-inner`}
+                          placeholder="email@perusahaan.com"
                         />
+                        {errors.email && <p className="text-[10px] text-error font-bold ml-6 mt-1 uppercase tracking-widest">{errors.email}</p>}
+                      </div>
+
+                      <div className="space-y-3">
+                        <label className="text-[10px] font-black uppercase tracking-[0.2em] text-secondary ml-4">Pesan Anda</label>
+                        <textarea
+                          required
+                          rows={6}
+                          value={formData.message}
+                          onChange={(e) => setFormData({ ...formData, message: e.target.value })}
+                          className={`w-full bg-background border ${errors.message ? 'border-error/50' : 'border-outline/10'} rounded-[2.5rem] px-8 py-6 outline-none focus:border-primary/30 font-bold transition-all shadow-inner resize-none`}
+                          placeholder="Ceritakan sedikit tentang rencana project Anda..."
+                        />
+                        {errors.message && <p className="text-[10px] text-error font-bold ml-6 mt-1 uppercase tracking-widest">{errors.message}</p>}
                       </div>
                     </div>
-                    <div className="space-y-4">
-                      <label className="text-[10px] font-bold uppercase tracking-[0.2em] text-secondary ml-2">Pesan Anda</label>
-                      <textarea
-                        required
-                        value={formData.message}
-                        onChange={(e) => setFormData({ ...formData, message: e.target.value })}
-                        className="w-full px-8 py-5 rounded-[1.5rem] bg-background border border-outline/5 focus:border-primary/30 transition-all outline-none resize-none font-medium text-lg placeholder:text-secondary/30"
-                        placeholder="Ceritakan tentang visi atau kebutuhan project Anda..."
-                        rows={6}
-                      ></textarea>
-                    </div>
-                    
+
                     <div className="flex flex-col md:flex-row items-center justify-between gap-10">
                       <div className="w-full md:w-auto">
                         <HCaptcha
@@ -232,7 +258,7 @@ export default function ContactPage() {
                           onVerify={(token) => setHcaptchaToken(token)}
                         />
                       </div>
-                      
+
                       <button
                         disabled={isSubmitting || !hcaptchaToken}
                         type="submit"
