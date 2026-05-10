@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { Lock, ShieldCheck, ArrowRight, Loader2 } from "lucide-react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
@@ -11,6 +11,14 @@ export default function LoginPage() {
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
   const router = useRouter();
+
+  useEffect(() => {
+    supabase.auth.getUser().then(({ data }) => {
+      if (data.user) {
+        router.replace("/admin");
+      }
+    });
+  }, [router]);
 
   const isConfigured = isSupabaseConfigured();
 

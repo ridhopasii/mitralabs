@@ -1,7 +1,7 @@
 import { createServerClient } from "@supabase/ssr"
 import { NextResponse, type NextRequest } from "next/server"
 
-export async function proxy(request: NextRequest) {
+export async function middleware(request: NextRequest) {
   let response = NextResponse.next({
     request: {
       headers: request.headers,
@@ -31,41 +31,41 @@ export async function proxy(request: NextRequest) {
 
   const { data: { user } } = await supabase.auth.getUser()
 
-  // RBAC & Route Protection
   const path = request.nextUrl.pathname;
 
   // Protect Admin Routes
   if (path.startsWith("/admin")) {
     if (!user) {
-      console.log("🚩 No user found, redirecting to /login");
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirectedFrom", path);
       return NextResponse.redirect(loginUrl);
     }
 
-    // Temporary: Allow primary admin directly via email string check
-    // This is safer for initial setup when database sync might be delayed
+    // RBAC Check
     const primaryAdmin = "ridhorobbipasi@gmail.com";
     
+    // 1. Bypass for Primary Admin
     if (user.email?.toLowerCase() === primaryAdmin.toLowerCase()) {
       return response;
     }
 
-    // Database check for other users
+    // 2. Check Database for Role
     try {
       const { data: userData, error } = await supabase
         .from("User")
         .select("role")
         .eq("email", user.email)
-        .single();
+        .maybeSingle();
 
       if (error || !userData || (userData.role !== "admin" && userData.role !== "editor")) {
         console.warn(`🚫 Unauthorized admin access attempt by ${user.email}`);
+        // Redirect to home if not authorized
         return NextResponse.redirect(new URL("/", request.url));
       }
     } catch (e) {
       console.error("🔒 RBAC Database Error:", e);
-      // Fallback to home if database is unreachable
+      // Fallback: If DB is down but user is authenticated, we might want to allow 
+      // or deny. For security, we deny (redirect to home).
       return NextResponse.redirect(new URL("/", request.url));
     }
   }
@@ -87,7 +87,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * Feel free to modify this pattern to include more paths.
+     * - api routes that shouldn't be proxied
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],
