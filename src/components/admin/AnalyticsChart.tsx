@@ -9,7 +9,7 @@ export default function AnalyticsChart() {
   // Calculate real leads data from bookings
   const calculateData = () => {
     const days = ['Sun', 'Mon', 'Tue', 'Wed', 'Thu', 'Fri', 'Sat'];
-    const last7Days = [];
+    const last7Days: { name: string; date: string; leads: number }[] = [];
     const now = new Date();
 
     for (let i = 6; i >= 0; i--) {
