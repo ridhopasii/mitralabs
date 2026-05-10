@@ -15,7 +15,7 @@ export default function FloatingWhatsApp() {
   const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik dengan promo bulan ini.")}`;
 
   return (
-    <div className="fixed bottom-8 right-8 z-[100] flex flex-col items-end gap-4">
+    <div className="fixed bottom-8 right-8 z-100 flex flex-col items-end gap-4">
       {/* Floating Button */}
       <a
         href={waUrl}
