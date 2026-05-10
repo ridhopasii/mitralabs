@@ -111,6 +111,41 @@ export default function PesanSekarang() {
           alert(`Error saving booking: ${error.message}\n\nCheck browser console for details.`);
         } else {
           console.log("✅ Booking saved to Supabase:", insertedData);
+
+          // Auto-generate invoice for this booking
+          if (insertedData && insertedData[0]) {
+            const bookingId = insertedData[0].id;
+            const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+            const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
+            console.log("📄 Auto-generating invoice:", invoiceNumber);
+
+            const { data: invoiceData, error: invoiceError } = await supabase.from("Invoice").insert([{
+              booking_id: bookingId,
+              invoice_number: invoiceNumber,
+              amount: getPrice(),
+              status: "Unpaid",
+              due_date: dueDate,
+              items: JSON.stringify([
+                {
+                  desc: `${formData.service} - ${formData.plan} Package`,
+                  price: getPrice(),
+                  qty: 1
+                }
+              ]),
+              client_name: formData.name,
+              client_email: formData.email,
+              created_at: now,
+              updated_at: now
+            }]).select();
+
+            if (invoiceError) {
+              console.error("⚠️ Invoice auto-generation failed:", invoiceError);
+              // Non-blocking - booking still succeeds even if invoice fails
+            } else {
+              console.log("✅ Invoice auto-generated:", invoiceData);
+            }
+          }
         }
 
         // 2. Save to DataContext using the actual ID from Supabase (if available)

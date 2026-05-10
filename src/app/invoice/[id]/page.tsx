@@ -1,5 +1,6 @@
 "use client";
 
+import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
 import { useParams } from "next/navigation";
 import {
@@ -23,10 +24,42 @@ import { motion } from "framer-motion";
 export default function PublicInvoicePage() {
   const { id } = useParams();
   const { data } = useData();
+  const [invoice, setInvoice] = useState<any>(null);
+  const [isLoading, setIsLoading] = useState(true);
 
-  const invoice = data.bookings
-    ?.flatMap(b => b.invoices || [])
-    .find(inv => inv.invoice_number === id || inv.id.toString() === id);
+  useEffect(() => {
+    const fetchInvoice = async () => {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+
+        // Fetch invoice by invoice_number
+        const { data: invoiceData, error } = await supabase
+          .from("Invoice")
+          .select("*")
+          .eq("invoice_number", id)
+          .single();
+
+        if (error) {
+          console.error("Error fetching invoice:", error);
+        } else if (invoiceData) {
+          // Parse items if it's a string
+          const parsedInvoice = {
+            ...invoiceData,
+            items: typeof invoiceData.items === 'string'
+              ? JSON.parse(invoiceData.items)
+              : invoiceData.items
+          };
+          setInvoice(parsedInvoice);
+        }
+      } catch (err) {
+        console.error("Error:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchInvoice();
+  }, [id]);
 
   const invoiceSettings = data.invoiceSettings || {
     companyName: "MITRALABS.ID",
@@ -40,6 +73,15 @@ export default function PublicInvoicePage() {
     taxRate: 0,
     footerNote: "Verified by Mitralabs Cryptographic Protocol"
   };
+
+  if (isLoading) {
+    return (
+      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
+        <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
+        <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">Loading Invoice...</p>
+      </div>
+    );
+  }
 
   if (!invoice) {
     return (
