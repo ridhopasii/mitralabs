@@ -1,8 +1,7 @@
 "use client";
 
-import React, { useRef } from 'react';
 import { Download } from 'lucide-react';
-import { useData, Invoice } from '@/context/DataContext';
+import { useData } from '@/context/DataContext';
 
 interface InvoiceItem {
   desc: string;
@@ -11,366 +10,615 @@ interface InvoiceItem {
   qty: number;
 }
 
+interface InvoiceData {
+  invoice_number: string;
+  client_name: string;
+  client_email: string;
+  client_company?: string;
+  client_address?: string;
+  created_at: string;
+  due_date: string;
+  project_period_start?: string;
+  project_period_end?: string;
+  items: InvoiceItem[] | string;
+  amount: number;
+}
+
 interface KwitansiPDFGeneratorProps {
   invoiceNumber: string;
-  invoiceData: Invoice;
+  invoiceData: InvoiceData;
   className?: string;
 }
 
 export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, className }: KwitansiPDFGeneratorProps) {
   const { data } = useData();
   const settings = data.invoiceSettings;
-  const kwitansiRef = useRef<HTMLDivElement>(null);
-
-  const items = typeof invoiceData.items === 'string'
-    ? JSON.parse(invoiceData.items)
-    : invoiceData.items;
-
-  const subtotal = items.reduce((sum: number, item: InvoiceItem) => sum + (item.price * item.qty), 0);
-  const tax = subtotal * (settings?.taxRate || 0) / 100;
-  const total = subtotal + tax;
-
-  // Format currency to Indonesian Rupiah
-  const formatCurrency = (amount: number) => {
-    return new Intl.NumberFormat('id-ID', {
-      style: 'currency',
-      currency: 'IDR',
-      minimumFractionDigits: 0,
-      maximumFractionDigits: 0,
-    }).format(amount);
-  };
-
-  // Format date to Indonesian format
-  const formatDate = (dateString: string) => {
-    return new Date(dateString).toLocaleDateString('id-ID', {
-      day: 'numeric',
-      month: 'long',
-      year: 'numeric'
-    });
-  };
 
   const generatePDF = async () => {
     try {
-      console.log('🔄 Starting Kwitansi HTML-to-PDF generation...');
+      console.log('🔄 Starting premium kwitansi PDF generation...');
 
       // Dynamic imports to avoid SSR issues
       const html2canvas = (await import('html2canvas')).default;
       const { jsPDF } = await import('jspdf');
 
-      if (!kwitansiRef.current) {
-        throw new Error('Kwitansi element not found');
-      }
+      console.log('✅ Libraries loaded successfully');
 
-      console.log('📄 Capturing kwitansi element...');
+      const items = typeof invoiceData.items === 'string'
+        ? JSON.parse(invoiceData.items)
+        : invoiceData.items;
 
-      // Configure html2canvas for high quality
-      const canvas = await html2canvas(kwitansiRef.current, {
+      console.log('📄 Kwitansi data:', { invoiceNumber, items });
+
+      const subtotal = items.reduce((sum: number, item: InvoiceItem) => sum + (item.price * item.qty), 0);
+      const tax = subtotal * (settings?.taxRate || 0) / 100;
+      const total = subtotal + tax;
+
+      console.log('💰 Calculations:', { subtotal, tax, total });
+
+      // Create a temporary container for the HTML content
+      const container = document.createElement('div');
+      container.style.position = 'absolute';
+      container.style.left = '-9999px';
+      container.style.top = '-9999px';
+      container.style.width = '794px'; // A4 width in pixels at 96 DPI
+      container.style.minHeight = '1123px'; // A4 height in pixels at 96 DPI
+      container.style.backgroundColor = 'white';
+      container.style.fontFamily = 'Inter, system-ui, -apple-system, sans-serif';
+      container.style.fontSize = '14px';
+      container.style.lineHeight = '1.5';
+      container.style.color = '#1f2937';
+
+      // Premium kwitansi HTML template with Inter font and sophisticated styling
+      container.innerHTML = `
+        <div style="
+          width: 794px;
+          min-height: 1123px;
+          background: white;
+          padding: 60px;
+          box-sizing: border-box;
+          font-family: 'Inter', system-ui, -apple-system, sans-serif;
+          position: relative;
+        ">
+          <!-- Header Section -->
+          <div style="
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            margin-bottom: 50px;
+            padding-bottom: 30px;
+            border-bottom: 2px solid #f1f5f9;
+          ">
+            <!-- Company Info -->
+            <div style="flex: 1;">
+              <div style="
+                font-size: 28px;
+                font-weight: 800;
+                color: #0f172a;
+                margin-bottom: 8px;
+                letter-spacing: -0.5px;
+              ">${settings?.companyName || 'MITRALABS.ID'}</div>
+              <div style="
+                font-size: 14px;
+                color: #64748b;
+                font-weight: 500;
+                margin-bottom: 20px;
+              ">${settings?.companyTagline || 'Precision Web Engineering'}</div>
+
+              <div style="
+                font-size: 12px;
+                color: #475569;
+                line-height: 1.6;
+                font-weight: 400;
+              ">
+                <div style="margin-bottom: 4px;">${settings?.companyAddress || 'Jl. Contoh No. 123'}</div>
+                <div style="margin-bottom: 4px;">${settings?.companyCity || 'Medan'}, ${settings?.companyProvince || 'Sumatera Utara'} ${settings?.companyPostalCode || '20111'}</div>
+                <div style="margin-bottom: 4px;">Tel: ${settings?.companyPhone || '+62 823-8111-8520'}</div>
+                <div style="margin-bottom: 4px;">Email: ${settings?.companyEmail || 'contact@mitralabs.id'}</div>
+                <div style="margin-bottom: 4px;">Web: ${settings?.companyWebsite || 'www.mitralabs.id'}</div>
+                <div style="margin-bottom: 4px;">NPWP: ${settings?.companyNPWP || '00.000.000.0-000.000'}</div>
+                ${settings?.companyLinkedin ? `<div style="margin-bottom: 4px;">LinkedIn: ${settings.companyLinkedin}</div>` : ''}
+                ${settings?.companyInstagram ? `<div style="margin-bottom: 4px;">Instagram: ${settings.companyInstagram}</div>` : ''}
+              </div>
+            </div>
+
+            <!-- Kwitansi Badge -->
+            <div style="
+              background: linear-gradient(135deg, #0f172a 0%, #334155 100%);
+              color: white;
+              padding: 16px 32px;
+              border-radius: 12px;
+              text-align: center;
+              box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+            ">
+              <div style="
+                font-size: 24px;
+                font-weight: 800;
+                letter-spacing: 2px;
+                margin-bottom: 4px;
+              ">KWITANSI</div>
+              <div style="
+                font-size: 11px;
+                opacity: 0.8;
+                font-weight: 500;
+                letter-spacing: 1px;
+              ">OFFICIAL RECEIPT</div>
+            </div>
+          </div>
+
+          <!-- Invoice Details -->
+          <div style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+          ">
+            <div style="flex: 1; margin-right: 40px;">
+              <div style="
+                background: #f8fafc;
+                padding: 24px;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+              ">
+                <div style="
+                  font-size: 11px;
+                  font-weight: 700;
+                  color: #64748b;
+                  text-transform: uppercase;
+                  letter-spacing: 1px;
+                  margin-bottom: 12px;
+                ">BILL TO</div>
+
+                <div style="
+                  font-size: 18px;
+                  font-weight: 700;
+                  color: #0f172a;
+                  margin-bottom: 8px;
+                ">${invoiceData.client_name}</div>
+
+                ${invoiceData.client_company ? `
+                <div style="
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #475569;
+                  margin-bottom: 8px;
+                ">${invoiceData.client_company}</div>
+                ` : ''}
+
+                <div style="
+                  font-size: 13px;
+                  color: #64748b;
+                  margin-bottom: 6px;
+                ">${invoiceData.client_email}</div>
+
+                ${invoiceData.client_address ? `
+                <div style="
+                  font-size: 12px;
+                  color: #64748b;
+                  line-height: 1.5;
+                ">${invoiceData.client_address}</div>
+                ` : ''}
+              </div>
+            </div>
+
+            <div style="flex: 1;">
+              <div style="
+                background: #f8fafc;
+                padding: 24px;
+                border-radius: 12px;
+                border: 1px solid #e2e8f0;
+              ">
+                <div style="margin-bottom: 16px;">
+                  <div style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: 6px;
+                  ">KWITANSI NUMBER</div>
+                  <div style="
+                    font-size: 16px;
+                    font-weight: 700;
+                    color: #0f172a;
+                    font-family: 'Courier New', monospace;
+                  ">${invoiceData.invoice_number}</div>
+                </div>
+
+                <div style="margin-bottom: 16px;">
+                  <div style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: 6px;
+                  ">ISSUE DATE</div>
+                  <div style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #0f172a;
+                  ">${new Date(invoiceData.created_at).toLocaleDateString('id-ID', {
+                    day: '2-digit',
+                    month: 'long',
+                    year: 'numeric'
+                  })}</div>
+                </div>
+
+                ${invoiceData.project_period_start && invoiceData.project_period_end ? `
+                <div>
+                  <div style="
+                    font-size: 11px;
+                    font-weight: 700;
+                    color: #64748b;
+                    text-transform: uppercase;
+                    letter-spacing: 1px;
+                    margin-bottom: 6px;
+                  ">PROJECT PERIOD</div>
+                  <div style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #0f172a;
+                  ">${new Date(invoiceData.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoiceData.project_period_end).toLocaleDateString('id-ID')}</div>
+                </div>
+                ` : ''}
+              </div>
+            </div>
+          </div>
+
+          <!-- Items Table -->
+          <div style="
+            background: white;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            overflow: hidden;
+            margin-bottom: 40px;
+          ">
+            <!-- Table Header -->
+            <div style="
+              background: #f1f5f9;
+              padding: 16px 24px;
+              border-bottom: 1px solid #e2e8f0;
+              display: flex;
+              font-size: 11px;
+              font-weight: 700;
+              color: #475569;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            ">
+              <div style="flex: 3; margin-right: 20px;">DESCRIPTION</div>
+              <div style="flex: 1; text-align: center; margin-right: 20px;">QTY</div>
+              <div style="flex: 1; text-align: right; margin-right: 20px;">RATE</div>
+              <div style="flex: 1; text-align: right;">AMOUNT</div>
+            </div>
+
+            <!-- Table Body -->
+            ${items.map((item: InvoiceItem, index: number) => `
+              <div style="
+                padding: 20px 24px;
+                border-bottom: ${index < items.length - 1 ? '1px solid #f1f5f9' : 'none'};
+                display: flex;
+                align-items: flex-start;
+                ${index % 2 === 0 ? 'background: #fafbfc;' : 'background: white;'}
+              ">
+                <div style="flex: 3; margin-right: 20px;">
+                  <div style="
+                    font-size: 14px;
+                    font-weight: 600;
+                    color: #0f172a;
+                    margin-bottom: 4px;
+                  ">${item.desc}</div>
+                  ${item.details ? `
+                  <div style="
+                    font-size: 12px;
+                    color: #64748b;
+                    line-height: 1.4;
+                  ">${item.details}</div>
+                  ` : ''}
+                </div>
+                <div style="
+                  flex: 1;
+                  text-align: center;
+                  margin-right: 20px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #475569;
+                ">${item.qty}</div>
+                <div style="
+                  flex: 1;
+                  text-align: right;
+                  margin-right: 20px;
+                  font-size: 14px;
+                  font-weight: 600;
+                  color: #475569;
+                ">Rp ${item.price.toLocaleString('id-ID')}</div>
+                <div style="
+                  flex: 1;
+                  text-align: right;
+                  font-size: 14px;
+                  font-weight: 700;
+                  color: #0f172a;
+                ">Rp ${(item.price * item.qty).toLocaleString('id-ID')}</div>
+              </div>
+            `).join('')}
+          </div>
+
+          <!-- Total Section -->
+          <div style="
+            display: flex;
+            justify-content: flex-end;
+            margin-bottom: 50px;
+          ">
+            <div style="
+              background: #0f172a;
+              color: white;
+              padding: 24px 32px;
+              border-radius: 12px;
+              min-width: 280px;
+              box-shadow: 0 10px 25px rgba(15, 23, 42, 0.15);
+            ">
+              ${subtotal !== total ? `
+              <div style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 12px;
+                font-size: 14px;
+                opacity: 0.8;
+              ">
+                <span>Subtotal:</span>
+                <span>Rp ${subtotal.toLocaleString('id-ID')}</span>
+              </div>
+              <div style="
+                display: flex;
+                justify-content: space-between;
+                margin-bottom: 16px;
+                padding-bottom: 16px;
+                border-bottom: 1px solid rgba(255, 255, 255, 0.2);
+                font-size: 14px;
+                opacity: 0.8;
+              ">
+                <span>${settings?.taxLabel || 'Tax'}:</span>
+                <span>Rp ${tax.toLocaleString('id-ID')}</span>
+              </div>
+              ` : ''}
+              <div style="
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+              ">
+                <div style="
+                  font-size: 14px;
+                  font-weight: 600;
+                  opacity: 0.9;
+                ">TOTAL AMOUNT</div>
+                <div style="
+                  font-size: 24px;
+                  font-weight: 800;
+                  letter-spacing: -0.5px;
+                ">Rp ${total.toLocaleString('id-ID')}</div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Payment Information -->
+          <div style="
+            background: #f8fafc;
+            padding: 24px;
+            border-radius: 12px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 40px;
+          ">
+            <div style="
+              font-size: 14px;
+              font-weight: 700;
+              color: #0f172a;
+              margin-bottom: 16px;
+            ">PAYMENT INFORMATION</div>
+
+            <div style="
+              font-size: 13px;
+              color: #475569;
+              line-height: 1.6;
+              margin-bottom: 20px;
+            ">${settings?.paymentInstructions || 'Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.'}</div>
+
+            <div style="
+              background: white;
+              padding: 20px;
+              border-radius: 8px;
+              border: 1px solid #e2e8f0;
+            ">
+              <div style="
+                font-size: 16px;
+                font-weight: 700;
+                color: #0f172a;
+                margin-bottom: 8px;
+              ">${settings?.bankName || 'Bank Central Asia (BCA)'}</div>
+              <div style="
+                font-size: 14px;
+                color: #475569;
+                margin-bottom: 4px;
+              ">Account Number: <span style="font-weight: 600; font-family: 'Courier New', monospace;">${settings?.bankAccountNumber || '8000-7625-12'}</span></div>
+              <div style="
+                font-size: 14px;
+                color: #475569;
+                margin-bottom: 4px;
+              ">Account Name: <span style="font-weight: 600;">${settings?.bankAccountName || 'Ridho Robbi Pasi'}</span></div>
+              ${settings?.bankBranch ? `
+              <div style="
+                font-size: 14px;
+                color: #475569;
+              ">Branch: <span style="font-weight: 600;">${settings.bankBranch}</span></div>
+              ` : ''}
+            </div>
+          </div>
+
+          <!-- Signature Section -->
+          <div style="
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 40px;
+          ">
+            ${settings?.signatureFields?.marketing ? `
+            <div style="
+              text-align: center;
+              flex: 1;
+              margin-right: 40px;
+            ">
+              <div style="
+                font-size: 12px;
+                color: #64748b;
+                margin-bottom: 60px;
+              ">${settings.signatureFields.marketing}</div>
+              <div style="
+                border-top: 1px solid #cbd5e1;
+                padding-top: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #475569;
+              ">Signature & Date</div>
+            </div>
+            ` : ''}
+
+            ${settings?.stampDutyRequired ? `
+            <div style="
+              text-align: center;
+              flex: 1;
+              margin: 0 20px;
+            ">
+              <div style="
+                width: 80px;
+                height: 80px;
+                border: 2px dashed #cbd5e1;
+                border-radius: 8px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                margin: 0 auto 12px;
+                font-size: 10px;
+                color: #94a3b8;
+                text-align: center;
+                line-height: 1.2;
+              ">MATERAI<br/>Rp ${(settings.stampDutyAmount || 10000).toLocaleString('id-ID')}</div>
+              <div style="
+                font-size: 11px;
+                color: #64748b;
+              ">Stamp Duty</div>
+            </div>
+            ` : ''}
+
+            ${settings?.signatureFields?.owner ? `
+            <div style="
+              text-align: center;
+              flex: 1;
+              margin-left: 40px;
+            ">
+              <div style="
+                font-size: 12px;
+                color: #64748b;
+                margin-bottom: 60px;
+              ">${settings.signatureFields.owner}</div>
+              <div style="
+                border-top: 1px solid #cbd5e1;
+                padding-top: 8px;
+                font-size: 12px;
+                font-weight: 600;
+                color: #475569;
+              ">Signature & Date</div>
+            </div>
+            ` : ''}
+          </div>
+
+          <!-- Terms & Conditions -->
+          ${settings?.termsAndConditions ? `
+          <div style="
+            background: #f8fafc;
+            padding: 20px;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            margin-bottom: 30px;
+          ">
+            <div style="
+              font-size: 12px;
+              font-weight: 700;
+              color: #475569;
+              margin-bottom: 12px;
+              text-transform: uppercase;
+              letter-spacing: 1px;
+            ">TERMS & CONDITIONS</div>
+            <div style="
+              font-size: 11px;
+              color: #64748b;
+              line-height: 1.6;
+              white-space: pre-line;
+            ">${settings.termsAndConditions}</div>
+          </div>
+          ` : ''}
+
+          <!-- Footer -->
+          <div style="
+            text-align: center;
+            padding-top: 20px;
+            border-top: 1px solid #e2e8f0;
+          ">
+            <div style="
+              font-size: 10px;
+              color: #94a3b8;
+              font-weight: 500;
+            ">${settings?.footerNote || 'Verified by Mitralabs Cryptographic Protocol'}</div>
+          </div>
+        </div>
+      `;
+
+      // Add the container to the document
+      document.body.appendChild(container);
+
+      console.log('📸 Capturing HTML as canvas...');
+
+      // Capture the HTML as canvas with high quality
+      const canvas = await html2canvas(container, {
         scale: 2, // Higher resolution
         useCORS: true,
         allowTaint: true,
         backgroundColor: '#ffffff',
-        width: kwitansiRef.current.scrollWidth,
-        height: kwitansiRef.current.scrollHeight,
+        width: 794,
+        height: 1123,
+        scrollX: 0,
+        scrollY: 0
       });
 
-      console.log('🖼️ Canvas created, generating PDF...');
+      // Remove the temporary container
+      document.body.removeChild(container);
 
-      // Create PDF
+      console.log('📄 Converting to PDF...');
+
+      // Create PDF from canvas
       const pdf = new jsPDF('p', 'mm', 'a4');
-      const pageWidth = pdf.internal.pageSize.getWidth();
-      const pageHeight = pdf.internal.pageSize.getHeight();
-
-      // Calculate dimensions to fit the page
-      const canvasWidth = canvas.width;
-      const canvasHeight = canvas.height;
-      const ratio = canvasWidth / canvasHeight;
-
-      let imgWidth = pageWidth - 20; // 10mm margin on each side
-      let imgHeight = imgWidth / ratio;
-
-      // If height exceeds page, scale down
-      if (imgHeight > pageHeight - 20) {
-        imgHeight = pageHeight - 20;
-        imgWidth = imgHeight * ratio;
-      }
-
-      // Center the image
-      const x = (pageWidth - imgWidth) / 2;
-      const y = (pageHeight - imgHeight) / 2;
-
-      // Convert canvas to image and add to PDF
       const imgData = canvas.toDataURL('image/png');
-      pdf.addImage(imgData, 'PNG', x, y, imgWidth, imgHeight);
 
-      console.log('📥 Saving Kwitansi PDF...');
+      // A4 dimensions in mm
+      const pdfWidth = 210;
+      const pdfHeight = 297;
+
+      pdf.addImage(imgData, 'PNG', 0, 0, pdfWidth, pdfHeight);
+
+      console.log('📥 Saving premium kwitansi PDF...');
       // Save PDF - This will directly download
       pdf.save(`Kwitansi-${invoiceNumber}.pdf`);
-      console.log('✅ Kwitansi PDF download initiated successfully!');
+      console.log('✅ Premium kwitansi PDF download initiated successfully!');
 
     } catch (error) {
-      console.error('❌ Error generating Kwitansi PDF:', error);
-      alert('Failed to generate Kwitansi PDF. Please try again.');
+      console.error('❌ Error generating kwitansi PDF:', error);
+      alert('Failed to generate kwitansi PDF. Please try again.');
     }
   };
 
   return (
-    <>
-      {/* Hidden Kwitansi Design for PDF Generation */}
-      <div ref={kwitansiRef} className="fixed -left-[9999px] top-0 w-[794px] bg-white">
-        {/* Kwitansi Design - Based on provided HTML */}
-        <div className="w-full bg-white p-12 font-sans">
-          {/* Header */}
-          <div className="text-center mb-8">
-            <h1 className="text-4xl font-bold text-gray-800 mb-2">KWITANSI</h1>
-            <div className="w-24 h-1 bg-blue-600 mx-auto mb-4"></div>
-            <p className="text-lg text-gray-600">No: {invoiceData.invoice_number}</p>
-          </div>
-
-          {/* Company Info */}
-          <div className="mb-8 text-center">
-            <h2 className="text-2xl font-bold text-gray-800 mb-2">
-              {settings?.companyName || 'MITRALABS.ID'}
-            </h2>
-            <p className="text-gray-600 mb-1">{settings?.companyTagline || 'Precision Web Engineering'}</p>
-            <p className="text-gray-600 mb-1">
-              {settings?.companyAddress || 'Jl. Contoh No. 123'}, {settings?.companyCity || 'Medan'}
-            </p>
-            <p className="text-gray-600 mb-1">
-              {settings?.companyProvince || 'Sumatera Utara'} {settings?.companyPostalCode || '20111'}
-            </p>
-            <p className="text-gray-600 mb-1">Telp: {settings?.companyPhone || '+62 823-8111-8520'}</p>
-            <p className="text-gray-600 mb-1">Email: {settings?.companyEmail || 'contact@mitralabs.id'}</p>
-            {settings?.companyWebsite && (
-              <p className="text-gray-600 mb-1">Website: {settings.companyWebsite}</p>
-            )}
-            {settings?.companyNPWP && (
-              <p className="text-gray-600">NPWP: {settings.companyNPWP}</p>
-            )}
-          </div>
-
-          {/* Divider */}
-          <div className="border-t-2 border-gray-300 mb-8"></div>
-
-          {/* Receipt Details */}
-          <div className="mb-8">
-            <div className="grid grid-cols-2 gap-8">
-              {/* Left Column - Client Info */}
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Telah Terima Dari:</h3>
-                <div className="space-y-2">
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Nama:</span> {invoiceData.client_name}
-                  </p>
-                  {invoiceData.client_company && (
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Perusahaan:</span> {invoiceData.client_company}
-                    </p>
-                  )}
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Email:</span> {invoiceData.client_email}
-                  </p>
-                  {invoiceData.client_address && (
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Alamat:</span> {invoiceData.client_address}
-                    </p>
-                  )}
-                </div>
-              </div>
-
-              {/* Right Column - Receipt Info */}
-              <div>
-                <h3 className="text-lg font-bold text-gray-800 mb-4">Informasi Kwitansi:</h3>
-                <div className="space-y-2">
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Tanggal:</span> {formatDate(invoiceData.created_at)}
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Jatuh Tempo:</span> {formatDate(invoiceData.due_date)}
-                  </p>
-                  {invoiceData.project_period_start && invoiceData.project_period_end && (
-                    <>
-                      <p className="text-gray-700">
-                        <span className="font-semibold">Periode Mulai:</span> {formatDate(invoiceData.project_period_start)}
-                      </p>
-                      <p className="text-gray-700">
-                        <span className="font-semibold">Periode Selesai:</span> {formatDate(invoiceData.project_period_end)}
-                      </p>
-                    </>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Services Table */}
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Untuk Pembayaran:</h3>
-            <div className="border border-gray-300 rounded-lg overflow-hidden">
-              <table className="w-full">
-                <thead className="bg-gray-50">
-                  <tr>
-                    <th className="px-4 py-3 text-left text-sm font-semibold text-gray-700 border-b">Deskripsi</th>
-                    <th className="px-4 py-3 text-center text-sm font-semibold text-gray-700 border-b">Qty</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 border-b">Harga</th>
-                    <th className="px-4 py-3 text-right text-sm font-semibold text-gray-700 border-b">Total</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {items.map((item: InvoiceItem, index: number) => (
-                    <tr key={index} className={index % 2 === 0 ? 'bg-white' : 'bg-gray-50'}>
-                      <td className="px-4 py-3 border-b">
-                        <div>
-                          <p className="font-medium text-gray-800">{item.desc}</p>
-                          {item.details && (
-                            <p className="text-sm text-gray-600 mt-1">{item.details}</p>
-                          )}
-                        </div>
-                      </td>
-                      <td className="px-4 py-3 text-center border-b text-gray-700">{item.qty}</td>
-                      <td className="px-4 py-3 text-right border-b text-gray-700">{formatCurrency(item.price)}</td>
-                      <td className="px-4 py-3 text-right border-b font-semibold text-gray-800">
-                        {formatCurrency(item.price * item.qty)}
-                      </td>
-                    </tr>
-                  ))}
-                </tbody>
-              </table>
-            </div>
-          </div>
-
-          {/* Total Section */}
-          <div className="mb-8">
-            <div className="flex justify-end">
-              <div className="w-80">
-                <div className="space-y-2">
-                  <div className="flex justify-between py-2">
-                    <span className="text-gray-700">Subtotal:</span>
-                    <span className="font-semibold text-gray-800">{formatCurrency(subtotal)}</span>
-                  </div>
-                  {tax > 0 && (
-                    <div className="flex justify-between py-2">
-                      <span className="text-gray-700">{settings?.taxLabel || 'PPN (11%)'}:</span>
-                      <span className="font-semibold text-gray-800">{formatCurrency(tax)}</span>
-                    </div>
-                  )}
-                  <div className="border-t-2 border-gray-300 pt-2">
-                    <div className="flex justify-between py-2">
-                      <span className="text-xl font-bold text-gray-800">TOTAL:</span>
-                      <span className="text-xl font-bold text-blue-600">{formatCurrency(total)}</span>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Payment Instructions */}
-          {settings?.paymentInstructions && (
-            <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">Instruksi Pembayaran:</h3>
-              <div className="bg-blue-50 border border-blue-200 rounded-lg p-4">
-                <p className="text-gray-700 whitespace-pre-line">{settings.paymentInstructions}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Bank Details */}
-          <div className="mb-8">
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Informasi Bank:</h3>
-            <div className="bg-gray-50 border border-gray-200 rounded-lg p-4">
-              <div className="grid grid-cols-2 gap-4">
-                <div>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Bank:</span> {settings?.bankName || 'Bank Central Asia (BCA)'}
-                  </p>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">No. Rekening:</span> {settings?.bankAccountNumber || '8000-7625-12'}
-                  </p>
-                </div>
-                <div>
-                  <p className="text-gray-700">
-                    <span className="font-semibold">Atas Nama:</span> {settings?.bankAccountName || 'Ridho Robbi Pasi'}
-                  </p>
-                  {settings?.bankBranch && (
-                    <p className="text-gray-700">
-                      <span className="font-semibold">Cabang:</span> {settings.bankBranch}
-                    </p>
-                  )}
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Signature Section */}
-          <div className="mb-8">
-            <div className="grid grid-cols-2 gap-8">
-              {/* Left - Marketing Signature */}
-              {settings?.signatureFields?.marketing && (
-                <div className="text-center">
-                  <p className="text-gray-700 mb-16">Yang Menerima,</p>
-                  <div className="border-b border-gray-400 mb-2"></div>
-                  <p className="text-gray-700 font-semibold">{settings.signatureFields.marketing}</p>
-                </div>
-              )}
-
-              {/* Right - Owner Signature */}
-              {settings?.signatureFields?.owner && (
-                <div className="text-center">
-                  <p className="text-gray-700 mb-16">Hormat Kami,</p>
-                  <div className="border-b border-gray-400 mb-2"></div>
-                  <p className="text-gray-700 font-semibold">{settings.signatureFields.owner}</p>
-                </div>
-              )}
-            </div>
-          </div>
-
-          {/* Stamp Duty */}
-          {settings?.stampDutyRequired && (
-            <div className="mb-8 text-center">
-              <div className="inline-block border-2 border-gray-400 p-4 transform rotate-12">
-                <p className="text-sm font-bold text-gray-700">MATERAI</p>
-                <p className="text-xs text-gray-600">{formatCurrency(settings.stampDutyAmount || 10000)}</p>
-              </div>
-            </div>
-          )}
-
-          {/* Terms and Conditions */}
-          {settings?.termsAndConditions && (
-            <div className="mb-8">
-              <h3 className="text-lg font-bold text-gray-800 mb-4">Syarat & Ketentuan:</h3>
-              <div className="text-sm text-gray-600 whitespace-pre-line leading-relaxed">
-                {settings.termsAndConditions}
-              </div>
-            </div>
-          )}
-
-          {/* Footer */}
-          <div className="text-center pt-8 border-t border-gray-200">
-            <p className="text-sm text-gray-500">
-              {settings?.footerNote || 'Verified by Mitralabs Cryptographic Protocol'}
-            </p>
-            {(settings?.companyLinkedin || settings?.companyInstagram) && (
-              <div className="mt-2 space-x-4">
-                {settings?.companyLinkedin && (
-                  <span className="text-sm text-gray-500">LinkedIn: {settings.companyLinkedin}</span>
-                )}
-                {settings?.companyInstagram && (
-                  <span className="text-sm text-gray-500">Instagram: {settings.companyInstagram}</span>
-                )}
-              </div>
-            )}
-          </div>
-        </div>
-      </div>
-
-      {/* Download Button */}
-      <button
-        onClick={generatePDF}
-        className={className || "p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"}
-        title="Download Kwitansi PDF"
-      >
-        <Download size={16} />
-      </button>
-    </>
+    <button
+      onClick={generatePDF}
+      className={className || "p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"}
+      title="Download Kwitansi PDF"
+    >
+      <Download size={16} />
+    </button>
   );
 }
