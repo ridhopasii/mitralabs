@@ -30,7 +30,7 @@ export default function InvoicePDFGenerator({ invoiceNumber, invoiceData, classN
 
   const generatePDF = async () => {
     try {
-      console.log('🔄 Starting PDF generation...');
+      console.log('🔄 Starting Apple-style PDF generation...');
 
       // Dynamic import to avoid SSR issues
       const { jsPDF } = await import('jspdf');
@@ -48,142 +48,238 @@ export default function InvoicePDFGenerator({ invoiceNumber, invoiceData, classN
 
       console.log('💰 Calculations:', { subtotal, tax, total });
 
-      // Create PDF
+      // Create PDF with Apple-style modern design
       const pdf = new jsPDF('p', 'mm', 'a4');
       const pageWidth = pdf.internal.pageSize.getWidth();
       const pageHeight = pdf.internal.pageSize.getHeight();
 
-      // Set font
+      // Apple-style color palette
+      const colors = {
+        primary: [0, 0, 0] as [number, number, number],        // Pure black
+        secondary: [128, 128, 128] as [number, number, number], // Medium gray
+        light: [248, 248, 250] as [number, number, number],    // Light gray background
+        accent: [0, 122, 255] as [number, number, number],     // Apple blue
+        success: [52, 199, 89] as [number, number, number],    // Apple green
+        text: [29, 29, 31] as [number, number, number],        // Apple text color
+        subtle: [174, 174, 178] as [number, number, number],   // Subtle gray
+        white: [255, 255, 255] as [number, number, number]     // Pure white
+      };
+
+      // Set default font
       pdf.setFont('helvetica');
 
-      let yPos = 30;
+      let yPos = 25;
 
-      // Header - Company Name
-      pdf.setFontSize(24);
+      // Modern Header with subtle background
+      pdf.setFillColor(...colors.light);
+      pdf.rect(0, 0, pageWidth, 50, 'F');
+
+      // Company Logo Area (simulated with modern circle)
+      pdf.setFillColor(...colors.primary);
+      pdf.circle(25, 25, 6, 'F');
+
+      // Company Name - Apple style typography
+      pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.primary);
       const companyName = settings?.companyName || 'MITRALABS.ID';
-      pdf.text(companyName, pageWidth / 2, yPos, { align: 'center' });
+      pdf.text(companyName, 38, 27);
 
-      yPos += 8;
-      pdf.setFontSize(12);
+      // Tagline - subtle and clean
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...colors.secondary);
       const tagline = settings?.companyTagline || 'Precision Web Engineering';
-      pdf.text(tagline, pageWidth / 2, yPos, { align: 'center' });
+      pdf.text(tagline, 38, 33);
 
-      yPos += 15;
+      // Invoice status badge (top right)
+      const badgeX = pageWidth - 45;
+      pdf.setFillColor(...colors.success);
+      pdf.roundedRect(badgeX, 18, 35, 10, 5, 5, 'F');
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.white);
+      pdf.text('INVOICE', badgeX + 17.5, 24.5, { align: 'center' });
 
-      // Invoice Number
+      yPos = 65;
+
+      // Invoice Number - Large and prominent
       pdf.setFontSize(28);
       pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.primary);
       pdf.text(invoiceData.invoice_number, pageWidth / 2, yPos, { align: 'center' });
 
       yPos += 25;
 
-      // Bill To
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('BILL TO STAKEHOLDER', 20, yPos);
+      // Client Information Card
+      pdf.setFillColor(...colors.white);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 30, 6, 6, 'F');
+      pdf.setDrawColor(...colors.light);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 30, 6, 6, 'S');
 
-      yPos += 8;
+      // Bill To Label
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('BILL TO', 28, yPos + 8);
+
+      // Client Name
       pdf.setFontSize(14);
       pdf.setFont('helvetica', 'bold');
-      pdf.text(invoiceData.client_name, 20, yPos);
+      pdf.setTextColor(...colors.primary);
+      pdf.text(invoiceData.client_name, 28, yPos + 16);
 
-      yPos += 6;
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(invoiceData.client_email, 20, yPos);
-
-      yPos += 20;
-
-      // Dates
-      pdf.setFontSize(10);
-      pdf.setFont('helvetica', 'bold');
-      pdf.text('ISSUE DATE', 20, yPos);
-      pdf.text('DUE DATE', 120, yPos);
-
-      yPos += 6;
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(new Date(invoiceData.created_at).toLocaleDateString('id-ID'), 20, yPos);
-      pdf.setTextColor(239, 68, 68); // Red color for due date
-      pdf.text(new Date(invoiceData.due_date).toLocaleDateString('id-ID'), 120, yPos);
-      pdf.setTextColor(0, 0, 0); // Reset to black
-
-      yPos += 25;
-
-      // Table Header
-      pdf.setFillColor(245, 245, 245);
-      pdf.rect(20, yPos - 5, pageWidth - 40, 12, 'F');
-
+      // Client Email
       pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...colors.secondary);
+      pdf.text(invoiceData.client_email, 28, yPos + 23);
+
+      // Dates section (right side of card)
+      const dateX = pageWidth - 65;
+
+      // Issue Date
+      pdf.setFontSize(7);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('DESCRIPTION', 25, yPos);
-      pdf.text('QTY', 120, yPos, { align: 'center' });
-      pdf.text('PRICE', 140, yPos, { align: 'right' });
-      pdf.text('TOTAL', 180, yPos, { align: 'right' });
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('ISSUE DATE', dateX, yPos + 8);
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...colors.primary);
+      pdf.text(new Date(invoiceData.created_at).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }), dateX, yPos + 15);
+
+      // Due Date
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('DUE DATE', dateX, yPos + 20);
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(255, 59, 48); // Apple red for due date
+      pdf.text(new Date(invoiceData.due_date).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+      }), dateX, yPos + 27);
+
+      yPos += 50;
+
+      // Items Table - Clean and minimal
+      // Table header
+      pdf.setFillColor(...colors.light);
+      pdf.rect(20, yPos, pageWidth - 40, 12, 'F');
+
+      pdf.setFontSize(7);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('DESCRIPTION', 28, yPos + 8);
+      pdf.text('QTY', pageWidth - 85, yPos + 8, { align: 'center' });
+      pdf.text('RATE', pageWidth - 60, yPos + 8, { align: 'right' });
+      pdf.text('AMOUNT', pageWidth - 28, yPos + 8, { align: 'right' });
+
+      yPos += 18;
+
+      // Table items with alternating background
+      items.forEach((item: InvoiceItem, index: number) => {
+        if (index % 2 === 0) {
+          pdf.setFillColor(252, 252, 253);
+          pdf.rect(20, yPos - 3, pageWidth - 40, 12, 'F');
+        }
+
+        pdf.setFontSize(9);
+        pdf.setFont('helvetica', 'normal');
+        pdf.setTextColor(...colors.primary);
+
+        // Description - wrap text if too long
+        const maxDescWidth = pageWidth - 120;
+        const wrappedDesc = pdf.splitTextToSize(item.desc, maxDescWidth);
+        pdf.text(wrappedDesc[0], 28, yPos + 3); // Only show first line for clean look
+
+        // Quantity
+        pdf.text(item.qty.toString(), pageWidth - 85, yPos + 3, { align: 'center' });
+
+        // Rate
+        pdf.setFont('helvetica', 'normal');
+        pdf.text(`Rp ${item.price.toLocaleString()}`, pageWidth - 60, yPos + 3, { align: 'right' });
+
+        // Amount
+        pdf.setFont('helvetica', 'bold');
+        pdf.text(`Rp ${(item.price * item.qty).toLocaleString()}`, pageWidth - 28, yPos + 3, { align: 'right' });
+
+        yPos += 12;
+      });
 
       yPos += 15;
 
-      // Table Items
+      // Total Section - Apple style card
+      const totalCardY = yPos;
+      pdf.setFillColor(...colors.primary);
+      pdf.roundedRect(pageWidth - 100, totalCardY, 80, 25, 6, 6, 'F');
+
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'normal');
-      items.forEach((item: InvoiceItem) => {
-        pdf.text(item.desc, 25, yPos);
-        pdf.text(item.qty.toString(), 120, yPos, { align: 'center' });
-        pdf.text(`Rp ${item.price.toLocaleString()}`, 140, yPos, { align: 'right' });
-        pdf.text(`Rp ${(item.price * item.qty).toLocaleString()}`, 180, yPos, { align: 'right' });
-        yPos += 8;
-      });
+      pdf.setTextColor(...colors.white);
+      pdf.text('TOTAL AMOUNT', pageWidth - 60, totalCardY + 8, { align: 'center' });
 
-      yPos += 10;
-
-      // Total
-      pdf.setFont('helvetica', 'bold');
       pdf.setFontSize(16);
-      pdf.text('TOTAL', 140, yPos, { align: 'right' });
-      pdf.text(`Rp ${total.toLocaleString()}`, 180, yPos, { align: 'right' });
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(`Rp ${total.toLocaleString()}`, pageWidth - 60, totalCardY + 18, { align: 'center' });
 
-      yPos += 25;
+      yPos += 40;
+
+      // Payment Information Card
+      pdf.setFillColor(...colors.white);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 40, 6, 6, 'F');
+      pdf.setDrawColor(...colors.light);
+      pdf.setLineWidth(0.3);
+      pdf.roundedRect(20, yPos, pageWidth - 40, 40, 6, 6, 'S');
 
       // Payment Instructions
-      pdf.setFontSize(10);
+      pdf.setFontSize(7);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('PAYMENT INSTRUCTIONS', 20, yPos);
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('PAYMENT INSTRUCTIONS', 28, yPos + 10);
 
-      yPos += 8;
+      pdf.setFontSize(8);
       pdf.setFont('helvetica', 'normal');
-      const paymentInstructions = settings?.paymentInstructions || 'Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.';
-      const splitInstructions = pdf.splitTextToSize(paymentInstructions, pageWidth - 40);
-      pdf.text(splitInstructions, 20, yPos);
-
-      yPos += splitInstructions.length * 5 + 15;
+      pdf.setTextColor(...colors.secondary);
+      const paymentInstructions = settings?.paymentInstructions || 'Transfer to the account below and send proof to our WhatsApp for confirmation.';
+      const splitInstructions = pdf.splitTextToSize(paymentInstructions, pageWidth - 60);
+      pdf.text(splitInstructions, 28, yPos + 16);
 
       // Bank Details
+      pdf.setFontSize(7);
       pdf.setFont('helvetica', 'bold');
-      pdf.text('BANK TRANSFER DETAILS', 20, yPos);
+      pdf.setTextColor(...colors.subtle);
+      pdf.text('BANK DETAILS', 28, yPos + 26);
 
-      yPos += 8;
-      pdf.setFont('helvetica', 'normal');
-      pdf.text(settings?.bankName || 'Bank Central Asia (BCA)', 20, yPos);
-      yPos += 5;
-      pdf.text(`Account: ${settings?.bankAccountNumber || '8000-7625-12'}`, 20, yPos);
-      yPos += 5;
-      pdf.text(`Name: ${settings?.bankAccountName || 'Ridho Robbi Pasi'}`, 20, yPos);
-      if (settings?.bankBranch) {
-        yPos += 5;
-        pdf.text(`Branch: ${settings.bankBranch}`, 20, yPos);
-      }
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.setTextColor(...colors.primary);
+      pdf.text(settings?.bankName || 'Bank Central Asia (BCA)', 28, yPos + 32);
 
-      // Footer
-      yPos = pageHeight - 20;
       pdf.setFontSize(8);
-      pdf.setTextColor(128, 128, 128);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...colors.secondary);
+      pdf.text(`${settings?.bankAccountNumber || '8000-7625-12'} • ${settings?.bankAccountName || 'Ridho Robbi Pasi'}`, 28, yPos + 37);
+
+      // Footer - Minimal and clean
+      yPos = pageHeight - 25;
+      pdf.setFontSize(6);
+      pdf.setFont('helvetica', 'normal');
+      pdf.setTextColor(...colors.subtle);
       const footerNote = settings?.footerNote || 'Verified by Mitralabs Cryptographic Protocol';
       pdf.text(footerNote, pageWidth / 2, yPos, { align: 'center' });
 
-      console.log('📥 Saving PDF...');
+      console.log('📥 Saving Apple-style PDF...');
       // Save PDF - This will directly download
       pdf.save(`Invoice-${invoiceNumber}.pdf`);
-      console.log('✅ PDF download initiated successfully!');
+      console.log('✅ Apple-style PDF download initiated successfully!');
 
     } catch (error) {
       console.error('❌ Error generating PDF:', error);
