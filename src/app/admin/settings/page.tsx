@@ -19,6 +19,88 @@ import {
   Briefcase
 } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
+import React from "react";
+
+const defaultInvoiceSettings = {
+  companyName: "MITRALABS.ID",
+  companyTagline: "Precision Web Engineering",
+  companyAddress: "Jl. Contoh No. 123",
+  companyCity: "Medan",
+  companyProvince: "Sumatera Utara",
+  companyPostalCode: "20111",
+  companyPhone: "+62 823-8111-8520",
+  companyEmail: "contact@mitralabs.id",
+  companyWebsite: "www.mitralabs.id",
+  companyNPWP: "00.000.000.0-000.000",
+  bankName: "Bank Central Asia (BCA)",
+  bankAccountNumber: "8000-7625-12",
+  bankAccountName: "Ridho Robbi Pasi",
+  bankBranch: "KCP Medan Petisah",
+  taxRate: 0,
+  taxLabel: "PPN (11%)",
+  footerNote: "Verified by Mitralabs Cryptographic Protocol",
+  termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+  paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
+};
+
+const defaultGlobalSettings = {
+  waNumber: "6282381118520",
+  companyLogo: "/logo.png",
+  companyFavicon: "/favicon.ico",
+  businessMode: "agresif",
+  waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial."
+};
+
+// Isolated Input Component to prevent parent re-renders
+const FormInput = React.memo(({ label, value, onChange, placeholder, type = "text", description, className = "" }: any) => {
+  const [localValue, setLocalValue] = React.useState(value);
+
+  // Sync with prop if it changes externally
+  React.useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  return (
+    <div className={`space-y-3 ${className}`}>
+      {label && <label className="text-xs font-bold uppercase tracking-widest text-slate-400">{label}</label>}
+      <input
+        type={type}
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={() => onChange(localValue)}
+        placeholder={placeholder}
+        className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+      />
+      {description && <p className="text-[10px] text-slate-400 font-medium">{description}</p>}
+    </div>
+  );
+});
+
+FormInput.displayName = "FormInput";
+
+const FormTextarea = React.memo(({ label, value, onChange, placeholder, rows = 3, className = "" }: any) => {
+  const [localValue, setLocalValue] = React.useState(value);
+
+  React.useEffect(() => {
+    setLocalValue(value);
+  }, [value]);
+
+  return (
+    <div className={`space-y-3 ${className}`}>
+      {label && <label className="text-xs font-bold uppercase tracking-widest text-slate-400">{label}</label>}
+      <textarea
+        value={localValue}
+        onChange={(e) => setLocalValue(e.target.value)}
+        onBlur={() => onChange(localValue)}
+        rows={rows}
+        placeholder={placeholder}
+        className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
+      />
+    </div>
+  );
+});
+
+FormTextarea.displayName = "FormTextarea";
 
 export default function SettingsPage() {
   const { data, updateData } = useData();
@@ -27,35 +109,10 @@ export default function SettingsPage() {
   const [isSaving, setIsSaving] = useState(false);
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
-  const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || {
-    companyName: "MITRALABS.ID",
-    companyTagline: "Precision Web Engineering",
-    companyAddress: "Jl. Contoh No. 123",
-    companyCity: "Medan",
-    companyProvince: "Sumatera Utara",
-    companyPostalCode: "20111",
-    companyPhone: "+62 823-8111-8520",
-    companyEmail: "contact@mitralabs.id",
-    companyWebsite: "www.mitralabs.id",
-    companyNPWP: "00.000.000.0-000.000",
-    bankName: "Bank Central Asia (BCA)",
-    bankAccountNumber: "8000-7625-12",
-    bankAccountName: "Ridho Robbi Pasi",
-    bankBranch: "KCP Medan Petisah",
-    taxRate: 0,
-    taxLabel: "PPN (11%)",
-    footerNote: "Verified by Mitralabs Cryptographic Protocol",
-    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
-    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
-  });
 
-  const [globalSettings, setGlobalSettings] = useState(data.settings || {
-    waNumber: "6282381118520",
-    companyLogo: "/logo.png",
-    companyFavicon: "/favicon.ico",
-    businessMode: "agresif",
-    waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial."
-  });
+  // Use state but only update on save to avoid massive re-renders while typing
+  const [invoiceSettings, setInvoiceSettings] = useState(() => data.invoiceSettings || defaultInvoiceSettings);
+  const [globalSettings, setGlobalSettings] = useState(() => data.settings || defaultGlobalSettings);
 
   const exportData = () => {
     setIsExporting(true);
@@ -163,27 +220,19 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nomor WhatsApp (untuk API)</label>
-                  <input
-                    type="text"
-                    value={globalSettings.waNumber}
-                    onChange={(e) => setGlobalSettings({...globalSettings, waNumber: e.target.value})}
-                    placeholder="6282381118520"
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                  <p className="text-[10px] text-slate-400 font-medium">Format: 62xxx (tanpa +, tanpa spasi)</p>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Pesan Promo WhatsApp</label>
-                  <input
-                    type="text"
-                    value={globalSettings.waPromoMessage}
-                    onChange={(e) => setGlobalSettings({...globalSettings, waPromoMessage: e.target.value})}
-                    placeholder="🔥 Promo Bulan Ini!"
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
+                <FormInput 
+                  label="Nomor WhatsApp (untuk API)"
+                  value={globalSettings.waNumber}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, waNumber: val})}
+                  placeholder="6282381118520"
+                  description="Format: 62xxx (tanpa +, tanpa spasi)"
+                />
+                <FormInput 
+                  label="Pesan Promo WhatsApp"
+                  value={globalSettings.waPromoMessage}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, waPromoMessage: val})}
+                  placeholder="🔥 Promo Bulan Ini!"
+                />
               </div>
             </div>
 
@@ -195,27 +244,19 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">URL Logo Perusahaan</label>
-                  <input
-                    type="text"
-                    value={globalSettings.companyLogo}
-                    onChange={(e) => setGlobalSettings({...globalSettings, companyLogo: e.target.value})}
-                    placeholder="/logo.png atau https://..."
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                  <p className="text-[10px] text-slate-400 font-medium">Path relatif atau URL lengkap</p>
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">URL Favicon</label>
-                  <input
-                    type="text"
-                    value={globalSettings.companyFavicon}
-                    onChange={(e) => setGlobalSettings({...globalSettings, companyFavicon: e.target.value})}
-                    placeholder="/favicon.ico"
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
+                <FormInput 
+                  label="URL Logo Perusahaan"
+                  value={globalSettings.companyLogo}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, companyLogo: val})}
+                  placeholder="/logo.png atau https://..."
+                  description="Path relatif atau URL lengkap"
+                />
+                <FormInput 
+                  label="URL Favicon"
+                  value={globalSettings.companyFavicon}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, companyFavicon: val})}
+                  placeholder="/favicon.ico"
+                />
               </div>
             </div>
 
@@ -264,55 +305,36 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nama Perusahaan</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.companyName}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, companyName: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Tagline</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.companyTagline}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, companyTagline: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Alamat</label>
-                <input
-                  type="text"
-                  value={invoiceSettings.companyAddress}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, companyAddress: e.target.value})}
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                <FormInput 
+                  label="Nama Perusahaan"
+                  value={invoiceSettings.companyName}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyName: val})}
+                />
+                <FormInput 
+                  label="Tagline"
+                  value={invoiceSettings.companyTagline}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyTagline: val})}
                 />
               </div>
 
+              <FormInput 
+                label="Alamat"
+                value={invoiceSettings.companyAddress}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyAddress: val})}
+              />
+
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Telepon</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.companyPhone}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, companyPhone: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Email</label>
-                  <input
-                    type="email"
-                    value={invoiceSettings.companyEmail}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, companyEmail: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
+                <FormInput 
+                  label="Telepon"
+                  value={invoiceSettings.companyPhone}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyPhone: val})}
+                />
+                <FormInput 
+                  label="Email"
+                  type="email"
+                  value={invoiceSettings.companyEmail}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyEmail: val})}
+                />
               </div>
             </div>
 
@@ -323,105 +345,72 @@ export default function SettingsPage() {
                 <h4 className="text-sm font-bold uppercase tracking-widest">Informasi Bank</h4>
               </div>
 
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nama Bank</label>
-                <input
-                  type="text"
-                  value={invoiceSettings.bankName}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, bankName: e.target.value})}
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                />
-              </div>
+              <FormInput 
+                label="Nama Bank"
+                value={invoiceSettings.bankName}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankName: val})}
+              />
 
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nomor Rekening</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.bankAccountNumber}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, bankAccountNumber: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nama Pemilik Rekening</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.bankAccountName}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, bankAccountName: e.target.value})}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Cabang Bank (Opsional)</label>
-                <input
-                  type="text"
-                  value={invoiceSettings.bankBranch}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, bankBranch: e.target.value})}
-                  placeholder="KCP Medan Petisah"
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                <FormInput 
+                  label="Nomor Rekening"
+                  value={invoiceSettings.bankAccountNumber}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountNumber: val})}
+                />
+                <FormInput 
+                  label="Nama Pemilik Rekening"
+                  value={invoiceSettings.bankAccountName}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountName: val})}
                 />
               </div>
+
+              <FormInput 
+                label="Cabang Bank (Opsional)"
+                value={invoiceSettings.bankBranch}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankBranch: val})}
+                placeholder="KCP Medan Petisah"
+              />
             </div>
 
             {/* Additional Settings */}
             <div className="space-y-6 pt-8 border-t border-slate-100">
               <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Pajak (%)</label>
-                  <input
-                    type="number"
-                    value={invoiceSettings.taxRate}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(e.target.value) || 0})}
-                    placeholder="11"
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Label Pajak</label>
-                  <input
-                    type="text"
-                    value={invoiceSettings.taxLabel}
-                    onChange={(e) => setInvoiceSettings({...invoiceSettings, taxLabel: e.target.value})}
-                    placeholder="PPN (11%)"
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
-                  />
-                </div>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Catatan Footer</label>
-                <input
-                  type="text"
-                  value={invoiceSettings.footerNote}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, footerNote: e.target.value})}
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                <FormInput 
+                  label="Pajak (%)"
+                  type="number"
+                  value={invoiceSettings.taxRate}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(val) || 0})}
+                  placeholder="11"
+                />
+                <FormInput 
+                  label="Label Pajak"
+                  value={invoiceSettings.taxLabel}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxLabel: val})}
+                  placeholder="PPN (11%)"
                 />
               </div>
 
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Instruksi Pembayaran</label>
-                <textarea
-                  value={invoiceSettings.paymentInstructions}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, paymentInstructions: e.target.value})}
-                  rows={3}
-                  placeholder="Silakan transfer ke rekening yang tertera..."
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
-                />
-              </div>
+              <FormInput 
+                label="Catatan Footer"
+                value={invoiceSettings.footerNote}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, footerNote: val})}
+              />
 
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Syarat & Ketentuan</label>
-                <textarea
-                  value={invoiceSettings.termsAndConditions}
-                  onChange={(e) => setInvoiceSettings({...invoiceSettings, termsAndConditions: e.target.value})}
-                  rows={5}
-                  placeholder="1. Pembayaran dilakukan maksimal 7 hari..."
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
-                />
-              </div>
+              <FormTextarea 
+                label="Instruksi Pembayaran"
+                value={invoiceSettings.paymentInstructions}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, paymentInstructions: val})}
+                rows={3}
+                placeholder="Silakan transfer ke rekening yang tertera..."
+              />
+
+              <FormTextarea 
+                label="Syarat & Ketentuan"
+                value={invoiceSettings.termsAndConditions}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, termsAndConditions: val})}
+                rows={5}
+                placeholder="1. Pembayaran dilakukan maksimal 7 hari..."
+              />
             </div>
 
             {/* Save Button */}

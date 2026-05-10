@@ -8,10 +8,13 @@
  */
 
 export const downloadInvoicePDF = async (invoiceNumber: string) => {
-  // We will trigger the download by opening the invoice page with a special query param
-  // and let the invoice page handle the auto-generation and closing.
-  const win = window.open(`/invoice/${invoiceNumber}?download=true`, '_blank');
-  if (win) {
-    win.focus();
+  const url = `/invoice/${invoiceNumber}?download=true`;
+  const win = window.open(url, '_blank');
+  
+  if (!win || win.closed || typeof win.closed === 'undefined') {
+    alert("Download terblokir oleh browser. Mohon izinkan pop-up untuk situs ini agar invoice bisa diunduh otomatis.");
+    return false;
   }
+  
+  return true;
 };

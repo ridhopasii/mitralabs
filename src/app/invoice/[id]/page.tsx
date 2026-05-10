@@ -139,24 +139,53 @@ export default function PublicInvoicePage() {
   // Auto-download logic
   useEffect(() => {
     if (!isLoading && invoice && isAutoDownload) {
-      // Small delay to ensure styles are fully applied
-      const timer = setTimeout(async () => {
-        await handleDownloadPDF();
-        // Close the window after download if it was an auto-download trigger
-        setTimeout(() => window.close(), 1000);
-      }, 1000);
-      return () => clearTimeout(timer);
+      // Ensure library is pre-loaded
+      const prepareAndDownload = async () => {
+        try {
+          // Small delay to ensure all CSS and images are rendered
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          await handleDownloadPDF();
+          // Wait another bit to ensure browser has started the download
+          await new Promise(resolve => setTimeout(resolve, 2000));
+          window.close();
+        } catch (err) {
+          console.error("Auto-download failed:", err);
+        }
+      };
+      
+      prepareAndDownload();
     }
   }, [isLoading, invoice, isAutoDownload]);
 
-  if (isLoading) {
+  if (isLoading || (isAutoDownload && !invoice)) {
     return (
-      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
-        <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
-        <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">Loading Invoice...</p>
+      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center">
+        <div className="w-20 h-20 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-8 shadow-xl"></div>
+        <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Generating Document...</h2>
+        <p className="text-slate-500 font-medium max-w-xs leading-relaxed uppercase text-[10px] tracking-[0.2em]">
+          Please wait while our cryptographic engine prepares your secure PDF.
+        </p>
       </div>
     );
   }
+
+  // Special overlay when downloading
+  const DownloadOverlay = () => (
+    <motion.div 
+      initial={{ opacity: 0 }}
+      animate={{ opacity: 1 }}
+      className="fixed inset-0 z-[9999] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center"
+    >
+      <div className="w-24 h-24 bg-slate-900 text-white rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-slate-900/20">
+        <Loader2 className="animate-spin" size={40} />
+      </div>
+      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan PDF</h2>
+      <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] max-w-sm">
+        Invoice sedang diproses. Tab ini akan tertutup otomatis setelah download dimulai.
+      </p>
+    </motion.div>
+  );
+
 
   if (!invoice) {
     return (
@@ -183,6 +212,7 @@ export default function PublicInvoicePage() {
 
   return (
     <>
+      {isAutoDownload && <DownloadOverlay />}
       <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
         <div className="max-w-5xl mx-auto">
           {/* Navigation & Actions Layer */}
