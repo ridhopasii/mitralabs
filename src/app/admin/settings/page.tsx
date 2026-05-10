@@ -507,7 +507,7 @@ export default function SettingsPage() {
                     })}
                     className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="true">Ya, tampilkan materai jika total > limit</option>
+                    <option value="true">Ya, tampilkan materai jika total &gt; limit</option>
                     <option value="false">Jangan tampilkan materai</option>
                   </select>
                 </div>
