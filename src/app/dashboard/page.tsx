@@ -78,17 +78,95 @@ export default function ClientDashboard() {
     );
   }
 
+  const [isActivating, setIsActivating] = useState(false);
+  const [activationForm, setActivationForm] = useState({
+    full_name: "",
+    phone: "",
+    company_name: ""
+  });
+
+  const handleActivate = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsActivating(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      if (!user) throw new Error("User session not found");
+
+      const { error } = await supabase.from("Client").insert([{
+        id: user.id,
+        email: user.email,
+        full_name: activationForm.full_name || user.user_metadata?.full_name || "Client",
+        phone: activationForm.phone,
+        company_name: activationForm.company_name
+      }]);
+
+      if (error) throw error;
+      window.location.reload();
+    } catch (err: any) {
+      alert("Gagal mengaktifkan portal: " + err.message);
+    } finally {
+      setIsActivating(false);
+    }
+  };
+
   if (!client) {
     return (
-      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center space-y-6">
-        <div className="w-20 h-20 bg-white rounded-3xl flex items-center justify-center shadow-xl border border-slate-100 mx-auto text-slate-300">
-           <UserIcon size={32} />
-        </div>
-        <div className="space-y-2">
-          <h1 className="text-2xl font-bold">Akun Client Belum Aktif</h1>
-          <p className="text-slate-500 max-w-xs mx-auto text-sm leading-relaxed">Silakan hubungi admin Mitralabs untuk mengaktifkan portal client untuk email Anda.</p>
-        </div>
-        <button onClick={handleLogout} className="text-xs font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-all">Logout</button>
+      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center">
+        <motion.div 
+          initial={{ opacity: 0, y: 20 }}
+          animate={{ opacity: 1, y: 0 }}
+          className="max-w-md w-full bg-white p-12 rounded-[3.5rem] shadow-2xl border border-slate-100 space-y-8"
+        >
+          <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mx-auto text-slate-900 shadow-sm">
+             <UserIcon size={32} />
+          </div>
+          <div className="space-y-2">
+            <h1 className="text-2xl font-bold">Aktifkan Portal Client</h1>
+            <p className="text-slate-500 text-sm leading-relaxed">Akun Anda belum terdaftar sebagai Client. Lengkapi data di bawah untuk mulai memantau projek Anda.</p>
+          </div>
+
+          <form onSubmit={handleActivate} className="space-y-4 text-left">
+             <div className="space-y-2">
+               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Nama Lengkap</label>
+               <input 
+                 required
+                 type="text" 
+                 placeholder="Contoh: Ridho Robbi"
+                 value={activationForm.full_name}
+                 onChange={(e) => setActivationForm({...activationForm, full_name: e.target.value})}
+                 className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100" 
+               />
+             </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Nomor WhatsApp</label>
+               <input 
+                 required
+                 type="tel" 
+                 placeholder="0812..."
+                 value={activationForm.phone}
+                 onChange={(e) => setActivationForm({...activationForm, phone: e.target.value})}
+                 className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100" 
+               />
+             </div>
+             <div className="space-y-2">
+               <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Nama Perusahaan (Opsional)</label>
+               <input 
+                 type="text" 
+                 placeholder="Contoh: Indo Digital"
+                 value={activationForm.company_name}
+                 onChange={(e) => setActivationForm({...activationForm, company_name: e.target.value})}
+                 className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100" 
+               />
+             </div>
+             
+             <button disabled={isActivating} className="w-full bg-slate-900 text-white py-5 rounded-[2rem] font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
+               {isActivating ? <Loader2 size={18} className="animate-spin" /> : <CheckCircle2 size={18} />}
+               Aktifkan Portal Sekarang
+             </button>
+          </form>
+
+          <button onClick={handleLogout} className="text-[10px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 transition-all">Keluar / Sign Out</button>
+        </motion.div>
       </div>
     );
   }
