@@ -63,15 +63,28 @@ export default function PublicInvoicePage() {
       const element = document.getElementById("invoice-canvas");
       
       const opt = {
-        margin: 0,
+        margin: [10, 0, 10, 0], // Top, Left, Bottom, Right
         filename: `Invoice-${id}.pdf`,
         image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { scale: 2, useCORS: true, logging: false },
+        html2canvas: { 
+          scale: 2, 
+          useCORS: true, 
+          allowTaint: true,
+          letterRendering: true,
+          logging: false 
+        },
         jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
       };
 
       if (element) {
+        // Force the element to be visible and on top during capture
+        const originalStyle = element.style.position;
+        element.style.position = 'relative';
+        element.style.zIndex = '10000';
+        
         await html2pdf().set(opt as any).from(element).save();
+        
+        element.style.position = originalStyle;
       }
     } catch (error) {
       console.error("PDF Generation Error:", error);
@@ -174,7 +187,8 @@ export default function PublicInvoicePage() {
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-white/90 backdrop-blur-md flex flex-col items-center justify-center p-6 text-center"
+      data-html2canvas-ignore="true"
+      className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
     >
       <div className="w-24 h-24 bg-slate-900 text-white rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-slate-900/20">
         <Loader2 className="animate-spin" size={40} />
