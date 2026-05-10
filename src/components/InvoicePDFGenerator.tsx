@@ -1,186 +1,203 @@
 "use client";
 
-import { useRef } from 'react';
-import { useReactToPrint } from 'react-to-print';
 import { Download } from 'lucide-react';
 import { useData } from '@/context/DataContext';
 
+interface InvoiceItem {
+  desc: string;
+  price: number;
+  qty: number;
+}
+
+interface InvoiceData {
+  invoice_number: string;
+  client_name: string;
+  client_email: string;
+  created_at: string;
+  due_date: string;
+  items: InvoiceItem[] | string;
+}
+
 interface InvoicePDFGeneratorProps {
   invoiceNumber: string;
-  invoiceData: any;
+  invoiceData: InvoiceData;
   className?: string;
 }
 
-const InvoiceTemplate = ({ invoiceData, settings }: any) => {
-  const items = typeof invoiceData.items === 'string'
-    ? JSON.parse(invoiceData.items)
-    : invoiceData.items;
-
-  const subtotal = items.reduce((sum: number, item: any) => sum + (item.price * item.qty), 0);
-  const tax = subtotal * (settings?.taxRate || 0) / 100;
-  const total = subtotal + tax;
-
-  return (
-    <div style={{
-      padding: '40px',
-      fontFamily: 'Arial, sans-serif',
-      backgroundColor: 'white',
-      minHeight: '100vh'
-    }}>
-      {/* Header */}
-      <div style={{ textAlign: 'center', marginBottom: '40px' }}>
-        <h1 style={{ fontSize: '24px', fontWeight: 'bold', margin: '0 0 5px 0' }}>
-          {settings?.companyName || 'MITRALABS.ID'}
-        </h1>
-        <p style={{ margin: '0 0 20px 0', color: '#666' }}>
-          {settings?.companyTagline || 'Precision Web Engineering'}
-        </p>
-        <h2 style={{ fontSize: '32px', fontWeight: 'bold', margin: '20px 0' }}>
-          {invoiceData.invoice_number}
-        </h2>
-      </div>
-
-      {/* Bill To */}
-      <div style={{ marginBottom: '30px' }}>
-        <p style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '5px' }}>
-          BILL TO STAKEHOLDER
-        </p>
-        <p style={{ fontSize: '16px', fontWeight: 'bold', margin: '0' }}>
-          {invoiceData.client_name}
-        </p>
-        <p style={{ margin: '5px 0 0 0' }}>{invoiceData.client_email}</p>
-      </div>
-
-      {/* Dates */}
-      <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: '40px' }}>
-        <div>
-          <p style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '5px' }}>
-            ISSUE DATE
-          </p>
-          <p style={{ fontWeight: 'bold' }}>
-            {new Date(invoiceData.created_at).toLocaleDateString('id-ID')}
-          </p>
-        </div>
-        <div>
-          <p style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '5px' }}>
-            DUE DATE
-          </p>
-          <p style={{ fontWeight: 'bold', color: '#ef4444' }}>
-            {new Date(invoiceData.due_date).toLocaleDateString('id-ID')}
-          </p>
-        </div>
-      </div>
-
-      {/* Items Table */}
-      <table style={{ width: '100%', borderCollapse: 'collapse', marginBottom: '30px' }}>
-        <thead>
-          <tr style={{ backgroundColor: '#f5f5f5' }}>
-            <th style={{ padding: '12px', textAlign: 'left', fontSize: '11px', textTransform: 'uppercase' }}>
-              STRATEGIC SERVICE DEFINITION
-            </th>
-            <th style={{ padding: '12px', textAlign: 'center', fontSize: '11px', textTransform: 'uppercase' }}>
-              QUANTITY
-            </th>
-            <th style={{ padding: '12px', textAlign: 'right', fontSize: '11px', textTransform: 'uppercase' }}>
-              UNIT LOGIC
-            </th>
-            <th style={{ padding: '12px', textAlign: 'right', fontSize: '11px', textTransform: 'uppercase' }}>
-              FINAL COMMITMENT
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          {items.map((item: any, idx: number) => (
-            <tr key={idx}>
-              <td style={{ padding: '12px', borderBottom: '1px solid #eee' }}>
-                {item.desc}
-              </td>
-              <td style={{ padding: '12px', textAlign: 'center', borderBottom: '1px solid #eee' }}>
-                {item.qty}
-              </td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #eee' }}>
-                Rp {item.price.toLocaleString()}
-              </td>
-              <td style={{ padding: '12px', textAlign: 'right', borderBottom: '1px solid #eee' }}>
-                Rp {(item.price * item.qty).toLocaleString()}
-              </td>
-            </tr>
-          ))}
-          <tr>
-            <td colSpan={3} style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', fontSize: '18px' }}>
-              TOTAL
-            </td>
-            <td style={{ padding: '12px', textAlign: 'right', fontWeight: 'bold', fontSize: '18px' }}>
-              Rp {total.toLocaleString()}
-            </td>
-          </tr>
-        </tbody>
-      </table>
-
-      {/* Payment Instructions */}
-      <div style={{ marginBottom: '30px' }}>
-        <p style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '10px' }}>
-          PAYMENT INSTRUCTIONS
-        </p>
-        <p style={{ lineHeight: '1.6' }}>
-          {settings?.paymentInstructions || 'Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.'}
-        </p>
-      </div>
-
-      {/* Bank Details */}
-      <div style={{ marginBottom: '30px' }}>
-        <p style={{ fontSize: '11px', textTransform: 'uppercase', color: '#666', marginBottom: '10px' }}>
-          BANK TRANSFER DETAILS
-        </p>
-        <p style={{ fontWeight: 'bold', marginBottom: '5px' }}>
-          {settings?.bankName || 'Bank Central Asia (BCA)'}
-        </p>
-        <p>Account: {settings?.bankAccountNumber || '8000-7625-12'}</p>
-        <p>Name: {settings?.bankAccountName || 'Ridho Robbi Pasi'}</p>
-        {settings?.bankBranch && <p>Branch: {settings.bankBranch}</p>}
-      </div>
-
-      {/* Footer */}
-      <div style={{ textAlign: 'center', marginTop: '50px', paddingTop: '20px', borderTop: '1px solid #eee' }}>
-        <p style={{ fontSize: '10px', color: '#666' }}>
-          {settings?.footerNote || 'Verified by Mitralabs Cryptographic Protocol'}
-        </p>
-      </div>
-    </div>
-  );
-};
-
 export default function InvoicePDFGenerator({ invoiceNumber, invoiceData, className }: InvoicePDFGeneratorProps) {
-  const componentRef = useRef<HTMLDivElement>(null);
-
-  // Get settings from DataContext
   const { data } = useData();
   const settings = data.invoiceSettings;
 
-  const handlePrint = useReactToPrint({
-    contentRef: componentRef,
-    documentTitle: `Invoice-${invoiceNumber}`,
-    onAfterPrint: () => {
-      console.log('PDF generated successfully');
-    },
-  });
+  const generatePDF = async () => {
+    try {
+      console.log('🔄 Starting PDF generation...');
+
+      // Dynamic import to avoid SSR issues
+      const { jsPDF } = await import('jspdf');
+      console.log('✅ jsPDF loaded successfully');
+
+      const items = typeof invoiceData.items === 'string'
+        ? JSON.parse(invoiceData.items)
+        : invoiceData.items;
+
+      console.log('📄 Invoice data:', { invoiceNumber, items });
+
+      const subtotal = items.reduce((sum: number, item: InvoiceItem) => sum + (item.price * item.qty), 0);
+      const tax = subtotal * (settings?.taxRate || 0) / 100;
+      const total = subtotal + tax;
+
+      console.log('💰 Calculations:', { subtotal, tax, total });
+
+      // Create PDF
+      const pdf = new jsPDF('p', 'mm', 'a4');
+      const pageWidth = pdf.internal.pageSize.getWidth();
+      const pageHeight = pdf.internal.pageSize.getHeight();
+
+      // Set font
+      pdf.setFont('helvetica');
+
+      let yPos = 30;
+
+      // Header - Company Name
+      pdf.setFontSize(24);
+      pdf.setFont('helvetica', 'bold');
+      const companyName = settings?.companyName || 'MITRALABS.ID';
+      pdf.text(companyName, pageWidth / 2, yPos, { align: 'center' });
+
+      yPos += 8;
+      pdf.setFontSize(12);
+      pdf.setFont('helvetica', 'normal');
+      const tagline = settings?.companyTagline || 'Precision Web Engineering';
+      pdf.text(tagline, pageWidth / 2, yPos, { align: 'center' });
+
+      yPos += 15;
+
+      // Invoice Number
+      pdf.setFontSize(28);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(invoiceData.invoice_number, pageWidth / 2, yPos, { align: 'center' });
+
+      yPos += 25;
+
+      // Bill To
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('BILL TO STAKEHOLDER', 20, yPos);
+
+      yPos += 8;
+      pdf.setFontSize(14);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text(invoiceData.client_name, 20, yPos);
+
+      yPos += 6;
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(invoiceData.client_email, 20, yPos);
+
+      yPos += 20;
+
+      // Dates
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('ISSUE DATE', 20, yPos);
+      pdf.text('DUE DATE', 120, yPos);
+
+      yPos += 6;
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(new Date(invoiceData.created_at).toLocaleDateString('id-ID'), 20, yPos);
+      pdf.setTextColor(239, 68, 68); // Red color for due date
+      pdf.text(new Date(invoiceData.due_date).toLocaleDateString('id-ID'), 120, yPos);
+      pdf.setTextColor(0, 0, 0); // Reset to black
+
+      yPos += 25;
+
+      // Table Header
+      pdf.setFillColor(245, 245, 245);
+      pdf.rect(20, yPos - 5, pageWidth - 40, 12, 'F');
+
+      pdf.setFontSize(9);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('DESCRIPTION', 25, yPos);
+      pdf.text('QTY', 120, yPos, { align: 'center' });
+      pdf.text('PRICE', 140, yPos, { align: 'right' });
+      pdf.text('TOTAL', 180, yPos, { align: 'right' });
+
+      yPos += 15;
+
+      // Table Items
+      pdf.setFont('helvetica', 'normal');
+      items.forEach((item: InvoiceItem) => {
+        pdf.text(item.desc, 25, yPos);
+        pdf.text(item.qty.toString(), 120, yPos, { align: 'center' });
+        pdf.text(`Rp ${item.price.toLocaleString()}`, 140, yPos, { align: 'right' });
+        pdf.text(`Rp ${(item.price * item.qty).toLocaleString()}`, 180, yPos, { align: 'right' });
+        yPos += 8;
+      });
+
+      yPos += 10;
+
+      // Total
+      pdf.setFont('helvetica', 'bold');
+      pdf.setFontSize(16);
+      pdf.text('TOTAL', 140, yPos, { align: 'right' });
+      pdf.text(`Rp ${total.toLocaleString()}`, 180, yPos, { align: 'right' });
+
+      yPos += 25;
+
+      // Payment Instructions
+      pdf.setFontSize(10);
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('PAYMENT INSTRUCTIONS', 20, yPos);
+
+      yPos += 8;
+      pdf.setFont('helvetica', 'normal');
+      const paymentInstructions = settings?.paymentInstructions || 'Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.';
+      const splitInstructions = pdf.splitTextToSize(paymentInstructions, pageWidth - 40);
+      pdf.text(splitInstructions, 20, yPos);
+
+      yPos += splitInstructions.length * 5 + 15;
+
+      // Bank Details
+      pdf.setFont('helvetica', 'bold');
+      pdf.text('BANK TRANSFER DETAILS', 20, yPos);
+
+      yPos += 8;
+      pdf.setFont('helvetica', 'normal');
+      pdf.text(settings?.bankName || 'Bank Central Asia (BCA)', 20, yPos);
+      yPos += 5;
+      pdf.text(`Account: ${settings?.bankAccountNumber || '8000-7625-12'}`, 20, yPos);
+      yPos += 5;
+      pdf.text(`Name: ${settings?.bankAccountName || 'Ridho Robbi Pasi'}`, 20, yPos);
+      if (settings?.bankBranch) {
+        yPos += 5;
+        pdf.text(`Branch: ${settings.bankBranch}`, 20, yPos);
+      }
+
+      // Footer
+      yPos = pageHeight - 20;
+      pdf.setFontSize(8);
+      pdf.setTextColor(128, 128, 128);
+      const footerNote = settings?.footerNote || 'Verified by Mitralabs Cryptographic Protocol';
+      pdf.text(footerNote, pageWidth / 2, yPos, { align: 'center' });
+
+      console.log('📥 Saving PDF...');
+      // Save PDF - This will directly download
+      pdf.save(`Invoice-${invoiceNumber}.pdf`);
+      console.log('✅ PDF download initiated successfully!');
+
+    } catch (error) {
+      console.error('❌ Error generating PDF:', error);
+      alert('Failed to generate PDF. Please try again.');
+    }
+  };
 
   return (
-    <>
-      <button
-        onClick={handlePrint}
-        className={className || "p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"}
-        title="Download Invoice PDF"
-      >
-        <Download size={16} />
-      </button>
-
-      {/* Hidden component for printing */}
-      <div style={{ display: 'none' }}>
-        <div ref={componentRef}>
-          <InvoiceTemplate invoiceData={invoiceData} settings={settings} />
-        </div>
-      </div>
-    </>
+    <button
+      onClick={generatePDF}
+      className={className || "p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"}
+      title="Download Invoice PDF"
+    >
+      <Download size={16} />
+    </button>
   );
 }

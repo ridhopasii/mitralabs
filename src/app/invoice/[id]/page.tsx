@@ -47,8 +47,9 @@ const defaultInvoiceSettings = {
 export default function PublicInvoicePage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
-  const isAutoDownload = searchParams.get("download") === "true";
-  const isSilent = searchParams.get("silent_download") === "true";
+  // Removed old download parameters - using new jsPDF approach instead
+  // const isAutoDownload = searchParams.get("download") === "true";
+  // const isSilent = searchParams.get("silent_download") === "true";
 
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
@@ -178,7 +179,9 @@ export default function PublicInvoicePage() {
     fetchData();
   }, [id]);
 
-  // Auto-download logic
+  // Auto-download logic - DISABLED to prevent conflicts with new jsPDF approach
+  // The new InvoicePDFGenerator component handles direct PDF download
+  /*
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const isAuto = searchParams.get("download") === "true";
@@ -225,8 +228,9 @@ export default function PublicInvoicePage() {
       return () => clearTimeout(timer);
     }
   }, [isLoading, invoice]);
+  */
 
-  if (isLoading || (isAutoDownload && !invoice)) {
+  if (isLoading || !invoice) {
     return (
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
@@ -278,7 +282,7 @@ export default function PublicInvoicePage() {
 
   return (
     <>
-      {(isAutoDownload && !isSilent) && <DownloadOverlay />}
+      {/* Removed DownloadOverlay - using new jsPDF approach instead */}
       <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
         <div className="max-w-5xl mx-auto">
           {/* Navigation & Actions Layer */}
