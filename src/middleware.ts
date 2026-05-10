@@ -71,8 +71,11 @@ export async function middleware(request: NextRequest) {
 
       if (!userData || (userData.role !== "admin" && userData.role !== "editor")) {
         console.warn(`🚫 [Middleware] Unauthorized role for ${user.email}: ${userData?.role || 'no_user_record'}`);
-        // Redirect to login with error message instead of home
-        return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
+        // Redirect to login with error message and the email found
+        const errorUrl = new URL("/login", request.url);
+        errorUrl.searchParams.set("error", "unauthorized");
+        errorUrl.searchParams.set("email", user.email || "unknown");
+        return NextResponse.redirect(errorUrl);
       }
       
       console.log(`✅ [Middleware] Access granted for role: ${userData.role}`);

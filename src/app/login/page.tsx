@@ -103,7 +103,7 @@ export default function LoginPage() {
             {/* Display URL Errors */}
             {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'unauthorized' && !error && (
               <p className="text-error text-xs font-bold text-left bg-error/10 border border-error/20 rounded-2xl p-4">
-                Akun Anda tidak memiliki izin akses Admin. Silakan hubungi pengelola sistem.
+                Akun <span className="underline">{new URLSearchParams(window.location.search).get('email')}</span> tidak memiliki izin akses Admin. Silakan hubungi pengelola sistem.
               </p>
             )}
             {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'db_error' && !error && (
