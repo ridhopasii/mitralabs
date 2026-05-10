@@ -59,11 +59,10 @@ export default function PublicInvoicePage() {
     if (!element) return false;
 
     try {
-      // @ts-ignore
-      const domtoimage = (await import("dom-to-image-more")).default;
+      const html2canvas = (await import("html2canvas")).default;
       const { jsPDF } = await import("jspdf");
 
-      // Wait for all images to be loaded
+      // Wait for all images to be loaded to prevent hanging
       const images = Array.from(element.getElementsByTagName('img'));
       await Promise.all(images.map(img => {
         if (img.complete) return Promise.resolve();
@@ -73,24 +72,34 @@ export default function PublicInvoicePage() {
         });
       }));
 
-      // Convert DOM to PNG Blob (fastest and most accurate)
-      const dataUrl = await domtoimage.toPng(element, {
-        quality: 1.0,
-        bgcolor: '#ffffff',
+      // Convert DOM to Canvas
+      const canvas = await html2canvas(element, {
         scale: 2, // Retina quality
+        useCORS: true, // Handle external images
+        allowTaint: true,
+        backgroundColor: "#ffffff",
+        logging: false,
+        onclone: (documentClone) => {
+          // Ensure the cloned element is visible and has a background
+          const el = documentClone.getElementById("invoice-canvas");
+          if (el) {
+             el.style.backgroundColor = "#ffffff";
+          }
+        }
       });
 
+      const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
       });
 
-      const imgProps = pdf.getImageProperties(dataUrl);
+      const imgProps = pdf.getImageProperties(imgData);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Invoice-${id}.pdf`);
       
       return true;
