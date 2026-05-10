@@ -1,10 +1,17 @@
 import { NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabaseAdmin = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!
-);
+// Helper to get admin client inside handler to avoid build-time errors
+const getSupabaseAdmin = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY;
+
+  if (!url || !key) {
+    throw new Error('Supabase Admin credentials missing');
+  }
+
+  return createClient(url, key);
+};
 
 export async function POST(request: Request) {
   try {
@@ -17,10 +24,12 @@ export async function POST(request: Request) {
       return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
     }
 
+    const supabaseAdmin = getSupabaseAdmin();
+
     // 2. Extract Payment Info (Example for common gateways like Midtrans/Xendit)
-    const { 
-      order_id, 
-      transaction_status, 
+    const {
+      order_id,
+      transaction_status,
       status, // Xendit uses status
       external_id // Xendit uses external_id for order_id
     } = payload;
@@ -34,7 +43,7 @@ export async function POST(request: Request) {
       // 3. Update Invoice Status in Database
       const { error } = await supabaseAdmin
         .from('Invoice')
-        .update({ 
+        .update({
           status: 'Paid',
           updated_at: new Date().toISOString()
         })

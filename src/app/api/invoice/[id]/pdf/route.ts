@@ -1,10 +1,17 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
+// Helper to get supabase client inside handler to avoid build-time errors
+const getSupabase = () => {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY || process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+  if (!url || !key) {
+    throw new Error('Supabase credentials missing');
+  }
+
+  return createClient(url, key);
+};
 
 export async function GET(
   request: NextRequest,
@@ -12,6 +19,7 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const supabase = getSupabase();
 
     // Fetch invoice from Supabase
     const { data: invoice, error } = await supabase
@@ -74,29 +82,29 @@ function generateInvoiceHTML(invoice: any, items: any[], settings: any) {
     body { font-family: 'Inter', -apple-system, sans-serif; color: #1e293b; line-height: 1.5; background: #f8fafc; }
     .page { width: 210mm; min-height: 297mm; padding: 20mm; margin: 10mm auto; background: white; box-shadow: 0 0 10px rgba(0,0,0,0.1); }
     @media print { body { background: white; } .page { margin: 0; box-shadow: none; } }
-    
+
     .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 60px; border-bottom: 2px solid #f1f5f9; padding-bottom: 30px; }
     .logo-area h1 { font-size: 28px; font-weight: 900; letter-spacing: -0.05em; color: #0f172a; }
     .company-info { font-size: 12px; color: #64748b; margin-top: 8px; max-width: 250px; }
-    
+
     .invoice-title { text-align: right; }
     .invoice-title h2 { font-size: 48px; font-weight: 900; color: #f1f5f9; margin-bottom: -10px; }
     .invoice-number { font-size: 16px; font-weight: 700; color: #0f172a; }
-    
+
     .details-grid { display: grid; grid-cols: 2; gap: 40px; margin-bottom: 60px; }
     .detail-box h4 { font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #3b82f6; margin-bottom: 12px; }
     .detail-box p { font-size: 14px; font-weight: 600; }
-    
+
     table { width: 100%; border-collapse: collapse; margin-bottom: 40px; }
     th { text-align: left; font-size: 10px; font-weight: 800; text-transform: uppercase; letter-spacing: 0.1em; color: #64748b; padding: 15px; border-bottom: 2px solid #f1f5f9; }
     td { padding: 15px; font-size: 14px; border-bottom: 1px solid #f8fafc; }
     .item-desc { font-weight: 700; color: #0f172a; }
     .item-details { font-size: 12px; color: #64748b; margin-top: 4px; }
-    
+
     .totals { margin-left: auto; width: 300px; }
     .total-row { display: flex; justify-content: space-between; padding: 10px 0; font-size: 14px; }
     .total-row.grand-total { border-top: 2px solid #0f172a; margin-top: 10px; padding-top: 20px; font-size: 20px; font-weight: 900; color: #0f172a; }
-    
+
     .footer { margin-top: 80px; font-size: 11px; color: #94a3b8; border-top: 1px solid #f1f5f9; padding-top: 30px; }
     .payment-instructions { background: #f8fafc; padding: 20px; rounded: 12px; margin-top: 40px; }
     .payment-instructions h4 { font-size: 12px; font-weight: 800; margin-bottom: 10px; color: #0f172a; }
