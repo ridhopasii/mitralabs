@@ -41,6 +41,11 @@ export async function proxy(request: NextRequest) {
     }
 
     // Strict RBAC Check
+    // Special bypass for the first admin (ridhorobbipasi@gmail.com)
+    if (user.email === "ridhorobbipasi@gmail.com") {
+      return response;
+    }
+
     const { data: userData } = await supabase
       .from("User")
       .select("role")
