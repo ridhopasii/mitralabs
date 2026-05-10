@@ -234,6 +234,10 @@ export const initialData: AppData = {
     companyFavicon: "/favicon.ico",
     businessMode: "agresif",
     waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial.",
+    companyTagline: "Mitra Digital Anda",
+    companyWebsite: "mitralabs.id",
+    companyNpwp: "01.234.567.8-901.000",
+    linkedinUrl: "linkedin.com/company/mitralabs-id",
   },
   invoiceSettings: {
     companyName: "MITRALABS.ID",

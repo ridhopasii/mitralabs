@@ -32,10 +32,10 @@ export interface Invoice {
   client_email: string;
   client_company?: string;
   client_address?: string;
-  created_at: string;
   project_period_start?: string;
   project_period_end?: string;
-  invoice_type?: "Invoice" | "Kwitansi";
+  invoice_type?: string;
+  created_at: string;
 }
 
 export interface Booking {
@@ -203,6 +203,10 @@ export interface AppData {
     companyFavicon: string;
     businessMode: string;
     waPromoMessage: string;
+    companyTagline: string;
+    companyWebsite: string;
+    companyNpwp: string;
+    linkedinUrl: string;
   };
   invoiceSettings: {
     companyName: string;
@@ -341,6 +345,11 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           merged.contact.instagram = configRes.data.instagram ?? initialData.contact.instagram;
           merged.contact.address = configRes.data.address ?? initialData.contact.address;
           merged.contact.mapsUrl = configRes.data.maps_url ?? initialData.contact.mapsUrl;
+          
+          merged.settings.companyTagline = configRes.data.company_tagline ?? initialData.settings.companyTagline;
+          merged.settings.companyWebsite = configRes.data.company_website ?? initialData.settings.companyWebsite;
+          merged.settings.companyNpwp = configRes.data.company_npwp ?? initialData.settings.companyNpwp;
+          merged.settings.linkedinUrl = configRes.data.linkedin_url ?? initialData.settings.linkedinUrl;
 
           if (configRes.data.json_content) {
             try {
@@ -516,6 +525,10 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             instagram: newData.contact.instagram,
             address: newData.contact.address,
             maps_url: newData.contact.mapsUrl,
+            company_tagline: newData.settings.companyTagline,
+            company_website: newData.settings.companyWebsite,
+            company_npwp: newData.settings.companyNpwp,
+            linkedin_url: newData.settings.linkedinUrl,
             json_content: {
               home: newData.home,
               services: newData.services,

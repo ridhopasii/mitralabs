@@ -1,104 +1,92 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, useMemo } from "react";
 import { useData } from "@/context/DataContext";
-import { useParams, useSearchParams } from "next/navigation";
-import {
+import { useParams, useRouter } from "next/navigation";
+import { 
+  CheckCircle2, 
+  Globe, 
+  Mail, 
+  Phone, 
+  Building2, 
+  ShieldCheck, 
+  CreditCard, 
+  ChevronRight, 
+  Hash, 
+  Info, 
+  Linkedin, 
+  Instagram, 
+  Copy,
   Printer,
   Download,
-  CheckCircle2,
-  Clock,
-  AlertCircle,
   ChevronLeft,
-  Mail,
-  Phone,
-  Globe,
-  ShieldCheck,
-  CreditCard,
-  Building2,
-  Receipt,
   Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
 
-const defaultInvoiceSettings = {
-  companyName: "MITRALABS.ID",
-  companyTagline: "Precision Web Engineering",
-  companyAddress: "Jl. Contoh No. 123, Medan, Sumatera Utara, Indonesia",
-  companyCity: "Medan",
-  companyProvince: "Sumatera Utara",
-  companyPostalCode: "20111",
-  companyPhone: "+62 823-8111-8520",
-  companyEmail: "contact@mitralabs.id",
-  companyWebsite: "www.mitralabs.id",
-  companyNPWP: "00.000.000.0-000.000",
-  bankName: "Bank Central Asia (BCA)",
-  bankAccountNumber: "8000-7625-12",
-  bankAccountName: "Ridho Robbi Pasi",
-  bankBranch: "KCP Medan Petisah",
-  taxRate: 0,
-  taxLabel: "PPN (11%)",
-  footerNote: "Verified by Mitralabs Cryptographic Protocol",
-  termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
-  paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
-};
-
 export default function PublicInvoicePage() {
   const { id } = useParams();
-  const searchParams = useSearchParams();
-  // Removed old download parameters - using new jsPDF approach instead
-  // const isAutoDownload = searchParams.get("download") === "true";
-  // const isSilent = searchParams.get("silent_download") === "true";
-
-  const { data } = useData();
+  const router = useRouter();
+  const { data: globalData } = useData();
+  
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || defaultInvoiceSettings);
+  const [isGenerating, setIsGenerating] = useState(false);
 
+  // Fetch Data from Supabase
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const { supabase } = await import("@/lib/supabase");
+        const { data, error } = await supabase
+          .from("Invoice")
+          .select("*")
+          .eq("invoice_number", id)
+          .single();
+
+        if (error) throw error;
+        if (data) {
+          setInvoice({
+            ...data,
+            items: typeof data.items === 'string' ? JSON.parse(data.items) : data.items
+          });
+        }
+      } catch (err) {
+        console.error("Error fetching invoice:", err);
+      } finally {
+        setIsLoading(false);
+      }
+    };
+    fetchData();
+  }, [id]);
+
+  // Format Currency
+  const formatCurrency = (num: number) => {
+    return new Intl.NumberFormat('id-ID', {
+      style: 'currency',
+      currency: 'IDR',
+      minimumFractionDigits: 0
+    }).format(num);
+  };
+
+  // PDF Download Handler (using jsPDF + html2canvas for high fidelity)
   const handleDownloadPDF = async () => {
-    const element = document.getElementById("invoice-canvas");
-    if (!element) {
-      console.error("Invoice canvas element not found");
-      return false;
-    }
+    const element = document.getElementById("invoice-content");
+    if (!element) return;
 
+    setIsGenerating(true);
     try {
-      console.log("Starting PDF generation...");
       const html2canvas = (await import("html2canvas")).default;
       const { jsPDF } = await import("jspdf");
 
-      // Wait for all images to be loaded to prevent hanging
-      const images = Array.from(element.getElementsByTagName('img'));
-      await Promise.all(images.map(img => {
-        if (img.complete) return Promise.resolve();
-        return new Promise(resolve => {
-          img.onload = resolve;
-          img.onerror = resolve;
-          // Timeout after 3 seconds
-          setTimeout(resolve, 3000);
-        });
-      }));
-
-      console.log("Converting to canvas...");
-      // Convert DOM to Canvas
       const canvas = await html2canvas(element, {
-        scale: 2, // Retina quality
-        useCORS: true, // Handle external images
-        allowTaint: true,
+        scale: 2,
+        useCORS: true,
         backgroundColor: "#ffffff",
-        logging: false,
-        onclone: (documentClone) => {
-          // Ensure the cloned element is visible and has a background
-          const el = documentClone.getElementById("invoice-canvas");
-          if (el) {
-             el.style.backgroundColor = "#ffffff";
-          }
-        }
       });
 
-      console.log("Creating PDF...");
-      const imgData = canvas.toDataURL("image/jpeg", 0.95);
+      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
@@ -109,426 +97,347 @@ export default function PublicInvoicePage() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
-
-      console.log("Saving PDF...");
-      pdf.save(`Invoice-${id}.pdf`);
-
-      console.log("PDF generated successfully!");
-      return true;
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Kwitansi-${invoice?.invoice_number}.pdf`);
     } catch (error) {
-      console.error("PDF Generation Error:", error);
-      // Return false instead of fallback to print
-      return false;
+      console.error("PDF Error:", error);
+    } finally {
+      setIsGenerating(false);
     }
   };
 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const { supabase } = await import("@/lib/supabase");
-
-        // Fetch invoice and settings in parallel from Supabase
-        const [invoiceRes, configRes] = await Promise.all([
-          supabase
-            .from("Invoice")
-            .select("*")
-            .eq("invoice_number", id)
-            .single(),
-          supabase
-            .from("SiteConfig")
-            .select("json_content")
-            .eq("id", 1)
-            .maybeSingle()
-        ]);
-
-        // Process invoice
-        if (invoiceRes.error) {
-          console.error("Error fetching invoice:", invoiceRes.error);
-        } else if (invoiceRes.data) {
-          const parsedInvoice = {
-            ...invoiceRes.data,
-            items: typeof invoiceRes.data.items === 'string'
-              ? JSON.parse(invoiceRes.data.items)
-              : invoiceRes.data.items
-          };
-          setInvoice(parsedInvoice);
-        }
-
-        // Process settings from Supabase (takes priority over localStorage)
-        if (configRes.data?.json_content) {
-          try {
-            const jsonContent = typeof configRes.data.json_content === 'string'
-              ? JSON.parse(configRes.data.json_content)
-              : configRes.data.json_content;
-
-            if (jsonContent.invoiceSettings) {
-              setInvoiceSettings({ ...defaultInvoiceSettings, ...jsonContent.invoiceSettings });
-            }
-          } catch (e) {
-            console.error("Failed to parse settings from Supabase:", e);
-          }
-        }
-      } catch (err) {
-        console.error("Error:", err);
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, [id]);
-
-  // Auto-download logic - DISABLED to prevent conflicts with new jsPDF approach
-  // The new InvoicePDFGenerator component handles direct PDF download
-  /*
-  useEffect(() => {
-    const searchParams = new URLSearchParams(window.location.search);
-    const isAuto = searchParams.get("download") === "true";
-    const isSilent = searchParams.get("silent_download") === "true";
-
-    if (!isLoading && invoice && (isAuto || isSilent)) {
-      const timer = setTimeout(async () => {
-        console.log("Auto-download triggered");
-
-        // Set a safety timeout for the entire process
-        const safetyTimeout = setTimeout(() => {
-          console.warn("PDF generation taking too long...");
-          if (isSilent) {
-            window.parent.postMessage({ type: 'PDF_DOWNLOAD_ERROR', invoiceNumber: id }, '*');
-          } else {
-            // Close tab if taking too long
-            alert("PDF generation failed. Please try again or use the Print button.");
-            window.close();
-          }
-          // Don't fallback to print dialog - just show error
-        }, 15000);
-
-        const success = await handleDownloadPDF();
-        clearTimeout(safetyTimeout);
-
-        console.log("PDF generation result:", success);
-
-        if (isSilent) {
-           window.parent.postMessage({
-             type: success ? 'PDF_DOWNLOAD_COMPLETE' : 'PDF_DOWNLOAD_ERROR',
-             invoiceNumber: id
-           }, '*');
-        } else if (isAuto) {
-           if (success) {
-             // Close tab after successful download
-             setTimeout(() => window.close(), 1500);
-           } else {
-             // Show error and close
-             alert("PDF generation failed. Please try again or use the Print button.");
-             window.close();
-           }
-        }
-      }, 1500);
-      return () => clearTimeout(timer);
-    }
-  }, [isLoading, invoice]);
-  */
-
-  if (isLoading || !invoice) {
+  if (isLoading) {
     return (
-      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
-        <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
-        <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">Loading Invoice...</p>
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-6">
+        <Loader2 className="w-12 h-12 text-slate-400 animate-spin mb-4" />
+        <p className="text-slate-500 font-bold text-xs uppercase tracking-widest">Memuat Dokumen...</p>
       </div>
     );
   }
-
-
-  // Special overlay when downloading
-  const DownloadOverlay = () => (
-    <motion.div
-      initial={{ opacity: 0 }}
-      animate={{ opacity: 1 }}
-      className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center no-print"
-    >
-      <div className="w-24 h-24 bg-slate-900 text-white rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-slate-900/20">
-        <Loader2 className="animate-spin" size={40} />
-      </div>
-      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan PDF</h2>
-      <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] max-w-sm">
-        Invoice sedang diproses. Tab ini akan tertutup otomatis setelah download dimulai.
-      </p>
-    </motion.div>
-  );
 
   if (!invoice) {
     return (
-      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center">
-        <motion.div
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          className="w-24 h-24 bg-rose-50 text-rose-500 rounded-3xl flex items-center justify-center mb-10 shadow-sm"
-        >
-          <AlertCircle size={40} strokeWidth={1.5} />
-        </motion.div>
-        <h1 className="text-3xl font-bold tracking-tight text-slate-900 mb-4">Document Not Found</h1>
-        <p className="text-slate-500 font-medium max-w-sm mb-12 leading-relaxed">
-          The requested financial document could not be located or has been archived by our security protocol.
-        </p>
-        <Link href="/" className="px-12 py-5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest shadow-xl hover:bg-slate-800 transition-all">
-          Return to Portal
-        </Link>
+      <div className="min-h-screen bg-[#F5F5F7] flex flex-col items-center justify-center p-6 text-center">
+        <h1 className="text-2xl font-bold mb-4">Dokumen Tidak Ditemukan</h1>
+        <Link href="/" className="text-blue-600 font-bold hover:underline">Kembali ke Beranda</Link>
       </div>
     );
   }
 
-  const isPaid = invoice.status === "Paid";
+  // Calculate Total
+  const subtotal = invoice.items.reduce((acc: number, item: any) => acc + (item.qty * item.price), 0);
+  const total = subtotal; // PPN removed as per user design
 
   return (
-    <>
-      {/* Removed DownloadOverlay - using new jsPDF approach instead */}
-      <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
-        <div className="max-w-5xl mx-auto">
-          {/* Navigation & Actions Layer */}
-          <div className="flex flex-col md:flex-row justify-between items-center gap-8 mb-12 no-print">
-            <Link href="/admin/booking" className="flex items-center gap-4 text-slate-400 hover:text-slate-900 transition-all font-bold group">
-              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center shadow-sm border border-slate-200/50 group-hover:scale-105 transition-transform">
-                <ChevronLeft size={20} />
-              </div>
-              <span className="text-sm uppercase tracking-widest">Exit to Dashboard</span>
-            </Link>
+    <div className="min-h-screen bg-[#F5F5F7] py-12 px-4 font-sans text-[#1D1D1F] flex flex-col items-center">
+      
+      {/* Actions Layer */}
+      <div className="w-full max-w-[800px] mb-8 flex justify-between items-center no-print">
+        <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-xs uppercase tracking-widest transition-all">
+          <ChevronLeft size={16} /> Back
+        </button>
+        <div className="flex gap-3">
+          <button 
+            onClick={() => window.print()}
+            className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
+          >
+            <Printer size={16} /> Print
+          </button>
+          <button 
+            onClick={handleDownloadPDF}
+            disabled={isGenerating}
+            className="px-6 py-3 bg-[#1D1D1F] text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:opacity-90 transition-all shadow-xl shadow-slate-200 disabled:opacity-50"
+          >
+            {isGenerating ? <Loader2 size={16} className="animate-spin" /> : <Download size={16} />}
+            Download PDF
+          </button>
+        </div>
+      </div>
 
-            <div className="flex items-center gap-3">
-              <button
-                onClick={() => window.print()}
-                className="px-10 py-5 bg-white text-slate-900 border border-slate-200/60 rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:bg-slate-50 transition-all shadow-sm"
-              >
-                <Printer size={18} strokeWidth={1.5} /> Print
-              </button>
-              <button
-                onClick={handleDownloadPDF}
-                className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20"
-              >
-                <Download size={18} strokeWidth={1.5} /> Save as PDF
-              </button>
+      {/* Main Document Content */}
+      <div id="invoice-content" className="w-full max-w-[800px] bg-white rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] overflow-hidden relative border border-slate-100">
+        
+        {/* Top Copy Indicator */}
+        <div className="bg-slate-50 px-10 py-2 border-b border-slate-100 flex justify-between items-center">
+          <div className="flex items-center gap-2 text-[9px] font-bold text-slate-400 uppercase tracking-widest leading-none">
+            <Copy size={10} /> Lembar 1: Pelanggan
+          </div>
+          <div className="text-[9px] font-bold text-slate-300 uppercase tracking-widest leading-none italic">
+            Original Receipt
+          </div>
+        </div>
+
+        {/* Header Section */}
+        <div className="p-10 md:p-16 border-b border-[#F2F2F7]">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+            <div className="space-y-8">
+              <div className="flex items-center gap-5">
+                <div className="w-16 h-16 bg-[#1D1D1F] rounded-2xl flex items-center justify-center text-white text-3xl font-semibold tracking-tighter shadow-xl shadow-slate-200">M</div>
+                <div className="space-y-1">
+                  <h2 className="text-2xl font-bold tracking-tight text-[#1D1D1F]">{globalData.invoiceSettings.companyName}</h2>
+                  <div className="flex items-center gap-2 text-[#0066FF] font-semibold text-[11px] uppercase tracking-[0.3em]">
+                    <span className="w-1.5 h-1.5 bg-[#0066FF] rounded-full"></span>
+                    {globalData.invoiceSettings.companyTagline}
+                  </div>
+                </div>
+              </div>
+              
+              <div className="grid grid-cols-1 gap-2 text-[13px] text-[#86868B] font-medium leading-relaxed">
+                <p className="flex items-center gap-2 italic"><Building2 size={14} className="text-[#D2D2D7]" /> {globalData.invoiceSettings.companyAddress}, {globalData.invoiceSettings.companyCity}</p>
+                <div className="flex gap-4">
+                  <p className="flex items-center gap-2"><Globe size={14} className="text-[#D2D2D7]" /> {globalData.invoiceSettings.companyWebsite}</p>
+                  <p className="flex items-center gap-2"><Phone size={14} className="text-[#D2D2D7]" /> {globalData.invoiceSettings.companyPhone}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="flex flex-col items-start md:items-end text-left md:text-right w-full md:w-auto">
+              <div className="mb-8">
+                <h1 className="text-5xl font-bold tracking-tighter text-[#1D1D1F] leading-none mb-2 italic">
+                  {invoice.invoice_type || "Kwitansi"}
+                </h1>
+                <p className="text-[#86868B] text-[10px] font-bold tracking-[0.2em] uppercase">E-Verification Success</p>
+              </div>
+
+              <div className="w-full md:min-w-[220px]">
+                <div className="flex justify-between items-center text-[11px] font-bold text-[#86868B] uppercase tracking-widest mb-1">
+                  <span>No. Referensi</span>
+                </div>
+                <h3 className="text-lg font-bold text-[#1D1D1F] mb-4 tracking-tight">{invoice.invoice_number}</h3>
+                
+                <div className="flex flex-wrap md:flex-col gap-4 md:gap-2">
+                  <div className="bg-[#F5F5F7] px-3 py-2 rounded-lg inline-flex flex-col border border-slate-100">
+                    <span className="text-[9px] font-bold text-[#86868B] uppercase mb-0.5 tracking-wider">Tanggal Terbit</span>
+                    <span className="text-xs font-bold">{new Date(invoice.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</span>
+                  </div>
+                  <div className="bg-[#E8F5E9] px-3 py-2 rounded-lg inline-flex flex-col border border-[#C8E6C9]/40">
+                    <span className="text-[9px] font-bold text-[#2E7D32] uppercase mb-0.5 tracking-wider">Status</span>
+                    <span className="text-xs font-bold text-[#2E7D32] flex items-center gap-1">
+                      <CheckCircle2 size={12} /> {invoice.status === 'Paid' ? 'Lunas' : invoice.status}
+                    </span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Client & Bank Details */}
+        <div className="p-10 md:px-16 md:py-12 bg-white">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-16">
+            <div className="space-y-6">
+              <h4 className="text-[11px] font-bold text-[#86868B] uppercase tracking-[0.2em] flex items-center gap-2">
+                Penerima Layanan <ChevronRight size={12} className="text-[#D2D2D7]" />
+              </h4>
+              <div className="space-y-2">
+                <p className="text-2xl font-bold text-[#1D1D1F] tracking-tight">{invoice.client_name}</p>
+                <p className="text-[#0066FF] font-bold text-sm">{invoice.client_company || "-"}</p>
+                <div className="pt-4 flex flex-col gap-1 text-sm text-[#86868B] font-medium leading-relaxed italic">
+                  <p className="flex items-center gap-2"><Mail size={14} className="text-[#D2D2D7]" /> {invoice.client_email}</p>
+                  <p className="max-w-xs">{invoice.client_address || "-"}</p>
+                </div>
+              </div>
+            </div>
+
+            <div className="space-y-6">
+              <h4 className="text-[11px] font-bold text-[#86868B] uppercase tracking-[0.2em] flex items-center gap-2">
+                Metode Pembayaran <ChevronRight size={12} className="text-[#D2D2D7]" />
+              </h4>
+              <div className="bg-[#F5F5F7] p-6 rounded-[24px] space-y-4 border border-slate-50">
+                <div className="flex items-center gap-3">
+                  <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-[#0066FF] shadow-sm border border-[#E8E8ED]">
+                    <CreditCard size={20} />
+                  </div>
+                  <div>
+                    <p className="text-[10px] font-bold text-[#86868B] uppercase leading-none mb-1 tracking-tighter">Transfer Bank</p>
+                    <p className="text-sm font-bold text-[#1D1D1F]">{globalData.invoiceSettings.bankName}</p>
+                  </div>
+                </div>
+                <div className="space-y-3 pt-2 border-t border-[#E8E8ED]">
+                  <div className="flex justify-between items-center text-xs">
+                    <span className="text-[#86868B] font-medium tracking-tight">Penerima</span>
+                    <span className="font-bold text-[#1D1D1F]">{globalData.invoiceSettings.bankAccountName}</span>
+                  </div>
+                  <div className="flex justify-between items-center text-sm">
+                    <span className="text-[#86868B] font-medium tracking-tight">No. Rekening</span>
+                    <span className="font-bold text-[#1D1D1F] tracking-widest font-mono">{globalData.invoiceSettings.bankAccountNumber}</span>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Table Items */}
+        <div className="px-10 md:px-16 py-6 min-h-[180px]">
+          <div className="mb-4 flex items-center gap-2 text-[10px] font-bold text-[#86868B] uppercase tracking-widest">
+            <Info size={12} className="text-[#0066FF]" />
+            Periode Proyek: <span className="text-[#1D1D1F]">
+              {invoice.project_period_start ? `${new Date(invoice.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoice.project_period_end).toLocaleDateString('id-ID')}` : "-"}
+            </span>
+          </div>
+          <table className="w-full text-sm">
+            <thead>
+              <tr className="border-b-2 border-[#1D1D1F]">
+                <th className="pb-6 text-left text-[11px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Deskripsi Item</th>
+                <th className="pb-6 px-4 text-center text-[11px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Qty</th>
+                <th className="pb-6 text-right text-[11px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Total</th>
+              </tr>
+            </thead>
+            <tbody className="divide-y divide-[#F5F5F7]">
+              {invoice.items.map((item: any, idx: number) => (
+                <tr key={idx}>
+                  <td className="py-6 pr-4">
+                    <p className="font-bold text-[#1D1D1F] tracking-tight mb-1">{item.desc}</p>
+                    <p className="text-[11px] text-[#86868B] font-medium leading-relaxed max-w-sm">{item.details}</p>
+                  </td>
+                  <td className="py-6 px-4 text-center font-bold text-[#86868B] tabular-nums">{item.qty}</td>
+                  <td className="py-6 text-right font-bold text-[#1D1D1F] tabular-nums">{formatCurrency(item.qty * item.price)}</td>
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+
+        {/* Totals Section */}
+        <div className="px-10 md:px-16 py-10 bg-[#F5F5F7]/40 border-t border-[#F2F2F7]">
+          <div className="flex flex-col md:flex-row justify-between items-start gap-12">
+            <div className="max-w-[340px] space-y-6">
+              <div>
+                <h5 className="text-[10px] font-bold text-[#1D1D1F] uppercase tracking-[0.2em] mb-3 flex items-center gap-2">
+                  <ShieldCheck size={14} className="text-[#2E7D32]" /> Syarat & Ketentuan
+                </h5>
+                <ul className="space-y-1.5">
+                  {globalData.invoiceSettings.termsAndConditions.split('\n').map((term: string, idx: number) => (
+                    <li key={idx} className="text-[10px] text-[#86868B] leading-relaxed font-medium flex gap-2">
+                      <span className="text-[#D2D2D7]">•</span> {term}
+                    </li>
+                  ))}
+                </ul>
+              </div>
+            </div>
+
+            <div className="w-full md:w-[280px] space-y-3">
+              <div className="flex justify-between items-center text-sm font-bold border-b border-[#E8E8ED] pb-4">
+                <span className="text-[#86868B] uppercase tracking-widest text-[10px]">Subtotal</span>
+                <span className="text-[#1D1D1F] tabular-nums">{formatCurrency(total)}</span>
+              </div>
+              
+              <div className="pt-4 flex flex-col items-end">
+                <p className="text-[10px] font-bold text-[#0066FF] uppercase tracking-[0.3em] mb-2">Total Akhir</p>
+                <span className="text-4xl font-bold text-[#1D1D1F] tracking-tighter tabular-nums leading-none">
+                  {formatCurrency(total)}
+                </span>
+                <div className="mt-4 inline-flex items-center gap-2 text-[#2E7D32] bg-[#E8F5E9] px-3 py-1.5 rounded-full border border-[#C8E6C9]/40">
+                  <CheckCircle2 size={12} />
+                  <span className="text-[9px] font-black uppercase tracking-widest leading-none">Verified Payment</span>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        {/* Signature Area */}
+        <div className="px-10 md:px-16 py-16 bg-white border-t border-[#F2F2F7]">
+          <div className="grid grid-cols-3 gap-12 text-center">
+            
+            <div className="space-y-4">
+              <p className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Pelanggan,</p>
+              <div className="h-28 flex flex-col justify-end">
+                <div className="border-b border-[#D2D2D7] w-full mx-auto"></div>
+                <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight">{invoice.client_name}</p>
+                <p className="text-[9px] text-slate-400 font-medium uppercase tracking-tighter italic">Signature / Digital Verified</p>
+              </div>
+            </div>
+
+            <div className="space-y-4">
+              <p className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Marketing,</p>
+              <div className="h-28 flex flex-col justify-end">
+                <div className="border-b border-[#D2D2D7] w-full mx-auto"></div>
+                <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight italic">
+                  {globalData.invoiceSettings.signatureFields?.marketing || "Marketing Officer"}
+                </p>
+                <p className="text-[9px] text-slate-400 font-medium uppercase tracking-tighter">Finance Department</p>
+              </div>
+            </div>
+
+            <div className="space-y-4 relative">
+              <p className="text-[10px] font-bold text-[#86868B] uppercase tracking-[0.2em]">Owner,</p>
+              <div className="h-28 flex flex-col justify-end items-center">
+                {total > 5000000 && (
+                  <div className="absolute top-8 left-1/2 -translate-x-1/2 w-20 h-24 border-2 border-dashed border-slate-200 flex flex-col items-center justify-center -rotate-6 bg-slate-50/20 px-2 rounded-md">
+                    <span className="text-[7px] text-slate-300 font-bold uppercase text-center leading-none mb-1">E-Stamp Duty</span>
+                    <span className="text-[10px] text-slate-300 font-black uppercase text-center leading-tight">MATERAI<br/>10.000</span>
+                  </div>
+                )}
+                <div className="border-b border-[#D2D2D7] w-full mx-auto z-10"></div>
+                <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight z-10">
+                   {globalData.invoiceSettings.signatureFields?.owner || "Direktur Utama"}
+                </p>
+              </div>
             </div>
           </div>
 
-          {/* Premium Invoice Canvas */}
-          <motion.div
-            id="invoice-canvas"
-            initial={{ opacity: 0, y: 40 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}
-            className="bg-white rounded-[3.5rem] shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)] overflow-hidden border border-slate-100"
-          >
-            {/* Design Element: Top Accent Bar */}
-            <div className={`h-3 w-full ${isPaid ? 'bg-emerald-400' : 'bg-primary'}`} />
-
-            {/* Inner Canvas Container */}
-            <div className="p-10 md:p-24">
-              {/* Header Grid */}
-              <div className="flex flex-col md:flex-row justify-between items-start gap-16 mb-24">
-                <div className="space-y-6">
-                  <div className="flex items-center gap-4">
-                    <div className="w-14 h-14 bg-slate-900 rounded-2xl flex items-center justify-center text-white shadow-lg">
-                      <Receipt size={28} strokeWidth={1.5} />
-                    </div>
-                    <div>
-                      <h1 className="text-3xl font-bold tracking-tighter text-slate-900">{invoiceSettings.companyName}</h1>
-                      <p className="text-[10px] font-bold uppercase tracking-[0.3em] text-slate-400">{invoiceSettings.companyTagline}</p>
-                    </div>
-                  </div>
-                  <div className="space-y-1 text-sm text-slate-500 font-medium">
-                    <p>{invoiceSettings.companyAddress}</p>
-                    <p>{invoiceSettings.companyPhone}</p>
-                    <p>{invoiceSettings.companyEmail}</p>
-                  </div>
-                </div>
-
-                <div className="text-right space-y-6">
-                  <div className={`inline-flex items-center gap-3 px-6 py-3 rounded-2xl font-bold text-[11px] uppercase tracking-widest border ${
-                    isPaid ? "bg-emerald-50 text-emerald-600 border-emerald-100" : "bg-rose-50 text-rose-600 border-rose-100"
-                  }`}>
-                    <div className={`w-2 h-2 rounded-full ${isPaid ? 'bg-emerald-500 animate-pulse' : 'bg-rose-500'}`} />
-                    {isPaid ? "Transaction Settled" : "Awaiting Settlement"}
-                  </div>
-                  <div className="space-y-1">
-                    <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Document Reference</p>
-                    <p className="text-3xl font-bold text-slate-900 tracking-tight">{invoice.invoice_number}</p>
-                  </div>
-                </div>
+          <div className="mt-16 flex flex-col items-center gap-4">
+            <div className="px-5 py-2 bg-[#F5F5F7] rounded-full inline-flex items-center gap-3 border border-slate-100">
+               <Hash size={12} className="text-[#86868B]" />
+               <span className="text-[10px] font-bold text-[#86868B] uppercase tracking-widest leading-none">
+                 NPWP: <span className="text-[#1D1D1F] ml-1">{globalData.invoiceSettings.companyNPWP}</span>
+               </span>
+            </div>
+            <div className="flex gap-6 text-[#D2D2D7]">
+              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                <Linkedin size={12} /> {globalData.invoiceSettings.companyLinkedin}
               </div>
-
-              {/* Stakeholder Info Grid */}
-              <div className="grid md:grid-cols-2 gap-16 md:gap-32 mb-24 pb-16 border-b border-slate-50">
-                <div className="space-y-8">
-                  <div className="space-y-4">
-                    <div className="flex items-center gap-3 text-slate-400">
-                      <Building2 size={16} />
-                      <p className="text-[10px] font-bold uppercase tracking-widest">Bill To Stakeholder</p>
-                    </div>
-                    <div>
-                      <h3 className="text-2xl font-bold text-slate-900 mb-1">{invoice.client_name}</h3>
-                      <p className="text-slate-500 font-medium">{invoice.client_email}</p>
-                    </div>
-                  </div>
-                </div>
-
-                <div className="grid grid-cols-2 gap-12">
-                   <div className="space-y-2">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Issue Date</p>
-                      <p className="font-bold text-slate-900">{new Date(invoice.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                   </div>
-                   <div className="space-y-2">
-                      <p className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Due Date</p>
-                      <p className="font-bold text-rose-500">{new Date(invoice.due_date).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
-                   </div>
-                </div>
-              </div>
-
-              {/* Line Items - Clean Minimalist Table */}
-              <div className="mb-24">
-                 <table className="w-full text-left">
-                    <thead>
-                       <tr className="text-slate-400 text-[10px] font-bold uppercase tracking-[0.2em] border-b border-slate-100">
-                          <th className="pb-8 font-bold">Strategic Service Definition</th>
-                          <th className="pb-8 text-center font-bold">Quantity</th>
-                          <th className="pb-8 text-right font-bold">Unit Logic</th>
-                          <th className="pb-8 text-right font-bold">Final Commitment</th>
-                       </tr>
-                    </thead>
-                    <tbody className="divide-y divide-slate-50">
-                       {invoice.items.map((item: { desc: string; price: number; qty: number }, idx: number) => (
-                         <tr key={idx} className="group">
-                            <td className="py-10">
-                               <p className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors">{item.desc}</p>
-                            </td>
-                            <td className="py-10 text-center font-medium text-slate-500">{item.qty}</td>
-                            <td className="py-10 text-right font-medium text-slate-500">Rp {item.price.toLocaleString()}</td>
-                            <td className="py-10 text-right font-bold text-slate-900">Rp {(item.price * item.qty).toLocaleString()}</td>
-                         </tr>
-                       ))}
-                    </tbody>
-                 </table>
-              </div>
-
-              {/* Financial Summary & Settlement Grid */}
-              <div className="grid lg:grid-cols-12 gap-16 items-end">
-                {/* Payment Instructions */}
-                <div className="lg:col-span-7 bg-[#FBFBFD] p-10 rounded-[2.5rem] border border-slate-100 flex items-start gap-8">
-                   <div className="w-14 h-14 bg-white rounded-2xl flex items-center justify-center text-slate-900 shadow-sm border border-slate-200/50">
-                      <CreditCard size={24} strokeWidth={1.5} />
-                   </div>
-                   <div className="space-y-3">
-                      <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Bank Settlement Protocol</h4>
-                      <div className="space-y-1">
-                        <p className="font-bold text-slate-900 text-xl tracking-tight">{invoiceSettings.bankName}</p>
-                        <p className="text-primary font-bold text-2xl tracking-tighter">{invoiceSettings.bankAccountNumber}</p>
-                      </div>
-                      <p className="text-xs text-slate-500 font-bold uppercase tracking-widest">Account Name: {invoiceSettings.bankAccountName}</p>
-                      {invoiceSettings.bankBranch && (
-                        <p className="text-xs text-slate-400 font-medium">Branch: {invoiceSettings.bankBranch}</p>
-                      )}
-                   </div>
-                </div>
-
-                {/* Calculation Stack */}
-                <div className="lg:col-span-5 space-y-6">
-                   <div className="flex justify-between items-center px-4">
-                      <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">Strategic Subtotal</span>
-                      <span className="font-bold text-slate-900">Rp {invoice.amount.toLocaleString()}</span>
-                   </div>
-                   {invoiceSettings.taxRate > 0 && (
-                     <div className="flex justify-between items-center px-4">
-                        <span className="text-[10px] font-bold uppercase tracking-widest text-slate-400">{invoiceSettings.taxLabel || `Tax (${invoiceSettings.taxRate}%)`}</span>
-                        <span className="font-bold text-slate-900">Rp {Math.round(invoice.amount * (invoiceSettings.taxRate / 100)).toLocaleString()}</span>
-                     </div>
-                   )}
-                   <div className="pt-8 px-8 pb-8 bg-slate-900 text-white rounded-[2rem] flex justify-between items-center shadow-2xl shadow-slate-900/10">
-                      <div className="space-y-1">
-                        <span className="text-[9px] font-bold uppercase tracking-[0.3em] opacity-50">Total Amount Due</span>
-                        <p className="text-3xl font-bold tracking-tighter">
-                          Rp {(invoice.amount + (invoiceSettings.taxRate > 0 ? Math.round(invoice.amount * (invoiceSettings.taxRate / 100)) : 0)).toLocaleString()}
-                        </p>
-                      </div>
-                      <ShieldCheck size={40} className="opacity-20" strokeWidth={1} />
-                   </div>
-                </div>
-              </div>
-
-              {/* Payment Instructions Section */}
-              {invoiceSettings.paymentInstructions && (
-                <div className="mt-16 p-10 bg-blue-50 border border-blue-100 rounded-[2.5rem]">
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-blue-400 mb-4">Payment Instructions</h4>
-                  <p className="text-sm text-slate-700 font-medium leading-relaxed whitespace-pre-line">
-                    {invoiceSettings.paymentInstructions}
-                  </p>
-                </div>
-              )}
-
-              {/* Terms & Conditions Section */}
-              {invoiceSettings.termsAndConditions && (
-                <div className="mt-12 p-10 bg-slate-50 border border-slate-100 rounded-[2.5rem]">
-                  <h4 className="text-[10px] font-bold uppercase tracking-widest text-slate-400 mb-4">Terms & Conditions</h4>
-                  <div className="text-xs text-slate-600 font-medium leading-relaxed whitespace-pre-line">
-                    {invoiceSettings.termsAndConditions}
-                  </div>
-                </div>
-              )}
-
-              {/* Secure Verification Footer */}
-              <div className="mt-24 pt-12 border-t border-slate-50 flex flex-col md:flex-row justify-between items-center gap-8">
-                <div className="flex items-center gap-3 text-slate-300">
-                  <ShieldCheck size={20} strokeWidth={1.5} />
-                  <p className="text-[9px] font-bold uppercase tracking-[0.4em]">{invoiceSettings.footerNote}</p>
-                </div>
-                <div className="flex gap-8 text-slate-400 hover:text-slate-900 transition-colors">
-                   <Globe size={18} strokeWidth={1.5} />
-                   <Mail size={18} strokeWidth={1.5} />
-                   <Phone size={18} strokeWidth={1.5} />
-                </div>
+              <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
+                <Instagram size={12} /> {globalData.invoiceSettings.companyInstagram}
               </div>
             </div>
-          </motion.div>
+          </div>
+        </div>
 
-          {/* Verification Badge (Post-Print Layer) */}
-          <div className="mt-12 text-center no-print opacity-30">
-            <p className="text-[10px] font-bold uppercase tracking-[0.8em] text-slate-400">Authentic Digital Document</p>
+        {/* Footer Branding */}
+        <div className="bg-[#1D1D1F] px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-8">
+          <div className="flex items-center gap-3">
+            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#1D1D1F] font-bold text-sm italic">M</div>
+            <span className="text-white font-bold text-xs tracking-tighter uppercase italic tracking-[0.1em]">{globalData.invoiceSettings.companyName}</span>
+          </div>
+          <div className="flex items-center gap-8 text-[10px] font-bold text-[#86868B] tracking-widest uppercase">
+            <div className="flex flex-col items-end">
+              <span className="text-white mb-1">E-Verification</span>
+              <span className="text-[9px] opacity-40">HASH: ML-{invoice.invoice_number}-SECURE</span>
+            </div>
+            <div className="w-[1px] h-8 bg-[#3A3A3C]" />
+            <div className="flex flex-col items-end">
+              <span className="text-white mb-1">Timestamp</span>
+              <span className="text-[9px] opacity-40 italic font-mono uppercase">{new Date().toLocaleString('id-ID')} WIB</span>
+            </div>
           </div>
         </div>
       </div>
 
-      <style jsx global>{`
+      <div className="mt-8 text-center space-y-2 no-print">
+        <p className="text-[10px] text-[#86868B] font-bold uppercase tracking-[0.3em]">Hak Cipta &copy; 2026 PT MITRA LABS DIGITAL</p>
+        <p className="text-[10px] text-[#D2D2D7] font-medium tracking-wide">Kwitansi ini diakui secara hukum sebagai bukti pelunasan digital yang sah.</p>
+      </div>
+
+      <style dangerouslySetInnerHTML={{ __html: `
+        @import url('https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800;900&display=swap');
+        
+        body { font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
+
         @media print {
-          .no-print {
-            display: none !important;
-          }
-          body {
-            background: white !important;
-            padding: 0 !important;
-          }
-          .max-w-5xl {
-            max-width: 100% !important;
-            margin: 0 !important;
-            padding: 0 !important;
-          }
-          .shadow-[0_40px_100px_-20px_rgba(0,0,0,0.08)], .shadow-lg, .shadow-2xl, .shadow-sm {
-            box-shadow: none !important;
-          }
-          .border {
-            border-color: #f1f1f1 !important;
-          }
-          .bg-[#F5F5F7] {
-            background: white !important;
-          }
-          .rounded-[3.5rem] {
-            border-radius: 0 !important;
-          }
-          .p-10, .p-24 {
-            padding: 2rem !important;
-          }
-          .selection\:bg-primary\/10 {
-            background: transparent !important;
-          }
+          @page { size: A4; margin: 0; }
+          body { background: white !important; padding: 0 !important; }
+          .no-print { display: none !important; }
+          .min-h-screen { background: white !important; padding: 0 !important; }
+          .max-w-[800px] { max-width: 100% !important; border: none !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
+          .bg-[#F5F5F7], .bg-white { background-color: white !important; }
+          .bg-[#F5F5F7]\\/40 { background-color: #fafafa !important; -webkit-print-color-adjust: exact; }
+          .bg-[#1D1D1F] { background-color: #1D1D1F !important; color: white !important; -webkit-print-color-adjust: exact; }
+          * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
         }
-      `}</style>
-    </>
+      `}} />
+    </div>
   );
 }

@@ -966,30 +966,112 @@ export default function BookingCMS() {
                                 />
                              </div>
 
-                             <div className="space-y-5">
-                                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Linked Invoices</label>
-                                <div className="grid gap-3">
+                             <div className="space-y-6">
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Linked Documents (Invoices/Kwitansi)</label>
+                                <div className="grid gap-6">
                                    {editingBooking.invoices?.map((inv, i) => (
-                                      <div key={i} className="flex items-center justify-between p-4 bg-slate-50 rounded-xl border border-transparent hover:border-slate-200 transition-all group">
-                                         <div className="flex items-center gap-3">
-                                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                                               <FileText size={14} className="text-slate-400" />
+                                      <div key={i} className="p-6 bg-slate-50 rounded-[2rem] border border-slate-100 space-y-6">
+                                         <div className="flex items-center justify-between">
+                                            <div className="flex items-center gap-4">
+                                               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center shadow-sm">
+                                                  <Receipt size={18} className="text-blue-500" />
+                                               </div>
+                                               <div>
+                                                  <p className="font-bold text-sm text-slate-900">{inv.invoice_number}</p>
+                                                  <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Document Registry</p>
+                                               </div>
                                             </div>
-                                            <div>
-                                               <p className="font-bold text-xs text-slate-900">{inv.invoice_number}</p>
-                                               <p className="text-[10px] text-slate-400 font-medium">Rp {inv.amount.toLocaleString()}</p>
+                                            <select
+                                              value={inv.status}
+                                              onChange={(e) => {
+                                                const newInvoices = [...(editingBooking.invoices || [])];
+                                                newInvoices[i] = { ...inv, status: e.target.value as any };
+                                                setEditingBooking({ ...editingBooking, invoices: newInvoices });
+                                              }}
+                                              className="px-4 py-2 bg-white border border-slate-200 rounded-xl text-[10px] font-bold uppercase tracking-widest outline-none focus:ring-1 focus:ring-slate-900"
+                                            >
+                                              <option value="Unpaid">Unpaid</option>
+                                              <option value="Paid">Paid</option>
+                                              <option value="Cancelled">Cancelled</option>
+                                            </select>
+                                         </div>
+
+                                         <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                              <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 ml-1">Document Type</label>
+                                              <select
+                                                value={inv.invoice_type || "Kwitansi"}
+                                                onChange={(e) => {
+                                                  const newInvoices = [...(editingBooking.invoices || [])];
+                                                  newInvoices[i] = { ...inv, invoice_type: e.target.value };
+                                                  setEditingBooking({ ...editingBooking, invoices: newInvoices });
+                                                }}
+                                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                                              >
+                                                <option value="Kwitansi">Kwitansi (Modern Design)</option>
+                                                <option value="Invoice">Invoice (Standard Design)</option>
+                                              </select>
+                                            </div>
+                                            <div className="space-y-2">
+                                              <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 ml-1">Amount (IDR)</label>
+                                              <input
+                                                type="number"
+                                                value={inv.amount}
+                                                onChange={(e) => {
+                                                  const newInvoices = [...(editingBooking.invoices || [])];
+                                                  newInvoices[i] = { ...inv, amount: Number(e.target.value) };
+                                                  setEditingBooking({ ...editingBooking, invoices: newInvoices });
+                                                }}
+                                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                                              />
                                             </div>
                                          </div>
-                                         <div className={`px-2 py-0.5 rounded-md text-[9px] font-bold uppercase tracking-widest ${inv.status === 'Paid' ? 'bg-emerald-50 text-emerald-600' : 'bg-rose-50 text-rose-600'}`}>
-                                            {inv.status}
+
+                                         <div className="grid grid-cols-2 gap-4">
+                                            <div className="space-y-2">
+                                              <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 ml-1">Project Period Start</label>
+                                              <input
+                                                type="date"
+                                                value={inv.project_period_start ? inv.project_period_start.split('T')[0] : ""}
+                                                onChange={(e) => {
+                                                  const newInvoices = [...(editingBooking.invoices || [])];
+                                                  newInvoices[i] = { ...inv, project_period_start: e.target.value };
+                                                  setEditingBooking({ ...editingBooking, invoices: newInvoices });
+                                                }}
+                                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                                              />
+                                            </div>
+                                            <div className="space-y-2">
+                                              <label className="text-[9px] font-bold uppercase tracking-widest text-slate-400 ml-1">Project Period End</label>
+                                              <input
+                                                type="date"
+                                                value={inv.project_period_end ? inv.project_period_end.split('T')[0] : ""}
+                                                onChange={(e) => {
+                                                  const newInvoices = [...(editingBooking.invoices || [])];
+                                                  newInvoices[i] = { ...inv, project_period_end: e.target.value };
+                                                  setEditingBooking({ ...editingBooking, invoices: newInvoices });
+                                                }}
+                                                className="w-full px-4 py-3 bg-white border border-slate-200 rounded-xl text-xs font-bold outline-none"
+                                              />
+                                            </div>
+                                         </div>
+
+                                         <div className="flex justify-end gap-3 pt-4 border-t border-slate-100">
+                                            <Link
+                                              href={`/invoice/${inv.invoice_number}`}
+                                              target="_blank"
+                                              className="flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-lg text-[10px] font-bold uppercase tracking-widest hover:opacity-90 transition-all"
+                                            >
+                                              <ExternalLink size={12} /> View Page
+                                            </Link>
                                          </div>
                                       </div>
                                    ))}
                                    <button
                                       onClick={() => generateInvoice(editingBooking)}
-                                      className="w-full py-4 border border-dashed border-slate-200 rounded-xl text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:border-slate-900 transition-all flex items-center justify-center gap-2"
+                                      className="w-full py-6 border border-dashed border-slate-200 rounded-[2rem] text-[11px] font-bold uppercase tracking-widest text-slate-400 hover:text-slate-900 hover:border-slate-900 transition-all flex items-center justify-center gap-2"
                                    >
-                                      <Plus size={14} /> Add Invoice
+                                      <Plus size={14} /> New Kwitansi / Invoice
                                    </button>
                                 </div>
                              </div>

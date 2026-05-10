@@ -22,6 +22,12 @@ model SiteConfig {
   maps_url         String   @default("")
   json_content     Json?
   updated_at       DateTime @default(now()) @updatedAt
+  
+  // New fields for Invoice/Kwitansi
+  company_tagline  String   @default("Mitra Digital Anda")
+  company_website  String   @default("mitralabs.id")
+  company_npwp     String   @default("01.234.567.8-901.000")
+  linkedin_url     String   @default("linkedin.com/company/mitralabs-id")
 }
 
 // --- HOME SECTIONS ---
@@ -108,9 +114,14 @@ model Invoice {
   amount         Float
   status         String   @default("Unpaid") // Unpaid, Partial, Paid, Cancelled
   due_date       DateTime
-  items          Json     // Array of { desc: string, price: number }
+  items          Json     // Array of { desc: string, details?: string, qty: number, price: number }
   client_name    String?
   client_email   String?
+  client_company String?
+  client_address String?
+  project_period_start DateTime?
+  project_period_end   DateTime?
+  invoice_type   String   @default("Invoice") // Invoice, Kwitansi
   created_at     DateTime @default(now())
   updated_at     DateTime @updatedAt
 
