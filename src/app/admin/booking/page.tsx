@@ -528,11 +528,11 @@ export default function BookingCMS() {
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
                          <a
-                           href={`/invoice/${booking.invoices[0].invoice_number}`}
+                           href={`/invoice/${booking.invoices?.[0]?.invoice_number}`}
                            target="_blank"
                            onClick={(e) => {
                              e.preventDefault();
-                             window.open(`/invoice/${booking.invoices[0].invoice_number}`, '_blank');
+                             window.open(`/invoice/${booking.invoices?.[0]?.invoice_number}`, '_blank');
                              setTimeout(() => window.print(), 500);
                            }}
                            className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
