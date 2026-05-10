@@ -445,6 +445,8 @@ const initialData: AppData = {
   },
   settings: {
     waNumber: "6282381118520",
+    companyLogo: "/logo.png",
+    companyFavicon: "/favicon.ico",
     businessMode: "agresif",
     waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial.",
   },
