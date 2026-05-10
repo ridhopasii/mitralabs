@@ -219,7 +219,7 @@ export default function PublicInvoicePage() {
                        </tr>
                     </thead>
                     <tbody className="divide-y divide-slate-50">
-                       {invoice.items.map((item, idx) => (
+                       {invoice.items.map((item: { desc: string; price: number; qty: number }, idx: number) => (
                          <tr key={idx} className="group">
                             <td className="py-10">
                                <p className="font-bold text-slate-900 text-lg group-hover:text-primary transition-colors">{item.desc}</p>
