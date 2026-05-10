@@ -187,6 +187,8 @@ interface AppData {
   };
   settings: {
     waNumber: string;
+    companyLogo: string;
+    companyFavicon: string;
     businessMode: string;
     waPromoMessage: string;
   };
