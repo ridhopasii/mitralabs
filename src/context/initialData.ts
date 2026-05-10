@@ -157,6 +157,11 @@ export const initialData: AppData = {
         tech_stack: ["Next.js", "Prisma", "Supabase"],
       }
     ],
+    cta: {
+      title: "Mulai Project Anda",
+      subtitle: "Konsultasikan kebutuhan digital Anda dengan tim ahli kami.",
+      buttonText: "Hubungi Kami"
+    }
   },
   blog: {
     title: "Insight & Strategi Digital",
@@ -176,9 +181,23 @@ export const initialData: AppData = {
     ]
   },
   about: {
-    title: "Membangun Standar Baru Presisi Digital",
-    subtitle: "Mitralabs lahir dari kebutuhan akan solusi teknologi yang tidak hanya estetis, tetapi juga tangguh secara teknis.",
-    description: "Kami adalah tim kecil yang berfokus pada kualitas tinggi. Setiap project adalah portofolio yang kami jaga reputasinya.",
+    hero: {
+      tagline: "About Mitralabs",
+      title: "Membangun Standar Baru Presisi Digital",
+      subtitle: "Mitralabs lahir dari kebutuhan akan solusi teknologi yang tidak hanya estetis, tetapi juga tangguh secara teknis.",
+      image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200"
+    },
+    stats: [
+      { label: "Success Projects", value: "240+" },
+      { label: "Client Satisfaction", value: "99%" }
+    ],
+    missionTitle: "Misi Kami",
+    mission: [
+      "Memberikan solusi digital yang presisi dan fungsional.",
+      "Membantu UMKM dan institusi bertransformasi ke era digital.",
+      "Menjamin kualitas teknis tertinggi dalam setiap baris kode."
+    ],
+    visionTitle: "Visi Kami",
     vision: "Menjadi mitra teknologi pilihan utama bagi bisnis yang ingin mendominasi pasar digital melalui presisi teknik dan desain.",
     teamTitle: "The Minds Behind Mitralabs",
     teamSubtitle: "Kombinasi antara kreativitas visual dan ketelitian kode.",
@@ -241,9 +260,20 @@ export const initialData: AppData = {
     signatureFields: {
       marketing: "Marketing Officer",
       owner: "Direktur Utama"
-    }
+    },
+    stampDutyRequired: false,
+    stampDutyAmount: 10000
   },
-  testimonials: [],
+  testimonials: [
+    {
+      id: 1,
+      name: "Andi Wijaya",
+      role: "CEO Toba Dream",
+      content: "Mitralabs membantu kami membangun sistem yang sangat efisien. Performa website luar biasa.",
+      rating: 5,
+      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200"
+    }
+  ],
   faqs: [
     {
       id: 1,
