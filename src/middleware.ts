@@ -29,6 +29,7 @@ export async function middleware(request: NextRequest) {
     }
   )
 
+  // IMPORTANT: getUser() is more secure than getSession() but slower
   const { data: { user } } = await supabase.auth.getUser()
 
   const path = request.nextUrl.pathname;
@@ -36,37 +37,48 @@ export async function middleware(request: NextRequest) {
   // Protect Admin Routes
   if (path.startsWith("/admin")) {
     if (!user) {
+      console.log("🚩 [Middleware] No user found for /admin, redirecting to /login");
       const loginUrl = new URL("/login", request.url);
       loginUrl.searchParams.set("redirectedFrom", path);
       return NextResponse.redirect(loginUrl);
     }
+
+    console.log(`👤 [Middleware] Auth user found: ${user.email}`);
 
     // RBAC Check
     const primaryAdmin = "ridhorobbipasi@gmail.com";
     
     // 1. Bypass for Primary Admin
     if (user.email?.toLowerCase() === primaryAdmin.toLowerCase()) {
+      console.log("✅ [Middleware] Primary Admin detected, allowing access.");
       return response;
     }
 
     // 2. Check Database for Role
     try {
+      console.log(`🔍 [Middleware] Checking DB role for ${user.email}`);
       const { data: userData, error } = await supabase
         .from("User")
         .select("role")
         .eq("email", user.email)
         .maybeSingle();
 
-      if (error || !userData || (userData.role !== "admin" && userData.role !== "editor")) {
-        console.warn(`🚫 Unauthorized admin access attempt by ${user.email}`);
-        // Redirect to home if not authorized
-        return NextResponse.redirect(new URL("/", request.url));
+      if (error) {
+         console.error("❌ [Middleware] Database error during RBAC check:", error);
+         // Fallback to home but with error param
+         return NextResponse.redirect(new URL("/login?error=db_error", request.url));
       }
+
+      if (!userData || (userData.role !== "admin" && userData.role !== "editor")) {
+        console.warn(`🚫 [Middleware] Unauthorized role for ${user.email}: ${userData?.role || 'no_user_record'}`);
+        // Redirect to login with error message instead of home
+        return NextResponse.redirect(new URL("/login?error=unauthorized", request.url));
+      }
+      
+      console.log(`✅ [Middleware] Access granted for role: ${userData.role}`);
     } catch (e) {
-      console.error("🔒 RBAC Database Error:", e);
-      // Fallback: If DB is down but user is authenticated, we might want to allow 
-      // or deny. For security, we deny (redirect to home).
-      return NextResponse.redirect(new URL("/", request.url));
+      console.error("🔒 [Middleware] RBAC Exception:", e);
+      return NextResponse.redirect(new URL("/login?error=system_error", request.url));
     }
   }
 
@@ -87,7 +99,7 @@ export const config = {
      * - _next/static (static files)
      * - _next/image (image optimization files)
      * - favicon.ico (favicon file)
-     * - api routes that shouldn't be proxied
+     * - images in public
      */
     '/((?!_next/static|_next/image|favicon.ico|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)',
   ],

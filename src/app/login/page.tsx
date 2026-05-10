@@ -99,6 +99,18 @@ export default function LoginPage() {
                 {error}
               </p>
             )}
+            
+            {/* Display URL Errors */}
+            {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'unauthorized' && !error && (
+              <p className="text-error text-xs font-bold text-left bg-error/10 border border-error/20 rounded-2xl p-4">
+                Akun Anda tidak memiliki izin akses Admin. Silakan hubungi pengelola sistem.
+              </p>
+            )}
+            {typeof window !== 'undefined' && new URLSearchParams(window.location.search).get('error') === 'db_error' && !error && (
+              <p className="text-error text-xs font-bold text-left bg-error/10 border border-error/20 rounded-2xl p-4">
+                Terjadi kesalahan pada database (RBAC). Silakan coba lagi nanti.
+              </p>
+            )}
             <button
               type="submit"
               disabled={loading}
