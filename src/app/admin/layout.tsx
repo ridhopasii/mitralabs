@@ -13,7 +13,8 @@ import {
   Star,
   HelpCircle,
   ExternalLink,
-  Image
+  Image,
+  Users
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
@@ -56,6 +57,7 @@ export default function AdminLayout({
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
+    { name: "Users & Staff", icon: Users, href: "/admin/users", category: "Utama" },
     { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
     { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
     { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },

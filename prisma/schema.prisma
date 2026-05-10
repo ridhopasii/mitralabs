@@ -98,10 +98,15 @@ model Booking {
   status               String    @default("Pending")
   total_price          Float
   scheduled_date       DateTime?
+  tracking_password    String?   // For guest access tracking
+  client_id            String?   // Link to registered Client if exists
+  client               Client?   @relation(fields: [client_id], references: [id])
   created_at           DateTime  @default(now())
   updated_at           DateTime  @updatedAt
   invoices             Invoice[]
   client_projects      ClientProject[]
+
+  @@index([client_id])
 }
 
 model Invoice {
@@ -212,7 +217,7 @@ model User {
   id            String   @id @default(uuid())
   email         String   @unique
   full_name     String
-  role          String   @default("viewer") // admin, editor, viewer
+  role          String   @default("viewer") // admin, staff, viewer
   avatar_url    String?
   is_active     Boolean  @default(true)
   last_login    DateTime?
@@ -235,6 +240,7 @@ model Client {
   created_at      DateTime  @default(now())
   updated_at      DateTime  @updatedAt
   projects        ClientProject[]
+  bookings        Booking[]
 
   @@index([email])
 }

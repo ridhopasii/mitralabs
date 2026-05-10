@@ -13,9 +13,19 @@ export default function LoginPage() {
   const router = useRouter();
 
   useEffect(() => {
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
-        router.replace("/admin");
+        const { data: userData } = await supabase
+          .from("User")
+          .select("role")
+          .eq("email", data.user.email)
+          .single();
+
+        if (userData?.role === 'admin' || userData?.role === 'staff') {
+          router.replace("/admin");
+        } else {
+          router.replace("/dashboard");
+        }
       }
     });
   }, [router]);
@@ -27,24 +37,36 @@ export default function LoginPage() {
     setError(null);
 
     if (!isConfigured) {
-      setError("Supabase belum dikonfigurasi. Atur env NEXT_PUBLIC_SUPABASE_URL dan NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY.");
+      setError("Supabase belum dikonfigurasi.");
       return;
     }
 
     setLoading(true);
-    const { error: loginError } = await supabase.auth.signInWithPassword({
+    const { error: loginError, data: authData } = await supabase.auth.signInWithPassword({
       email,
       password,
     });
 
-    setLoading(false);
-
     if (loginError) {
       setError(loginError.message);
+      setLoading(false);
       return;
     }
 
-    router.replace("/admin");
+    if (authData.user) {
+       const { data: userData } = await supabase
+         .from("User")
+         .select("role")
+         .eq("email", authData.user.email)
+         .single();
+
+       if (userData?.role === 'admin' || userData?.role === 'staff') {
+         router.replace("/admin");
+       } else {
+         router.replace("/dashboard");
+       }
+    }
+
     router.refresh();
   };
 
@@ -62,8 +84,8 @@ export default function LoginPage() {
             <div className="w-20 h-20 bg-primary rounded-3xl flex items-center justify-center mx-auto mb-6 shadow-2xl shadow-primary/40">
               <Lock className="text-on-primary" size={32} />
             </div>
-            <h1 className="font-display text-4xl font-black tracking-tight text-on-surface mb-2">Admin Access</h1>
-            <p className="text-on-surface-variant font-medium text-sm uppercase tracking-widest">Mitralabs Master CMS</p>
+            <h1 className="font-display text-4xl font-black tracking-tight text-on-surface mb-2">Mitralabs Portal</h1>
+            <p className="text-on-surface-variant font-medium text-sm uppercase tracking-widest">Sign in to your account</p>
 
             {!isConfigured && (
               <div className="mt-6 p-4 bg-error/10 border border-error/20 rounded-2xl text-left">
@@ -117,7 +139,7 @@ export default function LoginPage() {
               className="w-full bg-primary text-on-primary py-6 rounded-[2rem] font-black text-xl flex items-center justify-center gap-4 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 disabled:opacity-50"
             >
               {loading ? <Loader2 className="animate-spin" size={24} /> : <ArrowRight size={24} />}
-              Masuk Dashboard
+              Sign In to Portal
             </button>
           </form>
 

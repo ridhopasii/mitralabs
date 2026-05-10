@@ -76,6 +76,8 @@ export default function PesanSekarang() {
     brief: ""
   });
 
+  const [trackingInfo, setTrackingInfo] = useState<{id: number, pass: string} | null>(null);
+
   const getPrice = () => {
     if (formData.customPrice) return parseInt(formData.customPrice);
     return formData.plan === "Premium" ? 7000000 : formData.plan === "Standard" ? 3500000 : 1500000;
@@ -85,7 +87,6 @@ export default function PesanSekarang() {
     e.preventDefault();
     setErrors({});
 
-    // 1. Validate with Zod
     const result = bookingSchema.safeParse(formData);
     if (!result.success) {
       const fieldErrors: Record<string, string> = {};
@@ -98,13 +99,24 @@ export default function PesanSekarang() {
 
     setIsSubmitting(true);
 
-    // WhatsApp Redirect Logic
-    const waNumber = data.settings?.waNumber || "6282381118520";
-    const waMessage = `Halo Mitralabs! Saya ingin melakukan pemesanan website.\n\n*Detail Klien:*\n- Nama: ${formData.name}\n- Instansi: ${formData.organization}\n- Jabatan: ${formData.position}\n\n*Detail Project:*\n- Layanan: ${formData.service}\n- Paket: ${formData.plan} (Rp ${getPrice().toLocaleString()})\n- Domain: ${formData.desiredDomain || '-'}\n- Industri: ${formData.businessIndustry || '-'}\n- Target Audiens: ${formData.targetAudience || '-'}\n- Utama CTA: ${formData.primaryCTA || '-'}\n- Kompetitor: ${formData.competitors || '-'}\n- Integrasi: ${formData.integrations || '-'}\n- Harapan: ${formData.expectation || '-'}\n- Brief: ${formData.brief}`;
-    const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
-
     try {
-      // 2. Save to Supabase
+      // 1. Check if user is logged in
+      const { data: { user } } = await supabase.auth.getUser();
+      let clientId = null;
+
+      if (user) {
+        const { data: clientData } = await supabase
+          .from("Client")
+          .select("id")
+          .eq("email", user.email)
+          .single();
+        if (clientData) clientId = clientData.id;
+      }
+
+      // 2. Generate tracking password (8 chars random)
+      const generatedPass = Math.random().toString(36).substring(2, 10).toUpperCase();
+
+      // 3. Save to Supabase
       const now = new Date().toISOString();
       const { data: insertedData, error } = await supabase.from("Booking").insert([{
         customer_name: formData.name,
@@ -125,15 +137,18 @@ export default function PesanSekarang() {
         biggest_expectation: formData.expectation,
         status: "Pending",
         total_price: getPrice(),
+        tracking_password: generatedPass,
+        client_id: clientId,
         created_at: now,
         updated_at: now
       }]).select();
 
       if (error) throw error;
 
-      // 3. Auto-generate invoice
       if (insertedData?.[0]) {
         const bookingId = insertedData[0].id;
+        setTrackingInfo({ id: bookingId, pass: generatedPass });
+
         const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
 
@@ -158,22 +173,18 @@ export default function PesanSekarang() {
       }
 
       setShowSuccess(true);
-      setTimeout(() => {
-        window.open(waUrl, "_blank");
-        setIsSubmitting(false);
-      }, 2000);
+      setIsSubmitting(false);
 
     } catch (err: any) {
       console.error("🔥 Submission error:", err);
       alert(`Gagal mengirim pesanan: ${err.message}`);
       setIsSubmitting(false);
-
     }
   };
 
   if (showSuccess) {
     const waNumber = data.settings?.waNumber || "6282381118520";
-    const waMessage = `Halo Mitralabs! Saya ingin melakukan pemesanan website.\n\n*Detail Klien:*\n- Nama: ${formData.name}\n- Instansi: ${formData.organization}\n- Jabatan: ${formData.position}\n\n*Detail Project:*\n- Layanan: ${formData.service}\n- Paket: ${formData.plan} (Rp ${getPrice().toLocaleString()})\n- Domain: ${formData.desiredDomain || '-'}\n- Industri: ${formData.businessIndustry || '-'}\n- Target Audiens: ${formData.targetAudience || '-'}\n- Utama CTA: ${formData.primaryCTA || '-'}\n- Kompetitor: ${formData.competitors || '-'}\n- Integrasi: ${formData.integrations || '-'}\n- Harapan: ${formData.expectation || '-'}\n- Brief: ${formData.brief}`;
+    const waMessage = `Halo Mitralabs! Saya baru saja melakukan pemesanan website.\n\n*Nomor Projek:* #${trackingInfo?.id}\n*Nama:* ${formData.name}\n*Layanan:* ${formData.service}\n*Paket:* ${formData.plan}\n\nSaya ingin melanjutkan konsultasi via WA.`;
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
     return (
@@ -181,34 +192,52 @@ export default function PesanSekarang() {
         <motion.div
           initial={{ opacity: 0, scale: 0.9 }}
           animate={{ opacity: 1, scale: 1 }}
-          className="max-w-2xl w-full bg-surface-container p-20 rounded-[4rem] text-center space-y-10 border border-outline/5 shadow-apple"
+          className="max-w-2xl w-full bg-surface-container p-12 md:p-20 rounded-[3rem] md:rounded-[4rem] text-center space-y-10 border border-outline/5 shadow-apple"
         >
-          <div className="w-24 h-24 bg-primary text-background rounded-[2.5rem] flex items-center justify-center mx-auto shadow-apple-hover">
-            <CheckCircle2 size={48} />
+          <div className="w-20 h-20 bg-primary text-background rounded-[2rem] flex items-center justify-center mx-auto shadow-apple-hover">
+            <CheckCircle2 size={40} />
           </div>
           <div className="space-y-4">
-            <h2 className="text-5xl font-black tracking-tighter text-on-background uppercase">Order Transmitted!</h2>
-            <p className="text-secondary text-xl font-medium">Data Anda telah masuk ke sistem kami. Kami sedang mengarahkan Anda ke WhatsApp untuk konsultasi langsung.</p>
+            <h2 className="text-3xl md:text-5xl font-black tracking-tighter text-on-background uppercase">Order Transmitted!</h2>
+            <p className="text-secondary text-base md:text-xl font-medium">Data Anda telah aman di sistem kami. Berikut adalah akses pelacakan projek Anda:</p>
           </div>
 
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-6">
+          <div className="bg-background/50 p-8 rounded-3xl border border-outline/10 grid grid-cols-2 gap-4">
+            <div className="space-y-2 border-r border-outline/10">
+               <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">Nomor Projek</p>
+               <p className="text-2xl font-black text-primary">#{trackingInfo?.id}</p>
+            </div>
+            <div className="space-y-2">
+               <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em]">Password Lacak</p>
+               <p className="text-2xl font-black text-on-background tracking-widest">{trackingInfo?.pass}</p>
+            </div>
+          </div>
+
+          <div className="p-6 bg-primary/5 rounded-2xl text-left flex gap-4 items-start border border-primary/10">
+            <ShieldAlert size={20} className="text-primary shrink-0" />
+            <p className="text-xs text-secondary leading-relaxed">
+              <span className="font-bold text-primary uppercase">Penting:</span> Gunakan data di atas untuk melihat progres pengerjaan di halaman <b>Lacak Projek</b> tanpa perlu membuat akun.
+            </p>
+          </div>
+
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6">
             <a
               href={waUrl}
               target="_blank"
-              className="w-full sm:w-auto px-12 py-6 bg-emerald-500 text-white rounded-full font-black text-sm uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-3"
+              className="w-full sm:w-auto px-10 py-5 bg-emerald-500 text-white rounded-full font-black text-xs uppercase tracking-widest hover:bg-emerald-600 transition-all shadow-lg flex items-center justify-center gap-3"
             >
-              <Phone size={18} /> Hubungi via WhatsApp
+              <Phone size={18} /> Lanjut ke WhatsApp
             </a>
-            <button
-              onClick={() => window.location.href = "/"}
-              className="w-full sm:w-auto px-12 py-6 bg-on-background text-background rounded-full font-black text-sm uppercase tracking-widest hover:opacity-80 transition-all shadow-apple"
+            <Link
+              href="/track"
+              className="w-full sm:w-auto px-10 py-5 bg-on-background text-background rounded-full font-black text-xs uppercase tracking-widest hover:opacity-80 transition-all flex items-center justify-center gap-3"
             >
-              Back to Home
-            </button>
+              Coba Lacak Sekarang
+            </Link>
           </div>
 
-          <p className="text-[10px] font-bold text-secondary uppercase tracking-[0.2em] opacity-40">
-            Redirecting automatically in a few seconds...
+          <p className="text-[9px] font-bold text-secondary uppercase tracking-[0.2em] opacity-40">
+             &copy; 2026 Mitralabs Cryptographic Protocol
           </p>
         </motion.div>
       </div>
