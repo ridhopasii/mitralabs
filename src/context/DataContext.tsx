@@ -811,7 +811,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             biggest_expectation: b.biggest_expectation,
             status: b.status,
             total_price: b.total_price,
-            scheduled_date: b.scheduled_date
+            scheduled_date: b.scheduled_date,
+            updated_at: new Date().toISOString()
           })),
           ...allInvoices.map(inv => supabase.from("Invoice").upsert({
             id: inv.id > 1000000000 ? undefined : inv.id,
@@ -822,7 +823,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             items: inv.items,
             client_name: inv.client_name,
             client_email: inv.client_email,
-            booking_id: inv.booking_id
+            booking_id: inv.booking_id,
+            updated_at: new Date().toISOString()
           })),
           ...allProjectInvoices.map(inv => supabase.from("Invoice").upsert({
             id: inv.id > 1000000000 ? undefined : inv.id,
@@ -833,7 +835,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             items: inv.items,
             client_name: inv.client_name,
             client_email: inv.client_email,
-            project_id: inv.project_id
+            project_id: inv.project_id,
+            updated_at: new Date().toISOString()
           }))
         ]);
 
