@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from "react";
 import { useData } from "@/context/DataContext";
-import { useParams } from "next/navigation";
+import { useParams, useSearchParams } from "next/navigation";
 import {
   Printer,
   Download,
@@ -16,7 +16,8 @@ import {
   ShieldCheck,
   CreditCard,
   Building2,
-  Receipt
+  Receipt,
+  Loader2
 } from "lucide-react";
 import Link from "next/link";
 import { motion } from "framer-motion";
@@ -45,10 +46,39 @@ const defaultInvoiceSettings = {
 
 export default function PublicInvoicePage() {
   const { id } = useParams();
+  const searchParams = useSearchParams();
+  const isAutoDownload = searchParams.get("download") === "true";
+  
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || defaultInvoiceSettings);
+
+  const handleDownloadPDF = async () => {
+    setIsGeneratingPDF(true);
+    try {
+      // @ts-ignore
+      const html2pdf = (await import("html2pdf.js")).default;
+      const element = document.getElementById("invoice-canvas");
+      
+      const opt = {
+        margin: 0,
+        filename: `Invoice-${id}.pdf`,
+        image: { type: 'jpeg', quality: 0.98 },
+        html2canvas: { scale: 2, useCORS: true, logging: false },
+        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
+      };
+
+      if (element) {
+        await html2pdf().set(opt as any).from(element).save();
+      }
+    } catch (error) {
+      console.error("PDF Generation Error:", error);
+    } finally {
+      setIsGeneratingPDF(false);
+    }
+  };
 
   useEffect(() => {
     const fetchData = async () => {
@@ -106,6 +136,19 @@ export default function PublicInvoicePage() {
     fetchData();
   }, [id]);
 
+  // Auto-download logic
+  useEffect(() => {
+    if (!isLoading && invoice && isAutoDownload) {
+      // Small delay to ensure styles are fully applied
+      const timer = setTimeout(async () => {
+        await handleDownloadPDF();
+        // Close the window after download if it was an auto-download trigger
+        setTimeout(() => window.close(), 1000);
+      }, 1000);
+      return () => clearTimeout(timer);
+    }
+  }, [isLoading, invoice, isAutoDownload]);
+
   if (isLoading) {
     return (
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
@@ -159,16 +202,26 @@ export default function PublicInvoicePage() {
                 <Printer size={18} strokeWidth={1.5} /> Print
               </button>
               <button
-                onClick={() => window.print()}
-                className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20"
+                onClick={handleDownloadPDF}
+                disabled={isGeneratingPDF}
+                className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20 disabled:opacity-50"
               >
-                <Download size={18} strokeWidth={1.5} /> Save as PDF
+                {isGeneratingPDF ? (
+                  <>
+                    <Loader2 className="animate-spin" size={18} /> Generating...
+                  </>
+                ) : (
+                  <>
+                    <Download size={18} strokeWidth={1.5} /> Save as PDF
+                  </>
+                )}
               </button>
             </div>
           </div>
 
           {/* Premium Invoice Canvas */}
           <motion.div
+            id="invoice-canvas"
             initial={{ opacity: 0, y: 40 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1] }}

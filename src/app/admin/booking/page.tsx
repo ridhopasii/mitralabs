@@ -3,6 +3,7 @@
 import { useState, useEffect } from "react";
 import { useData, Booking, Invoice } from "@/context/DataContext";
 import Link from "next/link";
+import { downloadInvoicePDF } from "@/lib/pdf-utils";
 import {
   Plus,
   Search,
@@ -527,19 +528,17 @@ export default function BookingCMS() {
 
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
-                         <a
-                           href={`/invoice/${booking.invoices?.[0]?.invoice_number}`}
-                           target="_blank"
-                           onClick={(e) => {
-                             e.preventDefault();
-                             window.open(`/invoice/${booking.invoices?.[0]?.invoice_number}`, '_blank');
-                             setTimeout(() => window.print(), 500);
+                         <button
+                           onClick={() => {
+                             if (booking.invoices && booking.invoices[0]) {
+                               downloadInvoicePDF(booking.invoices[0].invoice_number);
+                             }
                            }}
                            className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
                            title="Download Invoice PDF"
                          >
                            <Download size={16} />
-                         </a>
+                         </button>
                        )}
 
                        {/* Edit Button */}
