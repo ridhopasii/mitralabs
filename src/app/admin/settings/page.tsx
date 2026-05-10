@@ -512,14 +512,14 @@ export default function SettingsPage() {
                   </select>
                 </div>
                 <FormInput
-                  label="Nominal Materai (Teks)"
+                  label="Nominal Materai (Rp)"
                   type="text"
-                  value={invoiceSettings.stampDutyAmount || "10.000"}
+                  value={invoiceSettings.stampDutyAmount?.toString() || "10000"}
                   onChange={(val: string) => setInvoiceSettings({
                     ...invoiceSettings,
-                    stampDutyAmount: val
+                    stampDutyAmount: parseInt(val.replace(/\D/g, "")) || 0
                   })}
-                  placeholder="10.000"
+                  placeholder="10000"
                 />
               </div>
             </div>
