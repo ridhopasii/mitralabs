@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { useData, Booking, Invoice } from "@/context/DataContext";
 import Link from "next/link";
-import InvoicePDFGenerator from "@/components/InvoicePDFGenerator";
 import KwitansiPDFGenerator from "@/components/KwitansiPDFGenerator";
 import {
   Plus,
@@ -539,23 +538,13 @@ export default function BookingCMS() {
                          </Link>
                        )}
 
-                       {/* Download Invoice Button */}
+                       {/* Download Invoice Button - ALWAYS USE PREMIUM KWITANSI GENERATOR */}
                        {booking.invoices && booking.invoices.length > 0 && (
-                         <>
-                           {booking.invoices[0].invoice_number?.startsWith('KW-') || booking.invoices[0].invoice_type === "Kwitansi" ? (
-                             <KwitansiPDFGenerator
-                               invoiceNumber={booking.invoices[0].invoice_number}
-                               invoiceData={booking.invoices[0]}
-                               className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                             />
-                           ) : (
-                             <InvoicePDFGenerator
-                               invoiceNumber={booking.invoices[0].invoice_number}
-                               invoiceData={booking.invoices[0]}
-                               className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                             />
-                           )}
-                         </>
+                         <KwitansiPDFGenerator
+                           invoiceNumber={booking.invoices[0].invoice_number}
+                           invoiceData={booking.invoices[0]}
+                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                         />
                        )}
 
                        {/* Edit Button */}
