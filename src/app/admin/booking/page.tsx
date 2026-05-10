@@ -51,6 +51,7 @@ export default function BookingCMS() {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
   const [selectedBookings, setSelectedBookings] = useState<Set<number>>(new Set());
   const [selectAll, setSelectAll] = useState(false);
+  const [downloadingInvoiceId, setDownloadingInvoiceId] = useState<number | null>(null);
 
   // Check authentication status
   useEffect(() => {
@@ -529,15 +530,27 @@ export default function BookingCMS() {
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
                          <button
-                           onClick={() => {
+                           disabled={downloadingInvoiceId === booking.id}
+                           onClick={async () => {
                              if (booking.invoices && booking.invoices[0]) {
-                               downloadInvoicePDF(booking.invoices[0].invoice_number);
+                               setDownloadingInvoiceId(booking.id);
+                               try {
+                                 await downloadInvoicePDF(booking.invoices[0].invoice_number);
+                               } catch (err) {
+                                 console.error("Download failed", err);
+                               } finally {
+                                 setDownloadingInvoiceId(null);
+                               }
                              }
                            }}
-                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                            title="Download Invoice PDF"
                          >
-                           <Download size={16} />
+                           {downloadingInvoiceId === booking.id ? (
+                             <Loader2 size={16} className="animate-spin" />
+                           ) : (
+                             <Download size={16} />
+                           )}
                          </button>
                        )}
 

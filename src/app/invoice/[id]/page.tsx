@@ -48,6 +48,7 @@ export default function PublicInvoicePage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
   const isAutoDownload = searchParams.get("download") === "true";
+  const isSilent = searchParams.get("silent_download") === "true";
   
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
@@ -171,20 +172,30 @@ export default function PublicInvoicePage() {
   useEffect(() => {
     const searchParams = new URLSearchParams(window.location.search);
     const isAuto = searchParams.get("download") === "true";
+    const isSilent = searchParams.get("silent_download") === "true";
 
-    if (!isLoading && invoice && isAuto) {
+    if (!isLoading && invoice && (isAuto || isSilent)) {
       const timer = setTimeout(async () => {
         // Set a safety timeout for the entire process
         const safetyTimeout = setTimeout(() => {
           console.warn("PDF generation taking too long, falling back...");
-          window.print();
+          if (isSilent) {
+            window.parent.postMessage({ type: 'PDF_DOWNLOAD_ERROR', invoiceNumber: id }, '*');
+          } else {
+            window.print();
+          }
         }, 15000);
 
         const success = await handleDownloadPDF();
         clearTimeout(safetyTimeout);
         
-        if (success) {
-          setTimeout(() => window.close(), 1500);
+        if (isSilent) {
+           window.parent.postMessage({ 
+             type: success ? 'PDF_DOWNLOAD_COMPLETE' : 'PDF_DOWNLOAD_ERROR', 
+             invoiceNumber: id 
+           }, '*');
+        } else if (success && isAuto) {
+           setTimeout(() => window.close(), 1500);
         }
       }, 1500);
       return () => clearTimeout(timer);
@@ -243,7 +254,7 @@ export default function PublicInvoicePage() {
 
   return (
     <>
-      {isAutoDownload && <DownloadOverlay />}
+      {(isAutoDownload && !isSilent) && <DownloadOverlay />}
       <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
         <div className="max-w-5xl mx-auto">
           {/* Navigation & Actions Layer */}
