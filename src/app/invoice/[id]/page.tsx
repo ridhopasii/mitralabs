@@ -47,15 +47,47 @@ const defaultInvoiceSettings = {
 export default function PublicInvoicePage() {
   const { id } = useParams();
   const searchParams = useSearchParams();
-  const isAutoPrint = searchParams.get("print") === "true";
+  const isAutoDownload = searchParams.get("download") === "true";
   
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
   const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || defaultInvoiceSettings);
 
-  const handlePrint = () => {
-    window.print();
+  const handleDownloadPDF = async () => {
+    const element = document.getElementById("invoice-canvas");
+    if (!element) return;
+
+    try {
+      const html2canvas = (await import("html2canvas")).default;
+      const { jsPDF } = await import("jspdf");
+
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "mm",
+        format: "a4",
+      });
+
+      const imgProps = pdf.getImageProperties(imgData);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.save(`Invoice-${id}.pdf`);
+      
+      return true;
+    } catch (error) {
+      console.error("PDF Generation Error:", error);
+      return false;
+    }
   };
 
   useEffect(() => {
@@ -114,17 +146,23 @@ export default function PublicInvoicePage() {
     fetchData();
   }, [id]);
 
-  // Auto-print logic
+  // Auto-download logic
   useEffect(() => {
-    if (!isLoading && invoice && isAutoPrint) {
-      const timer = setTimeout(() => {
-        window.print();
-      }, 1000);
+    const searchParams = new URLSearchParams(window.location.search);
+    const isAuto = searchParams.get("download") === "true";
+
+    if (!isLoading && invoice && isAuto) {
+      const timer = setTimeout(async () => {
+        const success = await handleDownloadPDF();
+        if (success) {
+          setTimeout(() => window.close(), 1500);
+        }
+      }, 1500);
       return () => clearTimeout(timer);
     }
-  }, [isLoading, invoice, isAutoPrint]);
+  }, [isLoading, invoice]);
 
-  if (isLoading || (isAutoPrint && !invoice)) {
+  if (isLoading || (isAutoDownload && !invoice)) {
     return (
       <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
         <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
@@ -135,18 +173,18 @@ export default function PublicInvoicePage() {
 
 
   // Special overlay when downloading
-  const PrintOverlay = () => (
+  const DownloadOverlay = () => (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center no-print"
     >
       <div className="w-24 h-24 bg-slate-900 text-white rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-slate-900/20">
-        <Printer className="animate-pulse" size={40} />
+        <Loader2 className="animate-spin" size={40} />
       </div>
-      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan Invoice</h2>
+      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan PDF</h2>
       <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] max-w-sm">
-        Invoice sedang disiapkan untuk dicetak/simpan. Mohon tunggu sebentar.
+        Invoice sedang diproses. Tab ini akan tertutup otomatis setelah download dimulai.
       </p>
     </motion.div>
   );
@@ -176,7 +214,7 @@ export default function PublicInvoicePage() {
 
   return (
     <>
-      {isAutoPrint && <PrintOverlay />}
+      {isAutoDownload && <DownloadOverlay />}
       <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
         <div className="max-w-5xl mx-auto">
           {/* Navigation & Actions Layer */}
@@ -190,13 +228,13 @@ export default function PublicInvoicePage() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={handlePrint}
+                onClick={() => window.print()}
                 className="px-10 py-5 bg-white text-slate-900 border border-slate-200/60 rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:bg-slate-50 transition-all shadow-sm"
               >
                 <Printer size={18} strokeWidth={1.5} /> Print
               </button>
               <button
-                onClick={handlePrint}
+                onClick={handleDownloadPDF}
                 className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20"
               >
                 <Download size={18} strokeWidth={1.5} /> Save as PDF

@@ -8,11 +8,11 @@
  */
 
 export const downloadInvoicePDF = (invoiceNumber: string) => {
-  const url = `/invoice/${invoiceNumber}?print=true`;
+  const url = `/invoice/${invoiceNumber}?download=true`;
   const win = window.open(url, '_blank');
   
   if (!win || win.closed || typeof win.closed === 'undefined') {
-    alert("Mohon izinkan pop-up untuk situs ini agar invoice bisa dibuka.");
+    alert("Mohon izinkan pop-up untuk situs ini agar invoice bisa diunduh.");
     return false;
   }
   
