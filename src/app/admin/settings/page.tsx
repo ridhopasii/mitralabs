@@ -317,11 +317,35 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <FormInput
-                label="Alamat"
-                value={invoiceSettings.companyAddress}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyAddress: val})}
-              />
+              <div className="grid md:grid-cols-2 gap-6">
+                <FormInput
+                  label="Alamat Lengkap"
+                  value={invoiceSettings.companyAddress}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyAddress: val})}
+                  placeholder="Jl. Jend. Sudirman Kav. 52"
+                />
+                <FormInput
+                  label="Kota"
+                  value={invoiceSettings.companyCity}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyCity: val})}
+                  placeholder="Bandung"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <FormInput
+                  label="Provinsi"
+                  value={invoiceSettings.companyProvince}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyProvince: val})}
+                  placeholder="Jawa Barat"
+                />
+                <FormInput
+                  label="Kode Pos"
+                  value={invoiceSettings.companyPostalCode}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyPostalCode: val})}
+                  placeholder="12190"
+                />
+              </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <FormInput
@@ -345,10 +369,10 @@ export default function SettingsPage() {
                   placeholder="www.mitralabs.id"
                 />
                 <FormInput
-                  label="NPWP"
+                  label="NPWP Perusahaan"
                   value={invoiceSettings.companyNPWP}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyNPWP: val})}
-                  placeholder="00.000.000.0-000.000"
+                  placeholder="01.234.567.8-901.000"
                 />
                 <FormInput
                   label="LinkedIn"
@@ -377,6 +401,7 @@ export default function SettingsPage() {
                 label="Nama Bank"
                 value={invoiceSettings.bankName}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankName: val})}
+                placeholder="Bank Central Asia (BCA)"
               />
 
               <div className="grid md:grid-cols-2 gap-6">
@@ -408,7 +433,8 @@ export default function SettingsPage() {
                   type="number"
                   value={invoiceSettings.taxRate}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(val) || 0})}
-                  placeholder="11"
+                  placeholder="0"
+                  description="Set ke 0 untuk menghilangkan pajak di kwitansi"
                 />
                 <FormInput
                   label="Label Pajak"
@@ -419,9 +445,10 @@ export default function SettingsPage() {
               </div>
 
               <FormInput
-                label="Catatan Footer"
+                label="Catatan Footer (Branding)"
                 value={invoiceSettings.footerNote}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, footerNote: val})}
+                placeholder="Verified by Mitralabs Cryptographic Protocol"
               />
 
               <FormTextarea
@@ -437,7 +464,7 @@ export default function SettingsPage() {
                 value={invoiceSettings.termsAndConditions}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, termsAndConditions: val})}
                 rows={5}
-                placeholder="1. Pembayaran dilakukan maksimal 7 hari..."
+                placeholder="Gunakan baris baru untuk setiap poin..."
               />
             </div>
 
@@ -450,28 +477,28 @@ export default function SettingsPage() {
 
               <div className="grid md:grid-cols-2 gap-6">
                 <FormInput
-                  label="Nama Marketing Officer"
+                  label="Nama Marketing Officer (Tanda Tangan 1)"
                   value={invoiceSettings.signatureFields?.marketing || ""}
                   onChange={(val: string) => setInvoiceSettings({
                     ...invoiceSettings,
                     signatureFields: { ...invoiceSettings.signatureFields, marketing: val }
                   })}
-                  placeholder="Marketing Officer"
+                  placeholder="Nama Marketing"
                 />
                 <FormInput
-                  label="Nama Owner/Direktur"
+                  label="Nama Owner/Direktur (Tanda Tangan 2)"
                   value={invoiceSettings.signatureFields?.owner || ""}
                   onChange={(val: string) => setInvoiceSettings({
                     ...invoiceSettings,
                     signatureFields: { ...invoiceSettings.signatureFields, owner: val }
                   })}
-                  placeholder="Direktur Utama"
+                  placeholder="Nama Direktur Utama"
                 />
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
                 <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Materai Diperlukan</label>
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Materai Otomatis</label>
                   <select
                     value={invoiceSettings.stampDutyRequired ? "true" : "false"}
                     onChange={(e) => setInvoiceSettings({
@@ -480,19 +507,19 @@ export default function SettingsPage() {
                     })}
                     className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
                   >
-                    <option value="true">Ya, tampilkan materai</option>
-                    <option value="false">Tidak perlu materai</option>
+                    <option value="true">Ya, tampilkan materai jika total > limit</option>
+                    <option value="false">Jangan tampilkan materai</option>
                   </select>
                 </div>
                 <FormInput
-                  label="Nominal Materai (Rp)"
-                  type="number"
-                  value={invoiceSettings.stampDutyAmount || 10000}
+                  label="Nominal Materai (Teks)"
+                  type="text"
+                  value={invoiceSettings.stampDutyAmount || "10.000"}
                   onChange={(val: string) => setInvoiceSettings({
                     ...invoiceSettings,
-                    stampDutyAmount: parseInt(val) || 10000
+                    stampDutyAmount: val
                   })}
-                  placeholder="10000"
+                  placeholder="10.000"
                 />
               </div>
             </div>
