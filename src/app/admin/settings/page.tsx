@@ -14,7 +14,9 @@ import {
   Receipt,
   Building2,
   CreditCard,
-  Save
+  Save,
+  Phone,
+  Briefcase
 } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
 
@@ -45,6 +47,14 @@ export default function SettingsPage() {
     footerNote: "Verified by Mitralabs Cryptographic Protocol",
     termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
+  });
+
+  const [globalSettings, setGlobalSettings] = useState(data.settings || {
+    waNumber: "6282381118520",
+    companyLogo: "/logo.png",
+    companyFavicon: "/favicon.ico",
+    businessMode: "agresif",
+    waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial."
   });
 
   const exportData = () => {
@@ -96,13 +106,13 @@ export default function SettingsPage() {
   const saveInvoiceSettings = async () => {
     setIsSaving(true);
     try {
-      const newData = { ...data, invoiceSettings };
+      const newData = { ...data, invoiceSettings, settings: globalSettings };
       updateData(newData);
-      await logActivity("Update Invoice Settings", "Invoice settings berhasil diperbarui");
-      setSuccess("Pengaturan invoice berhasil disimpan!");
+      await logActivity("Update Settings", "Invoice & Global settings berhasil diperbarui");
+      setSuccess("Pengaturan berhasil disimpan!");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
-      setError("Gagal menyimpan pengaturan invoice.");
+      setError("Gagal menyimpan pengaturan.");
       setTimeout(() => setError(null), 3000);
     } finally {
       setIsSaving(false);
@@ -131,6 +141,107 @@ export default function SettingsPage() {
             <p className="font-black">{error}</p>
           </div>
         )}
+
+        {/* Global Settings Section */}
+        <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+              <Database size={32} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Pengaturan Global Website</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">WhatsApp, Logo, dan Konfigurasi Umum</p>
+            </div>
+          </div>
+
+          <div className="space-y-8">
+            {/* WhatsApp & Contact */}
+            <div className="space-y-6">
+              <div className="flex items-center gap-3 text-slate-400">
+                <Phone size={18} />
+                <h4 className="text-sm font-bold uppercase tracking-widest">WhatsApp & Kontak</h4>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Nomor WhatsApp (untuk API)</label>
+                  <input
+                    type="text"
+                    value={globalSettings.waNumber}
+                    onChange={(e) => setGlobalSettings({...globalSettings, waNumber: e.target.value})}
+                    placeholder="6282381118520"
+                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                  />
+                  <p className="text-[10px] text-slate-400 font-medium">Format: 62xxx (tanpa +, tanpa spasi)</p>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Pesan Promo WhatsApp</label>
+                  <input
+                    type="text"
+                    value={globalSettings.waPromoMessage}
+                    onChange={(e) => setGlobalSettings({...globalSettings, waPromoMessage: e.target.value})}
+                    placeholder="🔥 Promo Bulan Ini!"
+                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Logo & Branding */}
+            <div className="space-y-6 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-3 text-slate-400">
+                <Building2 size={18} />
+                <h4 className="text-sm font-bold uppercase tracking-widest">Logo & Branding</h4>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">URL Logo Perusahaan</label>
+                  <input
+                    type="text"
+                    value={globalSettings.companyLogo}
+                    onChange={(e) => setGlobalSettings({...globalSettings, companyLogo: e.target.value})}
+                    placeholder="/logo.png atau https://..."
+                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                  />
+                  <p className="text-[10px] text-slate-400 font-medium">Path relatif atau URL lengkap</p>
+                </div>
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">URL Favicon</label>
+                  <input
+                    type="text"
+                    value={globalSettings.companyFavicon}
+                    onChange={(e) => setGlobalSettings({...globalSettings, companyFavicon: e.target.value})}
+                    placeholder="/favicon.ico"
+                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                  />
+                </div>
+              </div>
+            </div>
+
+            {/* Business Mode */}
+            <div className="space-y-6 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-3 text-slate-400">
+                <Briefcase size={18} />
+                <h4 className="text-sm font-bold uppercase tracking-widest">Mode Bisnis</h4>
+              </div>
+
+              <div className="space-y-3">
+                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mode Operasional</label>
+                <select
+                  value={globalSettings.businessMode}
+                  onChange={(e) => setGlobalSettings({...globalSettings, businessMode: e.target.value})}
+                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
+                >
+                  <option value="agresif">Agresif (Promo & CTA Kuat)</option>
+                  <option value="profesional">Profesional (Formal & Elegan)</option>
+                  <option value="santai">Santai (Friendly & Casual)</option>
+                </select>
+                <p className="text-[10px] text-slate-400 font-medium">Mempengaruhi tone komunikasi di website</p>
+              </div>
+            </div>
+          </div>
+        </section>
 
         {/* Invoice Settings Section */}
         <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
@@ -320,7 +431,7 @@ export default function SettingsPage() {
               className="w-full py-6 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl disabled:opacity-50"
             >
               {isSaving ? <RefreshCcw size={18} className="animate-spin" /> : <Save size={18} />}
-              Simpan Pengaturan Invoice
+              Simpan Semua Pengaturan (Global + Invoice)
             </button>
           </div>
         </section>
