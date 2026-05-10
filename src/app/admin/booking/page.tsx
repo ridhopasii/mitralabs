@@ -33,7 +33,8 @@ import {
   Layers,
   ArrowUpRight,
   ChevronDown,
-  TrendingUp
+  TrendingUp,
+  Receipt
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity } from "@/lib/supabase";
