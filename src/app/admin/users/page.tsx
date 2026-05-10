@@ -24,7 +24,13 @@ export default function UsersPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [editingUser, setEditingUser] = useState<any>(null);
+  const [isAddingUser, setIsAddingUser] = useState(false);
   const [isSaving, setIsSaving] = useState(false);
+  const [newUser, setNewUser] = useState({
+    email: "",
+    full_name: "",
+    role: "staff"
+  });
 
   useEffect(() => {
     fetchUsers();
@@ -44,6 +50,25 @@ export default function UsersPage() {
       console.error("Error fetching users:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleAddUser = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSaving(true);
+    try {
+      // For now, we just create the User record. 
+      // The person will still need to sign up/login via Supabase Auth with this email.
+      const { error } = await supabase.from("User").insert([newUser]);
+      if (error) throw error;
+      
+      setUsers([{ ...newUser, id: Math.random().toString(), created_at: new Date().toISOString(), is_active: true }, ...users]);
+      setIsAddingUser(false);
+      setNewUser({ email: "", full_name: "", role: "staff" });
+    } catch (error: any) {
+      alert("Gagal menambah user: " + error.message);
+    } finally {
+      setIsSaving(false);
     }
   };
 
@@ -85,8 +110,11 @@ export default function UsersPage() {
           </div>
         </div>
 
-        <button className="px-8 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
-          <UserPlus size={16} /> Invite New Staff
+        <button 
+          onClick={() => setIsAddingUser(true)}
+          className="px-8 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10"
+        >
+          <UserPlus size={16} /> Add New User/Staff
         </button>
       </div>
 
@@ -189,6 +217,88 @@ export default function UsersPage() {
           </tbody>
         </table>
       </div>
+
+      {/* Add User Modal */}
+      <AnimatePresence>
+        {isAddingUser && (
+          <div className="fixed inset-0 z-[100] flex items-center justify-center p-6">
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              onClick={() => setIsAddingUser(false)}
+              className="absolute inset-0 bg-slate-900/40 backdrop-blur-sm"
+            />
+            <motion.div 
+              initial={{ opacity: 0, scale: 0.95, y: 20 }}
+              animate={{ opacity: 1, scale: 1, y: 0 }}
+              exit={{ opacity: 0, scale: 0.95, y: 20 }}
+              className="relative w-full max-w-md bg-white rounded-[2.5rem] shadow-2xl overflow-hidden"
+            >
+              <div className="p-10 border-b border-slate-100 flex flex-col items-center text-center">
+                 <div className="w-20 h-20 bg-slate-50 rounded-3xl flex items-center justify-center mb-6 text-slate-900">
+                   <UserPlus size={32} />
+                 </div>
+                 <h3 className="text-xl font-bold text-slate-900 mb-2">Create New User</h3>
+                 <p className="text-sm font-medium text-slate-400">Add a member to your organization manually</p>
+              </div>
+
+              <form onSubmit={handleAddUser} className="p-10 space-y-6">
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Full Name</label>
+                    <input 
+                      required
+                      type="text" 
+                      value={newUser.full_name}
+                      onChange={(e) => setNewUser({...newUser, full_name: e.target.value})}
+                      className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Email Address</label>
+                    <input 
+                      required
+                      type="email" 
+                      value={newUser.email}
+                      onChange={(e) => setNewUser({...newUser, email: e.target.value})}
+                      className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100" 
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Initial Role</label>
+                    <select 
+                      value={newUser.role}
+                      onChange={(e) => setNewUser({...newUser, role: e.target.value})}
+                      className="w-full px-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-100 appearance-none cursor-pointer"
+                    >
+                      <option value="admin">Admin</option>
+                      <option value="staff">Staff</option>
+                      <option value="viewer">Viewer</option>
+                    </select>
+                  </div>
+                </div>
+
+                <button 
+                  type="submit"
+                  disabled={isSaving}
+                  className="w-full py-5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10 disabled:opacity-50"
+                >
+                  {isSaving ? <Loader2 size={18} className="animate-spin" /> : "Save User Data"}
+                </button>
+                
+                <button 
+                  type="button"
+                  onClick={() => setIsAddingUser(false)}
+                  className="w-full py-2 text-slate-400 font-bold text-[10px] uppercase tracking-widest hover:text-slate-900 transition-all"
+                >
+                  Cancel
+                </button>
+              </form>
+            </motion.div>
+          </div>
+        )}
+      </AnimatePresence>
 
       {/* Edit Role Modal */}
       <AnimatePresence>

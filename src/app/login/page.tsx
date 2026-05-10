@@ -143,7 +143,10 @@ export default function LoginPage() {
             </button>
           </form>
 
-          <div className="mt-12 pt-8 border-t border-surface-container-highest text-center">
+          <div className="mt-12 pt-8 border-t border-surface-container-highest text-center space-y-4">
+            <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
+              Belum punya akun? <Link href="/register" className="text-primary hover:underline">Daftar Sekarang</Link>
+            </p>
             <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-20">
               <ShieldCheck size={14} /> Protected by Supabase Auth
             </div>

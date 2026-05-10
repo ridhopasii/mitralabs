@@ -20,7 +20,7 @@ export default function Navbar() {
     return () => window.removeEventListener("scroll", handleScroll);
   }, []);
 
-  if (pathname?.startsWith("/admin") || pathname?.startsWith("/login")) return null;
+  if (pathname?.startsWith("/admin") || pathname?.startsWith("/login") || pathname?.startsWith("/register")) return null;
 
   const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
 
@@ -52,6 +52,10 @@ export default function Navbar() {
                   </Link>
                 );
               })}
+              <Link href="/login" className="transition-colors hover:text-on-background relative group">
+                Portal
+                <span className="absolute -bottom-1 left-0 w-full h-px bg-on-background scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
+              </Link>
             </nav>
 
             {/* CTA & Mobile Toggle */}

@@ -13,7 +13,8 @@ import {
   User as UserIcon,
   Loader2,
   FolderOpen,
-  ArrowUpRight
+  ArrowUpRight,
+  Download
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion } from "framer-motion";
@@ -41,7 +42,8 @@ export default function ClientDashboard() {
           *,
           projects:ClientProject (
             *,
-            booking:Booking (*)
+            booking:Booking (*),
+            files:ProjectFile (*)
           ),
           bookings:Booking (*)
         `)
@@ -193,11 +195,33 @@ export default function ClientDashboard() {
                           <Link href={`/track?id=${proj.booking_id}`} className="px-6 py-4 bg-slate-900 text-white rounded-2xl font-bold text-[11px] uppercase tracking-widest flex items-center justify-center gap-2 shadow-lg shadow-slate-900/10">
                             View Details <ArrowUpRight size={14} />
                           </Link>
-                          <button className="px-6 py-4 bg-slate-50 text-slate-400 hover:text-slate-900 rounded-2xl font-bold text-[11px] uppercase tracking-widest transition-all">
-                            Documentation
-                          </button>
                        </div>
                      </div>
+
+                     {/* Documents for this project */}
+                     {proj.files?.length > 0 && (
+                       <div className="mt-10 pt-8 border-t border-slate-100 grid grid-cols-1 md:grid-cols-2 gap-4">
+                         {proj.files.map((file: any) => (
+                           <a 
+                             key={file.id} 
+                             href={file.file_url} 
+                             target="_blank"
+                             className="flex items-center justify-between p-4 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-100 rounded-2xl transition-all group/file"
+                           >
+                             <div className="flex items-center gap-3">
+                               <div className="w-10 h-10 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover/file:text-red-500 transition-colors">
+                                 <FileText size={18} />
+                               </div>
+                               <div>
+                                 <p className="text-[11px] font-bold text-slate-900 uppercase truncate max-w-[150px]">{file.filename}</p>
+                                 <p className="text-[9px] font-medium text-slate-400 uppercase tracking-widest">{file.file_type || 'PDF'}</p>
+                               </div>
+                             </div>
+                             <Download size={14} className="text-slate-300 group-hover/file:text-slate-900" />
+                           </a>
+                         ))}
+                       </div>
+                     )}
                    </motion.div>
                  ))
                ) : (
@@ -206,6 +230,34 @@ export default function ClientDashboard() {
                     <Link href="/pesan-sekarang" className="mt-4 inline-block text-primary font-bold text-xs hover:underline uppercase tracking-widest">Pesan Website Pertama Anda</Link>
                  </div>
                )}
+            </div>
+
+            {/* Global Resources Section */}
+            <div className="mt-16 space-y-8">
+               <h3 className="text-xl font-bold flex items-center gap-3">
+                 <FileText size={20} className="text-slate-400" /> Resource & Panduan
+               </h3>
+               <div className="grid md:grid-cols-2 gap-6">
+                  {[
+                    { name: "Company Profile Mitralabs", size: "11 MB", icon: FileText },
+                    { name: "SOP Kerjasama & Revisi", size: "11 MB", icon: FileText },
+                  ].map((res, i) => (
+                    <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-200/60 shadow-sm flex items-center justify-between group">
+                       <div className="flex items-center gap-5">
+                          <div className="w-12 h-12 bg-slate-50 text-slate-400 rounded-2xl flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all">
+                             <res.icon size={24} />
+                          </div>
+                          <div>
+                             <p className="font-bold text-sm text-slate-900">{res.name}</p>
+                             <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{res.size} • PDF</p>
+                          </div>
+                       </div>
+                       <button className="p-3 text-slate-300 hover:text-slate-900 transition-colors">
+                          <Download size={20} />
+                       </button>
+                    </div>
+                  ))}
+               </div>
             </div>
           </div>
 

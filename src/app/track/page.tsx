@@ -12,7 +12,8 @@ import {
   FileText, 
   ExternalLink,
   ChevronRight,
-  ShieldCheck
+  ShieldCheck,
+  Download
 } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
@@ -37,7 +38,10 @@ export default function TrackingPage() {
         .select(`
           *,
           invoices (*),
-          client_projects (*)
+          client_projects (
+            *,
+            files:ProjectFile (*)
+          )
         `)
         .eq("id", parseInt(bookingId))
         .eq("tracking_password", password)
@@ -239,6 +243,34 @@ export default function TrackingPage() {
                       </div>
                     )}
                   </div>
+
+                  {/* Guest Documents Section */}
+                  {projectData.client_projects?.[0]?.files?.length > 0 && (
+                    <div className="p-10 border-t border-slate-100 bg-slate-50/30">
+                       <p className="text-[10px] font-black text-slate-300 uppercase tracking-[0.2em] mb-6">Dokumen & File Projek</p>
+                       <div className="grid gap-3">
+                          {projectData.client_projects[0].files.map((file: any) => (
+                            <a 
+                              key={file.id} 
+                              href={file.file_url} 
+                              target="_blank"
+                              className="flex items-center justify-between p-5 bg-white border border-slate-100 rounded-2xl hover:shadow-lg hover:shadow-slate-200/50 transition-all group"
+                            >
+                               <div className="flex items-center gap-4">
+                                  <div className="w-10 h-10 bg-slate-50 rounded-xl flex items-center justify-center text-slate-400 group-hover:text-red-500 transition-colors">
+                                    <FileText size={18} />
+                                  </div>
+                                  <div>
+                                    <p className="text-[11px] font-bold text-slate-900 uppercase">{file.filename}</p>
+                                    <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{file.file_type || 'PDF'}</p>
+                                  </div>
+                               </div>
+                               <Download size={14} className="text-slate-300 group-hover:text-slate-900" />
+                            </a>
+                          ))}
+                       </div>
+                    </div>
+                  )}
                 </div>
 
                 {/* Financials & Invoices */}

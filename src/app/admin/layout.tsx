@@ -66,6 +66,7 @@ export default function AdminLayout({
     { name: "Layanan", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
     { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
     { name: "Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
+    { name: "Dokumen", icon: FileText, href: "/admin/dokumen", category: "CMS" },
     { name: "Media", icon: Image, href: "/admin/media", category: "CMS" },
     { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "CMS" },
     { name: "FAQ", icon: HelpCircle, href: "/admin/faq", category: "CMS" },
