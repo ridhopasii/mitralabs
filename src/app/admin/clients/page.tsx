@@ -5,7 +5,7 @@ import { useState, useEffect } from "react";
 import { supabase, logActivity } from "@/lib/supabase";
 import {
   FolderKanban, FileText, Upload, Calendar, CheckCircle2,
-  ExternalLink, BarChart3, AlertCircle, RotateCcw, Link2, Download, Trash2, Send
+  ExternalLink, BarChart3, AlertCircle, RotateCcw, Link2, Download, Trash2, Send, Target
 } from "lucide-react";
 
 export default function ClientManagement() {
