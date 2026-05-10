@@ -30,6 +30,7 @@ import {
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity, supabase } from "@/lib/supabase";
 import { z } from "zod";
+import Link from "next/link";
 
 const bookingSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
