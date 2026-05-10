@@ -477,20 +477,6 @@ export default function BookingCMS() {
                           setIsRefreshing(false);
                         }
                       }}
-
-                          if (error) {
-                            setFetchError(`Error: ${error.message}`);
-                            alert(`Error: ${error.message}\nCode: ${error.code}`);
-                          } else if (bookingsData) {
-                            setBookings(bookingsData.map((b: any) => ({ ...b, invoices: [] })));
-                            setFetchError(null);
-                          }
-                        } catch (err: any) {
-                          setFetchError(`Error: ${err.message}`);
-                        } finally {
-                          setIsRefreshing(false);
-                        }
-                      }}
                       className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-bold text-sm hover:bg-slate-800 transition-all flex items-center gap-2"
                     >
                       <Download size={18} /> Retry Fetch
