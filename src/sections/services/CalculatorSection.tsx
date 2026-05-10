@@ -2,6 +2,7 @@
 
 import { useState, useMemo } from "react";
 import { Calculator, Check, MessageCircle } from "lucide-react";
+import { useData } from "@/context/DataContext";
 
 const options = [
   { id: "pages", label: "Jumlah Halaman", type: "range", min: 1, max: 20, unit: "Hal", basePrice: 1500000 },
@@ -13,6 +14,8 @@ const options = [
 ];
 
 export default function CalculatorSection() {
+  const { data } = useData();
+  const { settings } = data;
   const [selections, setSelections] = useState<any>({
     pages: 1,
     cms: false,
@@ -51,7 +54,7 @@ export default function CalculatorSection() {
     setSelections((prev: any) => ({ ...prev, pages: parseInt(e.target.value) }));
   };
 
-  const WA_NUMBER = "6282381118520";
+  const WA_NUMBER = settings.waNumber;
   const WA_MESSAGE = `Halo Mitralabs! Saya sudah menghitung estimasi di website untuk:
 - ${selections.pages} Halaman
 - Admin Panel: ${selections.cms ? 'Ya' : 'Tidak'}

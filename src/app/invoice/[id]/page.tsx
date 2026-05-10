@@ -21,35 +21,80 @@ import {
 import Link from "next/link";
 import { motion } from "framer-motion";
 
+const defaultInvoiceSettings = {
+  companyName: "MITRALABS.ID",
+  companyTagline: "Precision Web Engineering",
+  companyAddress: "Jl. Contoh No. 123, Medan, Sumatera Utara, Indonesia",
+  companyCity: "Medan",
+  companyProvince: "Sumatera Utara",
+  companyPostalCode: "20111",
+  companyPhone: "+62 823-8111-8520",
+  companyEmail: "contact@mitralabs.id",
+  companyWebsite: "www.mitralabs.id",
+  companyNPWP: "00.000.000.0-000.000",
+  bankName: "Bank Central Asia (BCA)",
+  bankAccountNumber: "8000-7625-12",
+  bankAccountName: "Ridho Robbi Pasi",
+  bankBranch: "KCP Medan Petisah",
+  taxRate: 0,
+  taxLabel: "PPN (11%)",
+  footerNote: "Verified by Mitralabs Cryptographic Protocol",
+  termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+  paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
+};
+
 export default function PublicInvoicePage() {
   const { id } = useParams();
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
+  const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || defaultInvoiceSettings);
 
   useEffect(() => {
-    const fetchInvoice = async () => {
+    const fetchData = async () => {
       try {
         const { supabase } = await import("@/lib/supabase");
 
-        // Fetch invoice by invoice_number
-        const { data: invoiceData, error } = await supabase
-          .from("Invoice")
-          .select("*")
-          .eq("invoice_number", id)
-          .single();
+        // Fetch invoice and settings in parallel from Supabase
+        const [invoiceRes, configRes] = await Promise.all([
+          supabase
+            .from("Invoice")
+            .select("*")
+            .eq("invoice_number", id)
+            .single(),
+          supabase
+            .from("SiteConfig")
+            .select("json_content")
+            .eq("id", 1)
+            .maybeSingle()
+        ]);
 
-        if (error) {
-          console.error("Error fetching invoice:", error);
-        } else if (invoiceData) {
-          // Parse items if it's a string
+        // Process invoice
+        if (invoiceRes.error) {
+          console.error("Error fetching invoice:", invoiceRes.error);
+        } else if (invoiceRes.data) {
           const parsedInvoice = {
-            ...invoiceData,
-            items: typeof invoiceData.items === 'string'
-              ? JSON.parse(invoiceData.items)
-              : invoiceData.items
+            ...invoiceRes.data,
+            items: typeof invoiceRes.data.items === 'string'
+              ? JSON.parse(invoiceRes.data.items)
+              : invoiceRes.data.items
           };
           setInvoice(parsedInvoice);
+        }
+
+        // Process settings from Supabase (takes priority over localStorage)
+        if (configRes.data?.json_content) {
+          try {
+            const jsonContent = typeof configRes.data.json_content === 'string'
+              ? JSON.parse(configRes.data.json_content)
+              : configRes.data.json_content;
+
+            if (jsonContent.invoiceSettings) {
+              setInvoiceSettings({ ...defaultInvoiceSettings, ...jsonContent.invoiceSettings });
+            }
+          } catch (e) {
+            console.error("Failed to parse settings from Supabase:", e);
+          }
         }
       } catch (err) {
         console.error("Error:", err);
@@ -58,41 +103,8 @@ export default function PublicInvoicePage() {
       }
     };
 
-    fetchInvoice();
+    fetchData();
   }, [id]);
-
-  const invoiceSettings = data.invoiceSettings || {
-    companyName: "MITRALABS.ID",
-    companyTagline: "Precision Web Engineering",
-    companyAddress: "Jl. Contoh No. 123, Medan, Sumatera Utara, Indonesia",
-    companyCity: "Medan",
-    companyProvince: "Sumatera Utara",
-    companyPostalCode: "20111",
-    companyPhone: "+62 823-8111-8520",
-    companyEmail: "contact@mitralabs.id",
-    companyWebsite: "www.mitralabs.id",
-    companyNPWP: "00.000.000.0-000.000",
-    bankName: "Bank Central Asia (BCA)",
-    bankAccountNumber: "8000-7625-12",
-    bankAccountName: "Ridho Robbi Pasi",
-    bankBranch: "KCP Medan Petisah",
-    taxRate: 0,
-    taxLabel: "PPN (11%)",
-    footerNote: "Verified by Mitralabs Cryptographic Protocol",
-    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
-    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
-  };
-
-  // Debug: Log invoice settings to console
-  useEffect(() => {
-    console.log("📄 Invoice Settings Loaded:", {
-      hasCustomSettings: !!data.invoiceSettings,
-      bankName: invoiceSettings.bankName,
-      bankAccount: invoiceSettings.bankAccountNumber,
-      companyName: invoiceSettings.companyName,
-      taxRate: invoiceSettings.taxRate
-    });
-  }, [data.invoiceSettings, invoiceSettings]);
 
   if (isLoading) {
     return (

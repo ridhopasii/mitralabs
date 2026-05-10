@@ -652,6 +652,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               if (structural.contact) merged.contact = mergeData(merged.contact, structural.contact);
               if (structural.footer) merged.footer = mergeData(merged.footer, structural.footer);
               if (structural.navbar) merged.navbar = mergeData(merged.navbar, structural.navbar);
+              // Sync invoiceSettings and global settings from Supabase
+              if (structural.invoiceSettings) merged.invoiceSettings = mergeData(merged.invoiceSettings, structural.invoiceSettings);
+              if (structural.settings) merged.settings = mergeData(merged.settings, structural.settings);
             } catch (e) {
               console.error("Failed to parse structural json_content", e);
             }
@@ -760,7 +763,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               about: newData.about,
               contact: newData.contact,
               footer: newData.footer,
-              navbar: newData.navbar
+              navbar: newData.navbar,
+              invoiceSettings: newData.invoiceSettings,
+              settings: newData.settings
             }
           }),
           supabase.from("HeroSection").upsert({

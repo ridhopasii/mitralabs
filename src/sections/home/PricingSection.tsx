@@ -1,5 +1,8 @@
+"use client";
+
 import Link from "next/link";
 import { CheckCircle2, Star, Zap, Diamond, MessageCircle, ArrowRight } from "lucide-react";
+import { useData } from "@/context/DataContext";
 
 const plans = [
   {
@@ -63,6 +66,9 @@ const plans = [
 ];
 
 export default function PricingSection() {
+  const { data } = useData();
+  const { settings } = data;
+
   return (
     <section id="harga" className="py-24 bg-white">
       <div className="max-w-7xl mx-auto px-6">
@@ -180,7 +186,7 @@ export default function PricingSection() {
         <div className="mt-10 text-center text-sm text-[#434656]">
           Tidak yakin pilih paket mana?{" "}
           <a
-            href={`https://wa.me/6282381118520?text=${encodeURIComponent("Halo, saya ingin konsultasi paket website yang cocok untuk bisnis saya.")}`}
+            href={`https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo, saya ingin konsultasi paket website yang cocok untuk bisnis saya.")}`}
             className="text-[#1A5CFF] font-semibold hover:underline"
             target="_blank"
             rel="noopener noreferrer"
