@@ -45,6 +45,7 @@ const defaultInvoiceSettings = {
 };
 
 export default function PublicInvoicePage() {
+  const { id } = useParams();
   const searchParams = useSearchParams();
   const isAutoPrint = searchParams.get("print") === "true";
   
