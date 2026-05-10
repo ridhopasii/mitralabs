@@ -298,6 +298,8 @@ export default function BookingCMS() {
     setBookings(newBookings);
     setShowSuccess(true);
     setTimeout(() => setShowSuccess(false), 3000);
+
+    console.log('✅ Generated new Kwitansi:', newInvoice.invoice_number, 'Type:', newInvoice.invoice_type);
   };
 
   const filteredBookings = bookings.filter(b =>
@@ -540,7 +542,7 @@ export default function BookingCMS() {
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
                          <>
-                           {booking.invoices[0].invoice_type === "Kwitansi" ? (
+                           {booking.invoices[0].invoice_number?.startsWith('KW-') || booking.invoices[0].invoice_type === "Kwitansi" ? (
                              <KwitansiPDFGenerator
                                invoiceNumber={booking.invoices[0].invoice_number}
                                invoiceData={booking.invoices[0]}
