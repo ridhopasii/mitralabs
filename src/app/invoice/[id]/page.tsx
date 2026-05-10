@@ -23,7 +23,6 @@ import {
   Loader2
 } from "lucide-react";
 import Link from "next/link";
-import { motion } from "framer-motion";
 
 export default function PublicInvoicePage() {
   const { id } = useParams();
@@ -70,7 +69,7 @@ export default function PublicInvoicePage() {
     }).format(num);
   };
 
-  // PDF Download Handler (using jsPDF + html2canvas for high fidelity)
+  // PDF Download Handler (Flexible Height - Identical to Designer's Intent)
   const handleDownloadPDF = async () => {
     const element = document.getElementById("invoice-content");
     if (!element) return;
@@ -87,17 +86,18 @@ export default function PublicInvoicePage() {
       });
 
       const imgData = canvas.toDataURL("image/png");
+      
+      // Flexible PDF Height logic
+      const imgWidth = 210; // mm
+      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
-        format: "a4",
+        format: [imgWidth, imgHeight],
       });
 
-      const imgProps = pdf.getImageProperties(imgData);
-      const pdfWidth = pdf.internal.pageSize.getWidth();
-      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
-
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
       pdf.save(`Kwitansi-${invoice?.invoice_number}.pdf`);
     } catch (error) {
       console.error("PDF Error:", error);
@@ -124,24 +124,22 @@ export default function PublicInvoicePage() {
     );
   }
 
-  // Calculate Total
-  const subtotal = invoice.items.reduce((acc: number, item: any) => acc + (item.qty * item.price), 0);
-  const total = subtotal; // PPN removed as per user design
+  const total = invoice.items.reduce((acc: number, item: any) => acc + (item.qty * item.price), 0);
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] py-12 px-4 font-sans text-[#1D1D1F] flex flex-col items-center">
       
-      {/* Actions Layer */}
-      <div className="w-full max-w-[800px] mb-8 flex justify-between items-center no-print">
+      {/* Action Buttons (Hidden on Print) */}
+      <div className="w-full max-w-[800px] mb-8 flex justify-between items-center print:hidden">
         <button onClick={() => router.back()} className="flex items-center gap-2 text-slate-500 hover:text-slate-900 font-bold text-xs uppercase tracking-widest transition-all">
-          <ChevronLeft size={16} /> Back
+          <ChevronLeft size={16} /> Kembali
         </button>
         <div className="flex gap-3">
           <button 
             onClick={() => window.print()}
             className="px-6 py-3 bg-white border border-slate-200 rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-slate-50 transition-all shadow-sm"
           >
-            <Printer size={16} /> Print
+            <Printer size={16} /> Cetak
           </button>
           <button 
             onClick={handleDownloadPDF}
@@ -155,7 +153,7 @@ export default function PublicInvoicePage() {
       </div>
 
       {/* Main Document Content */}
-      <div id="invoice-content" className="w-full max-w-[800px] bg-white rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] overflow-hidden relative border border-slate-100">
+      <div id="invoice-content" className="w-full max-w-[800px] bg-white rounded-[32px] shadow-[0_20px_60px_rgba(0,0,0,0.03)] overflow-hidden print:shadow-none print:rounded-none relative border border-slate-100">
         
         {/* Top Copy Indicator */}
         <div className="bg-slate-50 px-10 py-2 border-b border-slate-100 flex justify-between items-center">
@@ -193,9 +191,7 @@ export default function PublicInvoicePage() {
 
             <div className="flex flex-col items-start md:items-end text-left md:text-right w-full md:w-auto">
               <div className="mb-8">
-                <h1 className="text-5xl font-bold tracking-tighter text-[#1D1D1F] leading-none mb-2 italic">
-                  {invoice.invoice_type || "Kwitansi"}
-                </h1>
+                <h1 className="text-5xl font-bold tracking-tighter text-[#1D1D1F] leading-none mb-2 italic">{invoice.invoice_type || "Kwitansi"}</h1>
                 <p className="text-[#86868B] text-[10px] font-bold tracking-[0.2em] uppercase">E-Verification Success</p>
               </div>
 
@@ -273,7 +269,7 @@ export default function PublicInvoicePage() {
           <div className="mb-4 flex items-center gap-2 text-[10px] font-bold text-[#86868B] uppercase tracking-widest">
             <Info size={12} className="text-[#0066FF]" />
             Periode Proyek: <span className="text-[#1D1D1F]">
-              {invoice.project_period_start ? `${new Date(invoice.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoice.project_period_end).toLocaleDateString('id-ID')}` : "-"}
+              {invoice.project_period_start ? `${new Date(invoice.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoice.project_period_end || '').toLocaleDateString('id-ID')}` : "-"}
             </span>
           </div>
           <table className="w-full text-sm">
@@ -372,7 +368,7 @@ export default function PublicInvoicePage() {
                 )}
                 <div className="border-b border-[#D2D2D7] w-full mx-auto z-10"></div>
                 <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight z-10">
-                   {globalData.invoiceSettings.signatureFields?.owner || "Direktur Utama"}
+                  {globalData.invoiceSettings.signatureFields?.owner || "Direktur Utama"}
                 </p>
               </div>
             </div>
@@ -396,7 +392,7 @@ export default function PublicInvoicePage() {
           </div>
         </div>
 
-        {/* Footer Branding */}
+        {/* Footer Branding Area */}
         <div className="bg-[#1D1D1F] px-16 py-10 flex flex-col md:flex-row justify-between items-center gap-8">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center text-[#1D1D1F] font-bold text-sm italic">M</div>
@@ -416,7 +412,7 @@ export default function PublicInvoicePage() {
         </div>
       </div>
 
-      <div className="mt-8 text-center space-y-2 no-print">
+      <div className="mt-8 text-center space-y-2 print:hidden">
         <p className="text-[10px] text-[#86868B] font-bold uppercase tracking-[0.3em]">Hak Cipta &copy; 2026 PT MITRA LABS DIGITAL</p>
         <p className="text-[10px] text-[#D2D2D7] font-medium tracking-wide">Kwitansi ini diakui secara hukum sebagai bukti pelunasan digital yang sah.</p>
       </div>
@@ -427,14 +423,14 @@ export default function PublicInvoicePage() {
         body { font-family: 'Inter', -apple-system, sans-serif; -webkit-font-smoothing: antialiased; }
 
         @media print {
-          @page { size: A4; margin: 0; }
+          @page { size: auto; margin: 0; }
           body { background: white !important; padding: 0 !important; }
-          .no-print { display: none !important; }
           .min-h-screen { background: white !important; padding: 0 !important; }
           .max-w-[800px] { max-width: 100% !important; border: none !important; box-shadow: none !important; margin: 0 !important; border-radius: 0 !important; }
           .bg-[#F5F5F7], .bg-white { background-color: white !important; }
           .bg-[#F5F5F7]\\/40 { background-color: #fafafa !important; -webkit-print-color-adjust: exact; }
           .bg-[#1D1D1F] { background-color: #1D1D1F !important; color: white !important; -webkit-print-color-adjust: exact; }
+          .print\\:hidden { display: none !important; }
           * { -webkit-print-color-adjust: exact !important; color-adjust: exact !important; }
         }
       `}} />
