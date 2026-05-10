@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useData, Booking, Invoice } from "@/context/DataContext";
 import Link from "next/link";
 import InvoicePDFGenerator from "@/components/InvoicePDFGenerator";
+import KwitansiPDFGenerator from "@/components/KwitansiPDFGenerator";
 import {
   Plus,
   Search,
@@ -262,16 +263,26 @@ export default function BookingCMS() {
   const generateInvoice = (booking: Booking) => {
     const newInvoice: Invoice = {
       id: Date.now(),
-      invoice_number: `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      invoice_number: `KW-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
       amount: booking.total_price,
       status: "Unpaid",
       due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       items: [
-        { desc: `Service: ${booking.service_type} (${booking.plan_name})`, price: booking.total_price, qty: 1 }
+        {
+          desc: `${booking.service_type} - ${booking.plan_name} Package`,
+          details: `Custom development, optimization, and premium support included`,
+          price: booking.total_price,
+          qty: 1
+        }
       ],
       client_name: booking.customer_name,
       client_email: booking.customer_email,
-      created_at: new Date().toISOString()
+      client_company: booking.organization_name,
+      client_address: booking.client_address,
+      created_at: new Date().toISOString(),
+      project_period_start: new Date().toISOString().split('T')[0],
+      project_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      invoice_type: "Kwitansi"
     };
 
     const updatedBooking = {
@@ -528,11 +539,21 @@ export default function BookingCMS() {
 
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
-                         <InvoicePDFGenerator
-                           invoiceNumber={booking.invoices[0].invoice_number}
-                           invoiceData={booking.invoices[0]}
-                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                         />
+                         <>
+                           {booking.invoices[0].invoice_type === "Kwitansi" ? (
+                             <KwitansiPDFGenerator
+                               invoiceNumber={booking.invoices[0].invoice_number}
+                               invoiceData={booking.invoices[0]}
+                               className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                             />
+                           ) : (
+                             <InvoicePDFGenerator
+                               invoiceNumber={booking.invoices[0].invoice_number}
+                               invoiceData={booking.invoices[0]}
+                               className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                             />
+                           )}
+                         </>
                        )}
 
                        {/* Edit Button */}
@@ -715,6 +736,40 @@ export default function BookingCMS() {
                                       className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
                                    />
                                 </div>
+                             </div>
+
+                             <div className="grid grid-cols-1 md:grid-cols-2 gap-8">
+                                <div className="space-y-3">
+                                   <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Company Name (Optional)</label>
+                                   <input
+                                      type="text"
+                                      value={editingBooking.organization_name || ""}
+                                      onChange={(e) => setEditingBooking({...editingBooking, organization_name: e.target.value})}
+                                      placeholder="PT. Client Company"
+                                      className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                                   />
+                                </div>
+                                <div className="space-y-3">
+                                   <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Position (Optional)</label>
+                                   <input
+                                      type="text"
+                                      value={editingBooking.position || ""}
+                                      onChange={(e) => setEditingBooking({...editingBooking, position: e.target.value})}
+                                      placeholder="CEO, Manager, etc."
+                                      className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+                                   />
+                                </div>
+                             </div>
+
+                             <div className="space-y-3">
+                                <label className="text-[11px] font-bold uppercase tracking-widest text-slate-400 ml-1">Client Address (Optional)</label>
+                                <textarea
+                                   value={editingBooking.client_address || ""}
+                                   onChange={(e) => setEditingBooking({...editingBooking, client_address: e.target.value})}
+                                   rows={3}
+                                   placeholder="Jl. Client Address No. 123, City, Province, Postal Code"
+                                   className="w-full px-5 py-3.5 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
+                                />
                              </div>
 
                              <div className="grid grid-cols-1 md:grid-cols-2 gap-8">

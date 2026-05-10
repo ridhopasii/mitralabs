@@ -220,14 +220,14 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="Nomor WhatsApp (untuk API)"
                   value={globalSettings.waNumber}
                   onChange={(val: string) => setGlobalSettings({...globalSettings, waNumber: val})}
                   placeholder="6282381118520"
                   description="Format: 62xxx (tanpa +, tanpa spasi)"
                 />
-                <FormInput 
+                <FormInput
                   label="Pesan Promo WhatsApp"
                   value={globalSettings.waPromoMessage}
                   onChange={(val: string) => setGlobalSettings({...globalSettings, waPromoMessage: val})}
@@ -244,14 +244,14 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="URL Logo Perusahaan"
                   value={globalSettings.companyLogo}
                   onChange={(val: string) => setGlobalSettings({...globalSettings, companyLogo: val})}
                   placeholder="/logo.png atau https://..."
                   description="Path relatif atau URL lengkap"
                 />
-                <FormInput 
+                <FormInput
                   label="URL Favicon"
                   value={globalSettings.companyFavicon}
                   onChange={(val: string) => setGlobalSettings({...globalSettings, companyFavicon: val})}
@@ -305,37 +305,65 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="Nama Perusahaan"
                   value={invoiceSettings.companyName}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyName: val})}
                 />
-                <FormInput 
+                <FormInput
                   label="Tagline"
                   value={invoiceSettings.companyTagline}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyTagline: val})}
                 />
               </div>
 
-              <FormInput 
+              <FormInput
                 label="Alamat"
                 value={invoiceSettings.companyAddress}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyAddress: val})}
               />
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="Telepon"
                   value={invoiceSettings.companyPhone}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyPhone: val})}
                 />
-                <FormInput 
+                <FormInput
                   label="Email"
                   type="email"
                   value={invoiceSettings.companyEmail}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyEmail: val})}
                 />
               </div>
+
+              <div className="grid md:grid-cols-3 gap-6">
+                <FormInput
+                  label="Website"
+                  value={invoiceSettings.companyWebsite}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyWebsite: val})}
+                  placeholder="www.mitralabs.id"
+                />
+                <FormInput
+                  label="NPWP"
+                  value={invoiceSettings.companyNPWP}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyNPWP: val})}
+                  placeholder="00.000.000.0-000.000"
+                />
+                <FormInput
+                  label="LinkedIn"
+                  value={invoiceSettings.companyLinkedin || ""}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyLinkedin: val})}
+                  placeholder="linkedin.com/company/mitralabs-id"
+                />
+              </div>
+
+              <FormInput
+                label="Instagram"
+                value={invoiceSettings.companyInstagram || ""}
+                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyInstagram: val})}
+                placeholder="@mitralabs.id"
+              />
             </div>
 
             {/* Bank Info */}
@@ -345,26 +373,26 @@ export default function SettingsPage() {
                 <h4 className="text-sm font-bold uppercase tracking-widest">Informasi Bank</h4>
               </div>
 
-              <FormInput 
+              <FormInput
                 label="Nama Bank"
                 value={invoiceSettings.bankName}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankName: val})}
               />
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="Nomor Rekening"
                   value={invoiceSettings.bankAccountNumber}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountNumber: val})}
                 />
-                <FormInput 
+                <FormInput
                   label="Nama Pemilik Rekening"
                   value={invoiceSettings.bankAccountName}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountName: val})}
                 />
               </div>
 
-              <FormInput 
+              <FormInput
                 label="Cabang Bank (Opsional)"
                 value={invoiceSettings.bankBranch}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankBranch: val})}
@@ -375,14 +403,14 @@ export default function SettingsPage() {
             {/* Additional Settings */}
             <div className="space-y-6 pt-8 border-t border-slate-100">
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput 
+                <FormInput
                   label="Pajak (%)"
                   type="number"
                   value={invoiceSettings.taxRate}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(val) || 0})}
                   placeholder="11"
                 />
-                <FormInput 
+                <FormInput
                   label="Label Pajak"
                   value={invoiceSettings.taxLabel}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxLabel: val})}
@@ -390,13 +418,13 @@ export default function SettingsPage() {
                 />
               </div>
 
-              <FormInput 
+              <FormInput
                 label="Catatan Footer"
                 value={invoiceSettings.footerNote}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, footerNote: val})}
               />
 
-              <FormTextarea 
+              <FormTextarea
                 label="Instruksi Pembayaran"
                 value={invoiceSettings.paymentInstructions}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, paymentInstructions: val})}
@@ -404,13 +432,69 @@ export default function SettingsPage() {
                 placeholder="Silakan transfer ke rekening yang tertera..."
               />
 
-              <FormTextarea 
+              <FormTextarea
                 label="Syarat & Ketentuan"
                 value={invoiceSettings.termsAndConditions}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, termsAndConditions: val})}
                 rows={5}
                 placeholder="1. Pembayaran dilakukan maksimal 7 hari..."
               />
+            </div>
+
+            {/* Signature & Stamp Settings */}
+            <div className="space-y-6 pt-8 border-t border-slate-100">
+              <div className="flex items-center gap-3 text-slate-400">
+                <ShieldCheck size={18} />
+                <h4 className="text-sm font-bold uppercase tracking-widest">Tanda Tangan & Materai</h4>
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <FormInput
+                  label="Nama Marketing Officer"
+                  value={invoiceSettings.signatureFields?.marketing || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, marketing: val }
+                  })}
+                  placeholder="Marketing Officer"
+                />
+                <FormInput
+                  label="Nama Owner/Direktur"
+                  value={invoiceSettings.signatureFields?.owner || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, owner: val }
+                  })}
+                  placeholder="Direktur Utama"
+                />
+              </div>
+
+              <div className="grid md:grid-cols-2 gap-6">
+                <div className="space-y-3">
+                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Materai Diperlukan</label>
+                  <select
+                    value={invoiceSettings.stampDutyRequired ? "true" : "false"}
+                    onChange={(e) => setInvoiceSettings({
+                      ...invoiceSettings,
+                      stampDutyRequired: e.target.value === "true"
+                    })}
+                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
+                  >
+                    <option value="true">Ya, tampilkan materai</option>
+                    <option value="false">Tidak perlu materai</option>
+                  </select>
+                </div>
+                <FormInput
+                  label="Nominal Materai (Rp)"
+                  type="number"
+                  value={invoiceSettings.stampDutyAmount || 10000}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    stampDutyAmount: parseInt(val) || 10000
+                  })}
+                  placeholder="10000"
+                />
+              </div>
             </div>
 
             {/* Save Button */}

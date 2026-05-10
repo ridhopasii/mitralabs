@@ -21,10 +21,20 @@ export interface Invoice {
   amount: number;
   status: "Unpaid" | "Partial" | "Paid" | "Cancelled";
   due_date: string;
-  items: { desc: string; price: number; qty: number }[];
+  items: {
+    desc: string;
+    details?: string; // Sub-description for item
+    price: number;
+    qty: number;
+  }[];
   client_name: string;
   client_email: string;
+  client_company?: string;
+  client_address?: string;
   created_at: string;
+  project_period_start?: string;
+  project_period_end?: string;
+  invoice_type?: "Invoice" | "Kwitansi";
 }
 
 export interface Booking {
@@ -32,6 +42,7 @@ export interface Booking {
   customer_name: string;
   customer_email: string;
   customer_phone: string;
+  client_address?: string;
   service_type: string;
   plan_name: string;
   project_brief: string;
@@ -203,6 +214,8 @@ interface AppData {
     companyEmail: string;
     companyWebsite: string;
     companyNPWP: string;
+    companyLinkedin?: string;
+    companyInstagram?: string;
     bankName: string;
     bankAccountNumber: string;
     bankAccountName: string;
@@ -212,6 +225,12 @@ interface AppData {
     footerNote: string;
     termsAndConditions: string;
     paymentInstructions: string;
+    signatureFields?: {
+      marketing?: string;
+      owner?: string;
+    };
+    stampDutyRequired?: boolean;
+    stampDutyAmount?: number;
   };
   blog: {
     title: string;
@@ -463,6 +482,8 @@ const initialData: AppData = {
     companyEmail: "contact@mitralabs.id",
     companyWebsite: "www.mitralabs.id",
     companyNPWP: "00.000.000.0-000.000",
+    companyLinkedin: "linkedin.com/company/mitralabs-id",
+    companyInstagram: "@mitralabs.id",
     bankName: "Bank Central Asia (BCA)",
     bankAccountNumber: "8000-7625-12",
     bankAccountName: "Ridho Robbi Pasi",
@@ -471,7 +492,13 @@ const initialData: AppData = {
     taxLabel: "PPN (11%)",
     footerNote: "Verified by Mitralabs Cryptographic Protocol",
     termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
-    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
+    paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
+    signatureFields: {
+      marketing: "Marketing Officer",
+      owner: "Direktur Utama"
+    },
+    stampDutyRequired: true,
+    stampDutyAmount: 10000
   },
   blog: {
     title: "Edukasi & Wawasan",
