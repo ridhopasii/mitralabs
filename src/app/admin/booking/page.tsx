@@ -527,14 +527,15 @@ export default function BookingCMS() {
 
                        {/* Download Invoice Button */}
                        {booking.invoices && booking.invoices.length > 0 && (
-                         <Link
-                           href={`/invoice/${booking.invoices[0].invoice_number}`}
+                         <a
+                           href={`/api/invoice/${booking.invoices[0].invoice_number}/pdf`}
                            target="_blank"
+                           rel="noopener noreferrer"
                            className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                           title="Open Invoice (then use browser Print to PDF)"
+                           title="Download Invoice PDF"
                          >
                            <Download size={16} />
-                         </Link>
+                         </a>
                        )}
 
                        {/* Edit Button */}
