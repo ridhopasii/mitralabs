@@ -45,52 +45,16 @@ const defaultInvoiceSettings = {
 };
 
 export default function PublicInvoicePage() {
-  const { id } = useParams();
   const searchParams = useSearchParams();
-  const isAutoDownload = searchParams.get("download") === "true";
+  const isAutoPrint = searchParams.get("print") === "true";
   
   const { data } = useData();
   const [invoice, setInvoice] = useState<any>(null);
   const [isLoading, setIsLoading] = useState(true);
-  const [isGeneratingPDF, setIsGeneratingPDF] = useState(false);
   const [invoiceSettings, setInvoiceSettings] = useState(data.invoiceSettings || defaultInvoiceSettings);
 
-  const handleDownloadPDF = async () => {
-    setIsGeneratingPDF(true);
-    try {
-      // @ts-ignore
-      const html2pdf = (await import("html2pdf.js")).default;
-      const element = document.getElementById("invoice-canvas");
-      
-      const opt = {
-        margin: [10, 0, 10, 0], // Top, Left, Bottom, Right
-        filename: `Invoice-${id}.pdf`,
-        image: { type: 'jpeg', quality: 0.98 },
-        html2canvas: { 
-          scale: 2, 
-          useCORS: true, 
-          allowTaint: true,
-          letterRendering: true,
-          logging: false 
-        },
-        jsPDF: { unit: 'mm', format: 'a4', orientation: 'portrait' }
-      };
-
-      if (element) {
-        // Force the element to be visible and on top during capture
-        const originalStyle = element.style.position;
-        element.style.position = 'relative';
-        element.style.zIndex = '10000';
-        
-        await html2pdf().set(opt as any).from(element).save();
-        
-        element.style.position = originalStyle;
-      }
-    } catch (error) {
-      console.error("PDF Generation Error:", error);
-    } finally {
-      setIsGeneratingPDF(false);
-    }
+  const handlePrint = () => {
+    window.print();
   };
 
   useEffect(() => {
@@ -149,57 +113,42 @@ export default function PublicInvoicePage() {
     fetchData();
   }, [id]);
 
-  // Auto-download logic
+  // Auto-print logic
   useEffect(() => {
-    if (!isLoading && invoice && isAutoDownload) {
-      // Ensure library is pre-loaded
-      const prepareAndDownload = async () => {
-        try {
-          // Small delay to ensure all CSS and images are rendered
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          await handleDownloadPDF();
-          // Wait another bit to ensure browser has started the download
-          await new Promise(resolve => setTimeout(resolve, 2000));
-          window.close();
-        } catch (err) {
-          console.error("Auto-download failed:", err);
-        }
-      };
-      
-      prepareAndDownload();
+    if (!isLoading && invoice && isAutoPrint) {
+      const timer = setTimeout(() => {
+        window.print();
+      }, 1000);
+      return () => clearTimeout(timer);
     }
-  }, [isLoading, invoice, isAutoDownload]);
+  }, [isLoading, invoice, isAutoPrint]);
 
-  if (isLoading || (isAutoDownload && !invoice)) {
+  if (isLoading || (isAutoPrint && !invoice)) {
     return (
-      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6 text-center">
-        <div className="w-20 h-20 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-8 shadow-xl"></div>
-        <h2 className="text-2xl font-bold text-slate-900 mb-2 tracking-tight">Generating Document...</h2>
-        <p className="text-slate-500 font-medium max-w-xs leading-relaxed uppercase text-[10px] tracking-[0.2em]">
-          Please wait while our cryptographic engine prepares your secure PDF.
-        </p>
+      <div className="min-h-screen bg-[#FBFBFD] flex flex-col items-center justify-center p-6">
+        <div className="w-16 h-16 border-4 border-slate-200 border-t-slate-900 rounded-full animate-spin mb-6"></div>
+        <p className="text-slate-500 font-bold text-sm uppercase tracking-widest">Loading Invoice...</p>
       </div>
     );
   }
 
+
   // Special overlay when downloading
-  const DownloadOverlay = () => (
+  const PrintOverlay = () => (
     <motion.div 
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
-      data-html2canvas-ignore="true"
-      className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center"
+      className="fixed inset-0 z-[9999] bg-white/95 backdrop-blur-sm flex flex-col items-center justify-center p-6 text-center no-print"
     >
       <div className="w-24 h-24 bg-slate-900 text-white rounded-[2rem] flex items-center justify-center mb-8 shadow-2xl shadow-slate-900/20">
-        <Loader2 className="animate-spin" size={40} />
+        <Printer className="animate-pulse" size={40} />
       </div>
-      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan PDF</h2>
+      <h2 className="text-3xl font-black text-slate-900 mb-3 tracking-tighter uppercase">Menyiapkan Invoice</h2>
       <p className="text-slate-400 font-bold text-xs uppercase tracking-[0.3em] max-w-sm">
-        Invoice sedang diproses. Tab ini akan tertutup otomatis setelah download dimulai.
+        Invoice sedang disiapkan untuk dicetak/simpan. Mohon tunggu sebentar.
       </p>
     </motion.div>
   );
-
 
   if (!invoice) {
     return (
@@ -226,7 +175,7 @@ export default function PublicInvoicePage() {
 
   return (
     <>
-      {isAutoDownload && <DownloadOverlay />}
+      {isAutoPrint && <PrintOverlay />}
       <div className="min-h-screen bg-[#F5F5F7] py-12 md:py-24 px-4 md:px-6 font-sans selection:bg-primary/10">
         <div className="max-w-5xl mx-auto">
           {/* Navigation & Actions Layer */}
@@ -240,25 +189,16 @@ export default function PublicInvoicePage() {
 
             <div className="flex items-center gap-3">
               <button
-                onClick={() => window.print()}
+                onClick={handlePrint}
                 className="px-10 py-5 bg-white text-slate-900 border border-slate-200/60 rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:bg-slate-50 transition-all shadow-sm"
               >
                 <Printer size={18} strokeWidth={1.5} /> Print
               </button>
               <button
-                onClick={handleDownloadPDF}
-                disabled={isGeneratingPDF}
-                className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20 disabled:opacity-50"
+                onClick={handlePrint}
+                className="px-10 py-5 bg-slate-900 text-white rounded-[1.5rem] font-bold text-[11px] uppercase tracking-widest flex items-center gap-3 hover:opacity-90 transition-all shadow-2xl shadow-slate-900/20"
               >
-                {isGeneratingPDF ? (
-                  <>
-                    <Loader2 className="animate-spin" size={18} /> Generating...
-                  </>
-                ) : (
-                  <>
-                    <Download size={18} strokeWidth={1.5} /> Save as PDF
-                  </>
-                )}
+                <Download size={18} strokeWidth={1.5} /> Save as PDF
               </button>
             </div>
           </div>

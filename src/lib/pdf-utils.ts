@@ -7,12 +7,12 @@
  * is to use html2pdf on the actual target page.
  */
 
-export const downloadInvoicePDF = async (invoiceNumber: string) => {
-  const url = `/invoice/${invoiceNumber}?download=true`;
+export const downloadInvoicePDF = (invoiceNumber: string) => {
+  const url = `/invoice/${invoiceNumber}?print=true`;
   const win = window.open(url, '_blank');
   
   if (!win || win.closed || typeof win.closed === 'undefined') {
-    alert("Download terblokir oleh browser. Mohon izinkan pop-up untuk situs ini agar invoice bisa diunduh otomatis.");
+    alert("Mohon izinkan pop-up untuk situs ini agar invoice bisa dibuka.");
     return false;
   }
   
