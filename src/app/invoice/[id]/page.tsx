@@ -56,37 +56,49 @@ export default function PublicInvoicePage() {
 
   const handleDownloadPDF = async () => {
     const element = document.getElementById("invoice-canvas");
-    if (!element) return;
+    if (!element) return false;
 
     try {
-      const html2canvas = (await import("html2canvas")).default;
+      // @ts-ignore
+      const domtoimage = (await import("dom-to-image-more")).default;
       const { jsPDF } = await import("jspdf");
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
+      // Wait for all images to be loaded
+      const images = Array.from(element.getElementsByTagName('img'));
+      await Promise.all(images.map(img => {
+        if (img.complete) return Promise.resolve();
+        return new Promise(resolve => {
+          img.onload = resolve;
+          img.onerror = resolve;
+        });
+      }));
+
+      // Convert DOM to PNG Blob (fastest and most accurate)
+      const dataUrl = await domtoimage.toPng(element, {
+        quality: 1.0,
+        bgcolor: '#ffffff',
+        scale: 2, // Retina quality
       });
 
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
         format: "a4",
       });
 
-      const imgProps = pdf.getImageProperties(imgData);
+      const imgProps = pdf.getImageProperties(dataUrl);
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(imgData, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Invoice-${id}.pdf`);
       
       return true;
     } catch (error) {
       console.error("PDF Generation Error:", error);
-      return false;
+      // Fallback to print if JS generation fails
+      window.print();
+      return true; 
     }
   };
 
@@ -153,7 +165,15 @@ export default function PublicInvoicePage() {
 
     if (!isLoading && invoice && isAuto) {
       const timer = setTimeout(async () => {
+        // Set a safety timeout for the entire process
+        const safetyTimeout = setTimeout(() => {
+          console.warn("PDF generation taking too long, falling back...");
+          window.print();
+        }, 15000);
+
         const success = await handleDownloadPDF();
+        clearTimeout(safetyTimeout);
+        
         if (success) {
           setTimeout(() => window.close(), 1500);
         }
