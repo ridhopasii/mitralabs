@@ -57,9 +57,13 @@ export default function PublicInvoicePage() {
 
   const handleDownloadPDF = async () => {
     const element = document.getElementById("invoice-canvas");
-    if (!element) return false;
+    if (!element) {
+      console.error("Invoice canvas element not found");
+      return false;
+    }
 
     try {
+      console.log("Starting PDF generation...");
       const html2canvas = (await import("html2canvas")).default;
       const { jsPDF } = await import("jspdf");
 
@@ -70,9 +74,12 @@ export default function PublicInvoicePage() {
         return new Promise(resolve => {
           img.onload = resolve;
           img.onerror = resolve;
+          // Timeout after 3 seconds
+          setTimeout(resolve, 3000);
         });
       }));
 
+      console.log("Converting to canvas...");
       // Convert DOM to Canvas
       const canvas = await html2canvas(element, {
         scale: 2, // Retina quality
@@ -89,6 +96,7 @@ export default function PublicInvoicePage() {
         }
       });
 
+      console.log("Creating PDF...");
       const imgData = canvas.toDataURL("image/jpeg", 0.95);
       const pdf = new jsPDF({
         orientation: "portrait",
@@ -101,8 +109,11 @@ export default function PublicInvoicePage() {
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
       pdf.addImage(imgData, "JPEG", 0, 0, pdfWidth, pdfHeight);
+
+      console.log("Saving PDF...");
       pdf.save(`Invoice-${id}.pdf`);
 
+      console.log("PDF generated successfully!");
       return true;
     } catch (error) {
       console.error("PDF Generation Error:", error);
@@ -175,11 +186,17 @@ export default function PublicInvoicePage() {
 
     if (!isLoading && invoice && (isAuto || isSilent)) {
       const timer = setTimeout(async () => {
+        console.log("Auto-download triggered");
+
         // Set a safety timeout for the entire process
         const safetyTimeout = setTimeout(() => {
           console.warn("PDF generation taking too long...");
           if (isSilent) {
             window.parent.postMessage({ type: 'PDF_DOWNLOAD_ERROR', invoiceNumber: id }, '*');
+          } else {
+            // Close tab if taking too long
+            alert("PDF generation failed. Please try again or use the Print button.");
+            window.close();
           }
           // Don't fallback to print dialog - just show error
         }, 15000);
@@ -187,13 +204,22 @@ export default function PublicInvoicePage() {
         const success = await handleDownloadPDF();
         clearTimeout(safetyTimeout);
 
+        console.log("PDF generation result:", success);
+
         if (isSilent) {
            window.parent.postMessage({
              type: success ? 'PDF_DOWNLOAD_COMPLETE' : 'PDF_DOWNLOAD_ERROR',
              invoiceNumber: id
            }, '*');
-        } else if (success && isAuto) {
-           setTimeout(() => window.close(), 1500);
+        } else if (isAuto) {
+           if (success) {
+             // Close tab after successful download
+             setTimeout(() => window.close(), 1500);
+           } else {
+             // Show error and close
+             alert("PDF generation failed. Please try again or use the Print button.");
+             window.close();
+           }
         }
       }, 1500);
       return () => clearTimeout(timer);
