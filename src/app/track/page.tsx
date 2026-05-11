@@ -335,7 +335,6 @@ function TrackContent() {
           )}
         </AnimatePresence>
       </div>
-      </div>
     </div>
   );
 }
