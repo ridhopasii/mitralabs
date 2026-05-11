@@ -24,6 +24,7 @@ export default function AdminDokumenPage() {
   const [isLoading, setIsLoading] = useState(true);
   const [searchTerm, setSearchTerm] = useState("");
   const [isUploading, setIsUploading] = useState(false);
+  const [uploadSuccess, setUploadSuccess] = useState(false);
 
   useEffect(() => {
     fetchFiles();
@@ -49,6 +50,30 @@ export default function AdminDokumenPage() {
       console.error("Error fetching files:", error);
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleUpload = async (file: File) => {
+    setIsUploading(true);
+    try {
+      const { data: { user } } = await supabase.auth.getUser();
+      const ext = file.name.split('.').pop();
+      const filePath = `global_docs/${Date.now()}.${ext}`;
+      const { error: upErr } = await supabase.storage.from('mitralabs_assets').upload(filePath, file);
+      if (upErr) throw upErr;
+      const { data: { publicUrl } } = supabase.storage.from('mitralabs_assets').getPublicUrl(filePath);
+      await supabase.from('ProjectFile').insert([{
+        filename: file.name, file_url: publicUrl,
+        file_size: file.size, file_type: file.type,
+        uploaded_by: user?.email || 'admin'
+      }]);
+      setUploadSuccess(true);
+      setTimeout(() => setUploadSuccess(false), 3000);
+      fetchFiles();
+    } catch (e: any) {
+      alert('Upload gagal: ' + e.message);
+    } finally {
+      setIsUploading(false);
     }
   };
 
@@ -86,19 +111,21 @@ export default function AdminDokumenPage() {
           <button className="px-6 py-3.5 bg-slate-50 text-slate-600 rounded-2xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all border border-slate-100">
             Template Manager
           </button>
-          <button className="px-8 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
-            <FilePlus size={16} /> Upload New PDF
-          </button>
+          <label className="cursor-pointer px-8 py-3.5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
+            {isUploading ? <Loader2 size={16} className="animate-spin" /> : <FilePlus size={16} />}
+            {uploadSuccess ? 'Upload Berhasil!' : 'Upload New PDF'}
+            <input type="file" accept=".pdf,.doc,.docx,.zip" className="hidden" onChange={(e) => e.target.files && handleUpload(e.target.files[0])} />
+          </label>
         </div>
       </div>
 
       {/* Stats Quick View */}
       <div className="grid md:grid-cols-4 gap-6">
         {[
-          { label: "Total Dokumen", val: files.length, icon: FileText, color: "text-blue-500" },
-          { label: "Contracts Signed", val: "85%", icon: CheckCircle2, color: "text-emerald-500" },
-          { label: "Pending Review", val: 3, icon: Loader2, color: "text-amber-500" },
-          { label: "Storage Used", val: "1.2 GB", icon: Upload, color: "text-slate-400" },
+        { label: "Total Dokumen", val: files.length, icon: FileText, color: "text-blue-500" },
+          { label: "Dokumen Bulan Ini", val: files.filter(f => new Date(f.created_at).getMonth() === new Date().getMonth()).length, icon: CheckCircle2, color: "text-emerald-500" },
+          { label: "Pending Upload", val: isLoading ? '...' : 0, icon: Loader2, color: "text-amber-500" },
+          { label: "Tipe File", val: [...new Set(files.map(f => f.file_type?.split('/')[1] || 'pdf'))].join(', ') || 'PDF', icon: Upload, color: "text-slate-400" },
         ].map((s, i) => (
           <div key={i} className="bg-white p-6 rounded-[2rem] border border-slate-200/60 shadow-sm flex items-center gap-5">
             <div className={`w-12 h-12 rounded-2xl bg-slate-50 flex items-center justify-center ${s.color}`}>

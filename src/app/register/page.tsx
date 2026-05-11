@@ -73,12 +73,14 @@ export default function RegisterPage() {
         await supabase.from("Booking")
           .update({ client_id: authData.user.id })
           .eq("customer_email", email);
+
+        // 5. Auto sign-in and redirect directly to dashboard
+        await supabase.auth.signInWithPassword({ email, password });
+        router.push("/dashboard");
+        return;
       }
 
       setIsSuccess(true);
-      setTimeout(() => {
-        router.push("/login");
-      }, 3000);
 
     } catch (err: any) {
       setError(err.message);
@@ -109,35 +111,36 @@ export default function RegisterPage() {
   }
 
   return (
-    <div className="min-h-screen bg-on-background flex items-center justify-center p-6 relative overflow-hidden">
+    <div className="min-h-screen bg-on-background flex items-center justify-center p-6 md:p-12 relative overflow-hidden">
       {/* Decorative */}
       <div className="absolute top-0 right-0 w-[50%] h-[50%] bg-primary/10 rounded-full blur-[150px] -translate-y-1/2 translate-x-1/2"></div>
+      <div className="absolute bottom-0 left-0 w-[30%] h-[30%] bg-primary/5 rounded-full blur-[100px] translate-y-1/2 -translate-x-1/2"></div>
       
-      <div className="w-full max-w-xl relative z-10 grid lg:grid-cols-2 gap-10">
+      <div className="w-full max-w-5xl relative z-10 grid lg:grid-cols-5 gap-12 items-center">
         
-        {/* Info Column */}
-        <div className="hidden lg:flex flex-col justify-center space-y-8">
-           <div className="w-16 h-16 bg-white/5 rounded-3xl flex items-center justify-center border border-white/10">
-             <ShieldCheck className="text-primary" size={32} />
+        {/* Info Column (Left) */}
+        <div className="hidden lg:flex lg:col-span-2 flex-col justify-center space-y-10 pr-6">
+           <div className="w-20 h-20 bg-white/5 rounded-[2rem] flex items-center justify-center border border-white/10 shadow-2xl backdrop-blur-md">
+             <ShieldCheck className="text-primary" size={40} />
            </div>
-           <div className="space-y-4">
-              <h1 className="text-5xl font-black text-white tracking-tighter leading-none">Join the <br/><span className="text-primary">Ecosystem.</span></h1>
-              <p className="text-slate-400 font-medium leading-relaxed">Buat akun untuk mengelola semua projek website Anda, akses dokumentasi eksklusif, dan monitoring progress realtime.</p>
+           <div className="space-y-6">
+              <h1 className="text-6xl font-black text-white tracking-tighter leading-[0.9]">Join the <br/><span className="text-primary">Ecosystem.</span></h1>
+              <p className="text-slate-400 font-medium text-lg leading-relaxed">Buat akun untuk mengelola semua projek website Anda, akses dokumentasi eksklusif, dan monitoring progress realtime.</p>
            </div>
-           <div className="pt-6 space-y-4">
+           <div className="pt-8 space-y-5">
               {["Realtime Progress Tracking", "Digital Invoice Center", "Priority Support"].map((f, i) => (
-                <div key={i} className="flex items-center gap-3 text-xs font-bold text-white uppercase tracking-widest opacity-60">
-                   <CheckCircle2 size={14} className="text-primary" /> {f}
+                <div key={i} className="flex items-center gap-4 text-xs font-bold text-white uppercase tracking-[0.2em] opacity-50">
+                   <div className="w-2 h-2 rounded-full bg-primary shadow-[0_0_10px_rgba(var(--primary-rgb),0.5)]"></div> {f}
                 </div>
               ))}
            </div>
         </div>
 
-        {/* Form Column */}
-        <div className="bg-white p-10 md:p-14 rounded-[3.5rem] shadow-2xl border border-white/5 space-y-10">
-          <div className="text-center lg:text-left">
-             <h2 className="text-2xl font-black text-slate-900">Create Account</h2>
-             <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mt-1">Start your digital journey</p>
+        {/* Form Column (Right) */}
+        <div className="lg:col-span-3 bg-white p-12 md:p-20 rounded-[4rem] shadow-[0_40px_80px_-20px_rgba(0,0,0,0.4)] border border-white/5 space-y-12">
+          <div>
+             <h2 className="text-4xl font-black text-slate-900 tracking-tight">Create Account</h2>
+             <p className="text-xs font-bold text-slate-400 uppercase tracking-[0.3em] mt-3">Start your digital journey</p>
           </div>
 
           <form onSubmit={handleRegister} className="space-y-4">

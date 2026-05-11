@@ -25,7 +25,8 @@ import {
   ShieldAlert,
   Puzzle,
   Heart,
-  DollarSign
+  DollarSign,
+  Lock
 } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 import { logActivity, supabase } from "@/lib/supabase";
@@ -39,6 +40,7 @@ const bookingSchema = z.object({
   organization: z.string().optional(),
   position: z.string().optional(),
   service: z.string(),
+  tracking_password: z.string().min(6, "Password minimal 6 karakter"),
   plan: z.string(),
   desiredDomain: z.string().optional(),
   businessIndustry: z.string().optional(),
@@ -56,6 +58,7 @@ export default function PesanSekarang() {
   const { data, updateData } = useData();
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showSuccess, setShowSuccess] = useState(false);
+  const [trackingInfo, setTrackingInfo] = useState<{id: string, pass: string} | null>(null);
   const [errors, setErrors] = useState<Record<string, string>>({});
   const [formData, setFormData] = useState({
     name: "",
@@ -74,10 +77,9 @@ export default function PesanSekarang() {
     integrations: "",
     expectation: "",
     customPrice: "",
-    brief: ""
+    brief: "",
+    tracking_password: ""
   });
-
-  const [trackingInfo, setTrackingInfo] = useState<{id: number, pass: string} | null>(null);
 
   const getPrice = () => {
     if (formData.customPrice) return parseInt(formData.customPrice);
@@ -114,8 +116,7 @@ export default function PesanSekarang() {
         if (clientData) clientId = clientData.id;
       }
 
-      // 2. Generate tracking password (8 chars random)
-      const generatedPass = Math.random().toString(36).substring(2, 10).toUpperCase();
+      const tracking_password = formData.tracking_password;
 
       // 3. Save to Supabase
       const now = new Date().toISOString();
@@ -138,7 +139,7 @@ export default function PesanSekarang() {
         biggest_expectation: formData.expectation,
         status: "Pending",
         total_price: getPrice(),
-        tracking_password: generatedPass,
+        tracking_password: tracking_password,
         client_id: clientId,
         created_at: now,
         updated_at: now
@@ -148,7 +149,7 @@ export default function PesanSekarang() {
 
       if (insertedData?.[0]) {
         const bookingId = insertedData[0].id;
-        setTrackingInfo({ id: bookingId, pass: generatedPass });
+        setTrackingInfo({ id: bookingId.toString(), pass: tracking_password });
 
         const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
         const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -230,10 +231,10 @@ export default function PesanSekarang() {
               <Phone size={18} /> Lanjut ke WhatsApp
             </a>
             <Link
-              href="/track"
-              className="w-full sm:w-auto px-10 py-5 bg-on-background text-background rounded-full font-black text-xs uppercase tracking-widest hover:opacity-80 transition-all flex items-center justify-center gap-3"
+              href={`/track?email=${encodeURIComponent(formData.email)}&pass=${encodeURIComponent(trackingInfo?.pass || "")}`}
+              className="w-full sm:w-auto px-10 py-5 bg-on-background text-background rounded-2xl font-black text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:scale-105 transition-all shadow-xl shadow-slate-900/10"
             >
-              Coba Lacak Sekarang
+              Buka Dashboard Projek <ArrowRight size={18} />
             </Link>
           </div>
 
@@ -317,7 +318,7 @@ export default function PesanSekarang() {
                       <div className="relative group">
                          <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
                          <input required type="email" placeholder="" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border ${errors.email ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative`} />
-                      </div>
+                         
                       {errors.email && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.email}</p>}
                    </div>
                 </div>
@@ -350,6 +351,19 @@ export default function PesanSekarang() {
                    </div>
                 </div>
               </div>
+
+                 {/* Tracking Password */}
+                 <div className="space-y-3 pt-6 border-t border-outline/5">
+                    <div className="flex items-center gap-3 mb-2">
+                      <div className="w-8 h-8 bg-primary/10 text-primary rounded-xl flex items-center justify-center"><Lock size={15} /></div>
+                      <label className="text-[10px] font-bold uppercase tracking-widest text-secondary">Password Lacak Projek</label>
+                    </div>
+                    <div className="relative group">
+                       <Lock className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
+                       <input required type="password" placeholder="Buat password untuk cek status projek kapan saja" value={formData.tracking_password} onChange={(e) => setFormData({...formData, tracking_password: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border border-outline/10 rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner`} />
+                    </div>
+                    <p className="text-[10px] font-medium text-secondary ml-6 italic opacity-70">Digunakan bersama email Anda di halaman Lacak Projek tanpa perlu buat akun.</p>
+                 </div>
 
               {/* Section 2: Project Strategy */}
               <div className="space-y-10">

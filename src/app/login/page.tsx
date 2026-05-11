@@ -148,6 +148,9 @@ export default function LoginPage() {
             <p className="text-xs font-bold text-on-surface-variant uppercase tracking-widest">
               Belum punya akun? <Link href="/register" className="text-primary hover:underline">Daftar Sekarang</Link>
             </p>
+            <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">
+              Atau <Link href="/track" className="text-on-surface hover:text-primary transition-colors underline decoration-primary/30">Login via Email Pesanan</Link>
+            </p>
             <div className="inline-flex items-center gap-2 text-[10px] font-black uppercase tracking-widest opacity-20">
               <ShieldCheck size={14} /> Protected by Supabase Auth
             </div>

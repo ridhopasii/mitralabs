@@ -31,22 +31,21 @@ export default function AdminLayout({
   const pathname = usePathname();
   const router = useRouter();
   const [isAuthorized, setIsAuthorized] = useState(false);
+  const [adminName, setAdminName] = useState("Admin");
 
   useEffect(() => {
     let active = true;
 
-    supabase.auth.getUser().then(({ data }) => {
+    supabase.auth.getUser().then(async ({ data }) => {
       if (!active) return;
-      if (!data.user) {
-        router.replace("/login");
-        return;
-      }
+      if (!data.user) { router.replace("/login"); return; }
+      // Get name from User table
+      const { data: userData } = await supabase.from("User").select("full_name").eq("id", data.user.id).single();
+      setAdminName(userData?.full_name || data.user.email?.split('@')[0] || "Admin");
       setIsAuthorized(true);
     });
 
-    return () => {
-      active = false;
-    };
+    return () => { active = false; };
   }, [router]);
 
   const handleSignOut = async () => {
@@ -58,6 +57,7 @@ export default function AdminLayout({
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
     { name: "Users & Staff", icon: Users, href: "/admin/users", category: "Utama" },
+    { name: "Clients", icon: Users, href: "/admin/clients", category: "Utama" },
     { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
     { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
     { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },
@@ -149,7 +149,7 @@ export default function AdminLayout({
 
             <div className="flex items-center gap-6">
               <div className="text-right hidden sm:block">
-                <p className="text-sm font-bold text-slate-900">Ridho Robbi Pasi</p>
+                <p className="text-sm font-bold text-slate-900">{adminName}</p>
                 <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">Master Admin</p>
               </div>
               <div className="relative group">
