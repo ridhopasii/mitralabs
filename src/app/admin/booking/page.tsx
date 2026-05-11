@@ -254,17 +254,21 @@ export default function BookingCMS() {
     }
   };
 
-  const generateInvoice = (booking: Booking) => {
+  const generateInvoice = async (booking: Booking) => {
+    setIsRefreshing(true);
+    const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
+    const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+
     const newInvoice: Invoice = {
       id: Date.now(),
-      invoice_number: `KW-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`,
+      invoice_number: invoiceNumber,
       amount: booking.total_price,
       status: "Unpaid",
-      due_date: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
+      due_date: dueDate,
       items: [
         {
           desc: `${booking.service_type} - ${booking.plan_name} Package`,
-          details: `Custom development, optimization, and premium support included`,
+          details: `Premium development and professional support included`,
           price: booking.total_price,
           qty: 1
         }
@@ -274,26 +278,42 @@ export default function BookingCMS() {
       client_company: booking.organization_name,
       client_address: booking.client_address,
       created_at: new Date().toISOString(),
-      project_period_start: new Date().toISOString().split('T')[0],
-      project_period_end: new Date(Date.now() + 30 * 24 * 60 * 60 * 1000).toISOString().split('T')[0],
       invoice_type: "Kwitansi"
     };
 
-    const updatedBooking = {
-      ...booking,
-      invoices: [...(booking.invoices || []), newInvoice]
-    };
+    try {
+      const { supabase } = await import("@/lib/supabase");
+      const { data: invData, error } = await supabase.from("Invoice").insert([{
+        booking_id: booking.id,
+        invoice_number: newInvoice.invoice_number,
+        amount: newInvoice.amount,
+        status: newInvoice.status,
+        due_date: newInvoice.due_date,
+        items: newInvoice.items,
+        client_name: newInvoice.client_name,
+        client_email: newInvoice.client_email,
+        client_company: newInvoice.client_company,
+        client_address: newInvoice.client_address,
+        invoice_type: "Kwitansi"
+      }]);
 
-    const newBookings = bookings.map(b => b.id === booking.id ? updatedBooking : b);
-    const newData = { ...data };
-    newData.bookings = newBookings;
+      if (error) throw error;
 
-    updateData(newData);
-    setBookings(newBookings);
-    setShowSuccess(true);
-    setTimeout(() => setShowSuccess(false), 3000);
+      const updatedBooking = {
+        ...booking,
+        invoices: [...(booking.invoices || []), newInvoice]
+      };
 
-    console.log('✅ Generated new Kwitansi:', newInvoice.invoice_number, 'Type:', newInvoice.invoice_type);
+      setBookings(bookings.map(b => b.id === booking.id ? updatedBooking : b));
+      setShowSuccess(true);
+      setTimeout(() => setShowSuccess(false), 3000);
+      await logActivity("Generate Invoice", `Booking ID: ${booking.id}`);
+    } catch (err) {
+      console.error("Error generating invoice:", err);
+      alert("Gagal membuat kwitansi di database.");
+    } finally {
+      setIsRefreshing(false);
+    }
   };
 
   const filteredBookings = bookings.filter(b =>
@@ -533,14 +553,22 @@ export default function BookingCMS() {
                          </Link>
                        )}
 
-                       {/* Download Invoice Button - ALWAYS USE PREMIUM KWITANSI GENERATOR */}
-                       {booking.invoices && booking.invoices.length > 0 && (
-                         <KwitansiPDFGenerator
-                           invoiceNumber={booking.invoices[0].invoice_number}
-                           invoiceData={booking.invoices[0]}
-                           className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
-                         />
-                       )}
+                        {/* Download Invoice Button - ALWAYS USE PREMIUM KWITANSI GENERATOR */}
+                        {booking.invoices && booking.invoices.length > 0 ? (
+                          <KwitansiPDFGenerator
+                            invoiceNumber={booking.invoices[0].invoice_number}
+                            invoiceData={booking.invoices[0]}
+                            className="p-3 text-emerald-400 hover:text-emerald-600 hover:bg-emerald-50 rounded-xl transition-all"
+                          />
+                        ) : (
+                          <button
+                            onClick={() => generateInvoice(booking)}
+                            className="p-3 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
+                            title="Generate Kwitansi Otomatis"
+                          >
+                            <Receipt size={16} />
+                          </button>
+                        )}
 
                        {/* Manage Project Button */}
                        <Link
