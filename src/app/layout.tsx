@@ -9,8 +9,8 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Dynamic Metadata Generation
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Mitralabs.id — Jasa Website Profesional Medan";
-  const description = "Jasa pembuatan website profesional di Medan. Kami bantu UMKM, sekolah, travel, dan bisnis go-digital dengan website berkinerja tinggi. Harga terjangkau, kualitas premium.";
+  const title = "Mitralabs.id — Digitalisasi Bisnis & Software House Medan";
+  const description = "Software house terpercaya di Medan. Kami membantu perusahaan, institusi, dan UMKM melakukan transformasi digital dengan website profesional, aplikasi web, dan solusi cloud berkinerja tinggi.";
 
   return {
     metadataBase: new URL("https://mitralabs.id"),
@@ -20,19 +20,43 @@ export async function generateMetadata(): Promise<Metadata> {
     },
     description: description,
     keywords: [
-      "jasa buat website Medan",
-      "jasa website UMKM Medan",
-      "web developer Medan",
+      "software house medan",
+      "jasa pembuatan website medan",
+      "web developer medan",
+      "bikin web medan",
+      "jasa IT medan",
+      "digital agency medan",
       "Mitralabs",
+      "Mitralabs.id"
     ],
+    authors: [{ name: "Mitralabs.id Team" }],
+    creator: "Mitralabs.id",
     openGraph: {
       title: title,
       description: description,
       url: "https://mitralabs.id",
       siteName: "Mitralabs.id",
+      images: [
+        {
+          url: "/logo.png", // Assuming logo.png is in the public directory
+          width: 800,
+          height: 600,
+          alt: "Mitralabs.id - Software House Medan",
+        },
+      ],
       locale: "id_ID",
       type: "website",
     },
+    twitter: {
+      card: "summary_large_image",
+      title: title,
+      description: description,
+      images: ["/logo.png"],
+    },
+    robots: {
+      index: true,
+      follow: true,
+    }
   };
 }
 

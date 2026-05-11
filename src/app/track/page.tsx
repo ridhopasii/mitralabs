@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import { useState, useEffect, Suspense } from "react";
 import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
@@ -8,7 +8,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
 
-export default function TrackingPage() {
+function TrackContent() {
   const searchParams = useSearchParams();
   const { data } = useData();
   const [email, setEmail] = useState("");
@@ -335,6 +335,15 @@ export default function TrackingPage() {
           )}
         </AnimatePresence>
       </div>
+      </div>
     </div>
+  );
+}
+
+export default function TrackingPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center bg-slate-50"><Loader2 className="animate-spin text-slate-400" size={40} /></div>}>
+      <TrackContent />
+    </Suspense>
   );
 }
