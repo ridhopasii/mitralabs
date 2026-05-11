@@ -7,6 +7,6 @@ export default function robots(): MetadataRoute.Robots {
       allow: '/',
       disallow: '/admin/',
     },
-    sitemap: 'https://mitralabs.id/sitemap.xml',
+    sitemap: 'https://mitralabs.web.id/sitemap.xml',
   }
 }
