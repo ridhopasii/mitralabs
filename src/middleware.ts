@@ -46,10 +46,10 @@ export async function middleware(request: NextRequest) {
     console.log(`👤 [Middleware] Auth user found: ${user.email}`);
 
     // RBAC Check
-    const primaryAdmin = "ridhorobbipasi@gmail.com";
+    const primaryAdmins = ["ridhorobbipasi@gmail.com", "ridho@admin.com"];
     
-    // 1. Bypass for Primary Admin
-    if (user.email?.toLowerCase() === primaryAdmin.toLowerCase()) {
+    // 1. Bypass for Primary Admins
+    if (user.email && primaryAdmins.map(e => e.toLowerCase()).includes(user.email.toLowerCase())) {
       console.log("✅ [Middleware] Primary Admin detected, allowing access.");
       return response;
     }
