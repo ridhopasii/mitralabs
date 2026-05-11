@@ -47,11 +47,19 @@ function TrackContent() {
             updates:ProjectUpdate (*)
           )
         `)
-        .eq("customer_email", email)
+        .ilike("customer_email", email)
         .eq("tracking_password", password)
-        .single();
+        .maybeSingle();
 
-      if (dbErr || !result) throw new Error("Email atau Password salah. Pastikan sesuai dengan yang dimasukkan saat memesan.");
+      if (dbErr) {
+        console.error("❌ Supabase Query Error:", dbErr);
+        throw new Error(`Koneksi database bermasalah: ${dbErr.message}`);
+      }
+      
+      if (!result) {
+        throw new Error("Email atau Password salah. Pastikan sesuai dengan yang dimasukkan saat memesan.");
+      }
+
       setProjectData(result);
     } catch (err: any) {
       setError(err.message);
@@ -123,9 +131,9 @@ function TrackContent() {
                 </button>
               </form>
               <div className="mt-8 text-center">
-                <Link href="/login" className="text-slate-400 hover:text-slate-900 font-bold text-[10px] uppercase tracking-widest transition-all">
-                  Punya Akun? Login di sini <ChevronRight size={12} className="inline ml-1" />
-                </Link>
+                <a href={waUrl} target="_blank" className="text-slate-400 hover:text-slate-900 font-bold text-[10px] uppercase tracking-widest transition-all">
+                  Lupa password atau butuh bantuan? Hubungi Admin <ChevronRight size={12} className="inline ml-1" />
+                </a>
               </div>
             </motion.div>
           ) : (

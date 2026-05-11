@@ -9,14 +9,14 @@ import { SpeedInsights } from "@vercel/speed-insights/next";
 
 // Dynamic Metadata Generation
 export async function generateMetadata(): Promise<Metadata> {
-  const title = "Mitralabs.id — Digitalisasi Bisnis & Software House Medan";
+  const title = "Mitralabs.web.id — Digitalisasi Bisnis & Software House Medan";
   const description = "Software house terpercaya di Medan. Kami membantu perusahaan, institusi, dan UMKM melakukan transformasi digital dengan website profesional, aplikasi web, dan solusi cloud berkinerja tinggi.";
 
   return {
-    metadataBase: new URL("https://mitralabs.id"),
+    metadataBase: new URL("https://mitralabs.web.id"),
     title: {
       default: title,
-      template: "%s | Mitralabs.id",
+      template: "%s | Mitralabs.web.id",
     },
     description: description,
     keywords: [
@@ -27,21 +27,22 @@ export async function generateMetadata(): Promise<Metadata> {
       "jasa IT medan",
       "digital agency medan",
       "Mitralabs",
-      "Mitralabs.id"
+      "Mitralabs.id",
+      "Mitralabs.web.id"
     ],
-    authors: [{ name: "Mitralabs.id Team" }],
-    creator: "Mitralabs.id",
+    authors: [{ name: "Mitralabs.web.id Team" }],
+    creator: "Mitralabs.web.id",
     openGraph: {
       title: title,
       description: description,
-      url: "https://mitralabs.id",
-      siteName: "Mitralabs.id",
+      url: "https://mitralabs.web.id",
+      siteName: "Mitralabs.web.id",
       images: [
         {
-          url: "/logo.png", // Assuming logo.png is in the public directory
+          url: "/logo.png",
           width: 800,
           height: 600,
-          alt: "Mitralabs.id - Software House Medan",
+          alt: "Mitralabs.web.id - Software House Medan",
         },
       ],
       locale: "id_ID",
@@ -91,10 +92,10 @@ export default function RootLayout({
               __html: JSON.stringify({
                 "@context": "https://schema.org",
                 "@type": "ProfessionalService",
-                "name": "Mitralabs.id",
-                "image": "https://mitralabs.id/logo.png",
-                "@id": "https://mitralabs.id",
-                "url": "https://mitralabs.id",
+                "name": "Mitralabs.web.id",
+                "image": "https://mitralabs.web.id/logo.png",
+                "@id": "https://mitralabs.web.id",
+                "url": "https://mitralabs.web.id",
                 "telephone": "+6282381118520",
                 "address": {
                   "@type": "PostalAddress",

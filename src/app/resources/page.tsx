@@ -3,8 +3,8 @@ import Footer from "@/components/Footer";
 import { FileText, Download, Shield, Briefcase, FileCheck, ClipboardList } from "lucide-react";
 
 export const metadata: Metadata = {
-  title: "Resource & Dokumen — Mitralabs.id",
-  description: "Download dokumen pendukung, template brief, dan informasi legal Mitralabs.id untuk transparansi kerja sama.",
+  title: "Resource & Dokumen — Mitralabs.web.id",
+  description: "Download dokumen pendukung, template brief, dan informasi legal Mitralabs.web.id untuk transparansi kerja sama.",
 };
 
 const documents = [
@@ -12,19 +12,19 @@ const documents = [
     title: "Company Profile & Rate Card",
     desc: "Informasi lengkap mengenai profil perusahaan dan daftar harga layanan terbaru.",
     icon: Briefcase,
-    file: "CompanyProfile-RateCard-Mitralabs.id-v2.docx",
+    file: "CompanyProfile-RateCard-Mitralabs.web.id-v2.docx",
   },
   {
     title: "Proposal Kerja Sama",
     desc: "Template proposal standar kami untuk berbagai skala project digital.",
     icon: FileText,
-    file: "Proposal-Mitralabs.id-v2.docx",
+    file: "Proposal-Mitralabs.web.id-v2.docx",
   },
   {
     title: "SOP Pengerjaan Project",
     desc: "Standar Operasional Prosedur kami dalam menangani project dari awal hingga selesai.",
     icon: ClipboardList,
-    file: "SOP-Mitralabs.id-v2.docx",
+    file: "SOP-Mitralabs.web.id-v2.docx",
   },
   {
     title: "Form Brief Klien",

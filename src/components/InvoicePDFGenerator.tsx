@@ -82,7 +82,7 @@ export default function InvoicePDFGenerator({ invoiceNumber, invoiceData, classN
       pdf.setFontSize(18);
       pdf.setFont('helvetica', 'bold');
       pdf.setTextColor(...colors.primary);
-      const companyName = settings?.companyName || 'MITRALABS.ID';
+      const companyName = settings?.companyName || 'MITRALABS.WEB.ID';
       pdf.text(companyName, 38, 27);
 
       // Tagline - subtle and clean

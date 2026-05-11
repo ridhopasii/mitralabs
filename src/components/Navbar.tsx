@@ -52,8 +52,8 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              <Link href="/login" className="transition-colors hover:text-on-background relative group">
-                Portal
+              <Link href="/track" className="transition-colors hover:text-on-background relative group">
+                Lacak Projek
                 <span className="absolute -bottom-1 left-0 w-full h-px bg-on-background scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
               </Link>
             </nav>

@@ -84,7 +84,7 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
                   <div style="display: flex; align-items: center; gap: 20px;">
                     <div style="width: 64px; height: 64px; background: #1D1D1F; border-radius: 16px; display: flex; align-items: center; justify-content: center; color: white; font-size: 32px; font-weight: 600; letter-spacing: -2px;">M</div>
                     <div>
-                      <h2 style="font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -1px;">MITRALABS.ID</h2>
+                      <h2 style="font-size: 24px; font-weight: 700; margin: 0; letter-spacing: -1px;">MITRALABS.WEB.ID</h2>
                       <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px;">
                         <div style="width: 6px; height: 6px; background: #0066FF; border-radius: 50%;"></div>
                         <span style="font-size: 11px; font-weight: 600; color: #0066FF; text-transform: uppercase; letter-spacing: 3px;">${globalData.invoiceSettings.companyTagline}</span>
@@ -266,7 +266,7 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
             <div style="background: #1D1D1F; padding: 40px 64px; display: flex; justify-content: space-between; align-items: center; color: white;">
               <div style="display: flex; align-items: center; gap: 12px;">
                 <div style="width: 32px; height: 32px; background: white; border-radius: 8px; color: #1D1D1F; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-style: italic;">M</div>
-                <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; font-style: italic;">MITRALABS.ID</span>
+                <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; font-style: italic;">MITRALABS.WEB.ID</span>
               </div>
               <div style="display: flex; gap: 32px; align-items: center;">
                 <div style="text-align: right;">

@@ -10,7 +10,7 @@ import FAQSection from "@/sections/home/FAQSection";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
-  title: "Mitralabs.id — Jasa Website Profesional Medan | Ubah Bisnis Jadi Mesin Penjualan 24/7",
+  title: "Mitralabs.web.id — Jasa Website Profesional Medan | Ubah Bisnis Jadi Mesin Penjualan 24/7",
   description:
     "Jasa pembuatan website profesional di Medan. Kami bantu UMKM, sekolah, travel, dan bisnis go-digital dengan website berkinerja tinggi. Harga terjangkau, kualitas premium.",
 };
@@ -22,16 +22,17 @@ export default function Home() {
   const jsonLd = {
     "@context": "https://schema.org",
     "@type": "ProfessionalService",
-    "name": "Mitralabs.id",
-    "image": "https://mitralabs.id/logo.png",
-    "@id": "https://mitralabs.id",
-    "url": "https://mitralabs.id",
-    "telephone": "+6281234567890",
+    "name": "Mitralabs.web.id",
+    "image": "https://mitralabs.web.id/logo.png",
+    "@id": "https://mitralabs.web.id",
+    "url": "https://mitralabs.web.id",
+    "telephone": "+6282381118520",
     "address": {
       "@type": "PostalAddress",
-      "streetAddress": "Jl. Gatot Subroto",
+      "streetAddress": "Medan",
       "addressLocality": "Medan",
-      "postalCode": "20123",
+      "addressRegion": "Sumatera Utara",
+      "postalCode": "20000",
       "addressCountry": "ID"
     },
     "geo": {
@@ -50,7 +51,7 @@ export default function Home() {
         "Saturday"
       ],
       "opens": "09:00",
-      "closes": "17:00"
+      "closes": "18:00"
     },
     "sameAs": [
       "https://instagram.com/mitralabs.id"

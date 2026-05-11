@@ -52,7 +52,7 @@ export default function Footer() {
           </div>
         </div>
         <div className="pt-8 border-t border-outline/5 text-center md:text-left flex flex-col md:flex-row justify-between gap-4">
-           <p className="text-xs text-secondary/60 font-medium">© 2024 {navbar.logo}. All rights reserved.</p>
+           <p className="text-xs text-secondary/60 font-medium">© {new Date().getFullYear()} {navbar.logo}. All rights reserved.</p>
            <p className="text-xs text-secondary/60 font-medium">Designed with precision in Medan, Indonesia.</p>
         </div>
       </div>

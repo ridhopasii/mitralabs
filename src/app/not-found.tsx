@@ -74,7 +74,7 @@ export default function NotFound() {
         transition={{ delay: 1.2, duration: 1 }}
         className="mt-24 pt-12 border-t border-surface-container-highest/10 w-full max-w-xs flex justify-center grayscale opacity-30"
       >
-        <span className="font-black tracking-widest text-xs uppercase">Mitralabs.id</span>
+        <span className="font-black tracking-widest text-xs uppercase">Mitralabs.web.id</span>
       </motion.div>
     </div>
   );
