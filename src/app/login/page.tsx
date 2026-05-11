@@ -16,17 +16,7 @@ export default function LoginPage() {
   useEffect(() => {
     supabase.auth.getUser().then(async ({ data }) => {
       if (data.user) {
-        const { data: userData } = await supabase
-          .from("User")
-          .select("role")
-          .eq("email", data.user.email)
-          .single();
-
-        if (userData?.role === 'admin' || userData?.role === 'staff') {
-          router.replace("/admin");
-        } else {
-          router.replace("/dashboard");
-        }
+        router.replace("/admin");
       }
     });
   }, [router]);
@@ -55,17 +45,7 @@ export default function LoginPage() {
     }
 
     if (authData.user) {
-       const { data: userData } = await supabase
-         .from("User")
-         .select("role")
-         .eq("email", authData.user.email)
-         .single();
-
-       if (userData?.role === 'admin' || userData?.role === 'staff') {
-         router.replace("/admin");
-       } else {
-         router.replace("/dashboard");
-       }
+       router.replace("/admin");
     }
 
     router.refresh();
