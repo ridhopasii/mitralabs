@@ -40,8 +40,8 @@ function TrackContent() {
         .from("Booking")
         .select(`
           *,
-          invoices (*),
-          client_projects (
+          invoices:Invoice (*),
+          client_projects:ClientProject (
             *,
             files:ProjectFile (*),
             updates:ProjectUpdate (*)
