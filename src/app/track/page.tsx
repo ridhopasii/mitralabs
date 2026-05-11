@@ -44,7 +44,7 @@ function TrackContent() {
           client_projects (
             *,
             files:ProjectFile (*),
-            updates:ProjectUpdate (*, user:User (full_name))
+            updates:ProjectUpdate (*)
           )
         `)
         .eq("customer_email", email)

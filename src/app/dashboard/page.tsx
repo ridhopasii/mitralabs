@@ -34,9 +34,8 @@ export default function ClientDashboard() {
           *,
           projects:ClientProject (
             *,
-            booking:Booking (*),
             files:ProjectFile (*),
-            updates:ProjectUpdate (*, user:User (full_name))
+            updates:ProjectUpdate (*)
           ),
           bookings:Booking (*)
         `)
