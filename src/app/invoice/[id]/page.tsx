@@ -69,7 +69,7 @@ export default function PublicInvoicePage() {
     }).format(num);
   };
 
-  // PDF Download Handler (Flexible Height - Identical to Designer's Intent)
+  // PDF Download Handler
   const handleDownloadPDF = async () => {
     const element = document.getElementById("invoice-content");
     if (!element) return;
@@ -86,9 +86,7 @@ export default function PublicInvoicePage() {
       });
 
       const imgData = canvas.toDataURL("image/png");
-      
-      // Flexible PDF Height logic
-      const imgWidth = 210; // mm
+      const imgWidth = 210; 
       const imgHeight = (canvas.height * imgWidth) / canvas.width;
 
       const pdf = new jsPDF({
@@ -124,7 +122,7 @@ export default function PublicInvoicePage() {
     );
   }
 
-  const total = invoice.items.reduce((acc: number, item: any) => acc + (item.qty * item.price), 0);
+  const total = invoice.items.reduce((acc: number, item: any) => acc + (item.qty * (item.price || item.rate || 0)), 0);
 
   return (
     <div className="min-h-screen bg-[#F5F5F7] py-12 px-4 font-sans text-[#1D1D1F] flex flex-col items-center">
@@ -170,9 +168,11 @@ export default function PublicInvoicePage() {
           <div className="flex flex-col md:flex-row justify-between items-start gap-12">
             <div className="space-y-8">
               <div className="flex items-center gap-5">
-                <div className="w-16 h-16 bg-[#1D1D1F] rounded-2xl flex items-center justify-center text-white text-3xl font-semibold tracking-tighter shadow-xl shadow-slate-200">M</div>
+                <div className="w-16 h-16 bg-[#1D1D1F] rounded-2xl flex items-center justify-center text-white text-3xl font-semibold tracking-tighter shadow-xl shadow-slate-200 uppercase">
+                  {globalData.invoiceSettings.companyName.charAt(0)}
+                </div>
                 <div className="space-y-1">
-                  <h2 className="text-2xl font-bold tracking-tight text-[#1D1D1F]">{globalData.invoiceSettings.companyName}</h2>
+                  <h2 className="text-2xl font-bold tracking-tight text-[#1D1D1F] uppercase">{globalData.invoiceSettings.companyName}</h2>
                   <div className="flex items-center gap-2 text-[#0066FF] font-semibold text-[11px] uppercase tracking-[0.3em]">
                     <span className="w-1.5 h-1.5 bg-[#0066FF] rounded-full"></span>
                     {globalData.invoiceSettings.companyTagline}
@@ -269,7 +269,7 @@ export default function PublicInvoicePage() {
           <div className="mb-4 flex items-center gap-2 text-[10px] font-bold text-[#86868B] uppercase tracking-widest">
             <Info size={12} className="text-[#0066FF]" />
             Periode Proyek: <span className="text-[#1D1D1F]">
-              {invoice.project_period_start ? `${new Date(invoice.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoice.project_period_end || '').toLocaleDateString('id-ID')}` : "-"}
+              {invoice.project_period_start ? `${new Date(invoice.project_period_start).toLocaleDateString('id-ID')} - ${new Date(invoice.project_period_end || '').toLocaleDateString('id-ID')}` : "Tersedia Secara Digital"}
             </span>
           </div>
           <table className="w-full text-sm">
@@ -284,11 +284,11 @@ export default function PublicInvoicePage() {
               {invoice.items.map((item: any, idx: number) => (
                 <tr key={idx}>
                   <td className="py-6 pr-4">
-                    <p className="font-bold text-[#1D1D1F] tracking-tight mb-1">{item.desc}</p>
+                    <p className="font-bold text-[#1D1D1F] tracking-tight mb-1">{item.desc || item.description}</p>
                     <p className="text-[11px] text-[#86868B] font-medium leading-relaxed max-w-sm">{item.details}</p>
                   </td>
                   <td className="py-6 px-4 text-center font-bold text-[#86868B] tabular-nums">{item.qty}</td>
-                  <td className="py-6 text-right font-bold text-[#1D1D1F] tabular-nums">{formatCurrency(item.qty * item.price)}</td>
+                  <td className="py-6 text-right font-bold text-[#1D1D1F] tabular-nums">{formatCurrency(item.qty * (item.price || item.rate || 0))}</td>
                 </tr>
               ))}
             </tbody>
@@ -304,7 +304,7 @@ export default function PublicInvoicePage() {
                   <ShieldCheck size={14} className="text-[#2E7D32]" /> Syarat & Ketentuan
                 </h5>
                 <ul className="space-y-1.5">
-                  {globalData.invoiceSettings.termsAndConditions.split('\n').map((term: string, idx: number) => (
+                  {(globalData.invoiceSettings.termsAndConditions || "").split('\n').map((term: string, idx: number) => (
                     <li key={idx} className="text-[10px] text-[#86868B] leading-relaxed font-medium flex gap-2">
                       <span className="text-[#D2D2D7]">•</span> {term}
                     </li>
@@ -383,10 +383,10 @@ export default function PublicInvoicePage() {
             </div>
             <div className="flex gap-6 text-[#D2D2D7]">
               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                <Linkedin size={12} /> {globalData.invoiceSettings.companyLinkedin}
+                <Linkedin size={12} /> {globalData.invoiceSettings.companyLinkedin || "linkedin.com/company/mitralabs"}
               </div>
               <div className="flex items-center gap-1.5 text-[10px] font-bold uppercase tracking-widest">
-                <Instagram size={12} /> {globalData.invoiceSettings.companyInstagram}
+                <Instagram size={12} /> {globalData.invoiceSettings.companyInstagram || "@mitralabs"}
               </div>
             </div>
           </div>
@@ -413,7 +413,7 @@ export default function PublicInvoicePage() {
       </div>
 
       <div className="mt-8 text-center space-y-2 print:hidden">
-        <p className="text-[10px] text-[#86868B] font-bold uppercase tracking-[0.3em]">Hak Cipta &copy; 2026 PT MITRA LABS DIGITAL</p>
+        <p className="text-[10px] text-[#86868B] font-bold uppercase tracking-[0.3em]">Hak Cipta &copy; 2026 {globalData.invoiceSettings.companyName}</p>
         <p className="text-[10px] text-[#D2D2D7] font-medium tracking-wide">Kwitansi ini diakui secara hukum sebagai bukti pelunasan digital yang sah.</p>
       </div>
 
