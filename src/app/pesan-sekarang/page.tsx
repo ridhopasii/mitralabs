@@ -319,6 +319,7 @@ export default function PesanSekarang() {
                          <Mail className="absolute left-6 top-1/2 -translate-y-1/2 text-slate-300 group-focus-within:text-primary transition-colors z-10" size={18} />
                          <input required type="email" placeholder="" value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className={`w-full pl-16 pr-8 py-6 bg-background border ${errors.email ? 'border-error/50' : 'border-outline/10'} rounded-[2rem] outline-none focus:border-primary/30 font-bold transition-all shadow-inner relative`} />
                          
+                      </div>
                       {errors.email && <p className="text-[10px] text-error font-bold ml-6 mt-2 uppercase tracking-widest">{errors.email}</p>}
                    </div>
                 </div>
