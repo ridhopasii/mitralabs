@@ -542,6 +542,15 @@ export default function BookingCMS() {
                          />
                        )}
 
+                       {/* Manage Project Button */}
+                       <Link
+                         href={`/admin/booking/${booking.id}`}
+                         className="p-3 text-emerald-500 hover:text-emerald-700 hover:bg-emerald-50 rounded-xl transition-all"
+                         title="Kelola Projek & Upload Dokumen"
+                       >
+                         <Package size={16} />
+                       </Link>
+
                        {/* Edit Button */}
                        <button
                          onClick={() => { setEditingBooking(booking); setActiveTab("logistics"); }}
