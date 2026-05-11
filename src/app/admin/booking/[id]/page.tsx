@@ -61,10 +61,26 @@ export default function BookingDetailPage() {
     setIsUpdating(true);
     try {
       const { data: { user } } = await supabase.auth.getUser();
+      let currentClientId = booking.client_id;
+
+      // Auto-create client profile if missing
+      if (!currentClientId) {
+        currentClientId = crypto.randomUUID();
+        await supabase.from('Client').insert([{
+          id: currentClientId,
+          email: booking.customer_email,
+          full_name: booking.customer_name,
+          company_name: booking.organization_name,
+          phone: booking.customer_phone
+        }]);
+        await supabase.from('Booking').update({ client_id: currentClientId }).eq('id', booking.id);
+      }
+
       // Insert new ClientProject
       const { data: newProj, error } = await supabase.from('ClientProject').insert([{
+        id: crypto.randomUUID(),
         booking_id: booking.id,
-        client_id: booking.client_id, // Might be null if user didn't register
+        client_id: currentClientId,
         project_name: `Projek ${booking.plan_name} - ${booking.customer_name.split(' ')[0]}`,
         status: "Active",
         progress: 0
