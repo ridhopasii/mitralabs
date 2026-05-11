@@ -83,6 +83,53 @@ export default function RootLayout({
           </ErrorBoundary>
           <Analytics />
           <SpeedInsights />
+          
+          {/* JSON-LD Structured Data for SEO */}
+          <script
+            type="application/ld+json"
+            dangerouslySetInnerHTML={{
+              __html: JSON.stringify({
+                "@context": "https://schema.org",
+                "@type": "ProfessionalService",
+                "name": "Mitralabs.id",
+                "image": "https://mitralabs.id/logo.png",
+                "@id": "https://mitralabs.id",
+                "url": "https://mitralabs.id",
+                "telephone": "+6282381118520",
+                "address": {
+                  "@type": "PostalAddress",
+                  "streetAddress": "Medan",
+                  "addressLocality": "Medan",
+                  "addressRegion": "Sumatera Utara",
+                  "postalCode": "20000",
+                  "addressCountry": "ID"
+                },
+                "geo": {
+                  "@type": "GeoCoordinates",
+                  "latitude": 3.5952,
+                  "longitude": 98.6722
+                },
+                "openingHoursSpecification": {
+                  "@type": "OpeningHoursSpecification",
+                  "dayOfWeek": [
+                    "Monday",
+                    "Tuesday",
+                    "Wednesday",
+                    "Thursday",
+                    "Friday",
+                    "Saturday"
+                  ],
+                  "opens": "09:00",
+                  "closes": "18:00"
+                },
+                "sameAs": [
+                  "https://instagram.com/mitralabs.id",
+                  "https://linkedin.com/company/mitralabs-id"
+                ],
+                "priceRange": "$$"
+              })
+            }}
+          />
         </ThemeProvider>
       </body>
     </html>
