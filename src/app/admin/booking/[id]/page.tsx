@@ -393,7 +393,7 @@ export default function BookingDetailPage() {
                           <h4 className="font-bold text-slate-900">Riwayat Kwitansi & Tagihan</h4>
                           <p className="text-xs text-slate-500 mt-1">Kwitansi akan muncul di dashboard klien jika ditautkan ke order ini.</p>
                         </div>
-                        <Link href="/admin/invoice/create" className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
+                        <Link href={`/admin/invoice/create?bookingId=${booking.id}`} className="px-6 py-3 bg-slate-900 text-white rounded-xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-xl shadow-slate-900/10">
                           <Plus size={14} /> Buat Kwitansi Baru
                         </Link>
                      </div>
