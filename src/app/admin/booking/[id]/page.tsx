@@ -64,6 +64,7 @@ export default function BookingDetailPage() {
       let currentClientId = booking.client_id;
 
       // Auto-create client profile if missing
+      const now = new Date().toISOString();
       if (!currentClientId) {
         currentClientId = crypto.randomUUID();
         await supabase.from('Client').insert([{
@@ -71,7 +72,9 @@ export default function BookingDetailPage() {
           email: booking.customer_email,
           full_name: booking.customer_name,
           company_name: booking.organization_name,
-          phone: booking.customer_phone
+          phone: booking.customer_phone,
+          created_at: now,
+          updated_at: now
         }]);
         await supabase.from('Booking').update({ client_id: currentClientId }).eq('id', booking.id);
       }
@@ -82,8 +85,11 @@ export default function BookingDetailPage() {
         booking_id: booking.id,
         client_id: currentClientId,
         project_name: `Projek ${booking.plan_name} - ${booking.customer_name.split(' ')[0]}`,
+        description: `Workspace otomatis untuk pesanan ${booking.service_type}: ${booking.plan_name}. ${booking.project_brief || ''}`,
         status: "Active",
-        progress: 0
+        progress: 0,
+        created_at: now,
+        updated_at: now
       }]).select().single();
 
       if (error) throw error;
