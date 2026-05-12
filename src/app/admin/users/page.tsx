@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { 
   Users, 
   UserPlus, 
@@ -32,12 +32,7 @@ export default function UsersPage() {
     role: "staff"
   });
 
-  useEffect(() => {
-    fetchUsers();
-  }, []);
-
   const fetchUsers = async () => {
-    setIsLoading(true);
     try {
       const { data, error } = await supabase
         .from("User")
@@ -52,6 +47,10 @@ export default function UsersPage() {
       setIsLoading(false);
     }
   };
+
+  useEffect(() => {
+    fetchUsers();
+  }, []);
 
   const handleAddUser = async (e: React.FormEvent) => {
     e.preventDefault();

@@ -11,7 +11,20 @@ import { notFound } from "next/navigation";
 // Generate Metadata for SEO
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }): Promise<Metadata> {
   const { slug } = await params;
-  const { data: project } = await supabase.from("Project").select("*").eq("slug", slug).maybeSingle();
+  let { data: project } = await supabase.from("Project").select("*").eq("slug", slug).maybeSingle();
+
+  if (!project) {
+    // Check in ClientProject
+    const { data: cp } = await supabase.from("ClientProject").select("*, booking:Booking(*)").eq("is_public", true);
+    project = cp?.find(p => p.project_name.toLowerCase().replace(/\s+/g, '-') === slug);
+    if (project) {
+      project = {
+        title: project.project_name,
+        description: project.description,
+        image_url: project.portfolio_image || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80"
+      };
+    }
+  }
 
   if (!project) return { title: "Project Not Found | Mitralabs" };
 
@@ -31,7 +44,28 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
   const { slug } = await params;
   
   // Fetch direct from relational DB for SEO/Server Side performance
-  const { data: project } = await supabase.from("Project").select("*").eq("slug", slug).maybeSingle();
+  let { data: project } = await supabase.from("Project").select("*").eq("slug", slug).maybeSingle();
+
+  if (!project) {
+    // Check in ClientProject
+    const { data: cp } = await supabase.from("ClientProject").select("*, booking:Booking(*), files:ProjectFile(*)").eq("is_public", true);
+    const found = cp?.find(p => p.project_name.toLowerCase().replace(/\s+/g, '-') === slug);
+    if (found) {
+      project = {
+        title: found.project_name,
+        category: found.booking?.service_type || "Digital Solution",
+        description: found.description,
+        image_url: found.portfolio_image || (found.files?.[0]?.file_url) || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80",
+        client_name: found.booking?.customer_name,
+        project_date: new Date(found.created_at).getFullYear().toString(),
+        challenge: "Proyek klien yang berhasil diselesaikan dengan standar kualitas Mitralabs.",
+        solution: "Implementasi solusi digital kustom menggunakan teknologi modern.",
+        tech_stack: [],
+        results: ["100% Client Satisfaction", "On-time Delivery"],
+        live_link: null
+      };
+    }
+  }
 
   if (!project) notFound();
 

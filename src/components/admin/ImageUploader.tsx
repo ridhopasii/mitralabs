@@ -1,8 +1,9 @@
 "use client";
 
-import { useState, useRef } from "react";
-import { Upload, X, Image as ImageIcon, Loader2 } from "lucide-react";
-import { uploadImage, validateImage, getImageDimensions, UploadResult } from "@/lib/imageUpload";
+import React, { useState, useRef } from "react";
+import { Upload, X, Loader2 } from "lucide-react";
+import { uploadImage, validateImage, UploadResult } from "@/lib/imageUpload";
+import Image from "next/image";
 
 interface ImageUploaderProps {
   onUploadSuccess: (url: string, filename: string) => void;
@@ -106,11 +107,13 @@ export default function ImageUploader({
       />
 
       {preview ? (
-        <div className="relative group">
-          <img
+        <div className="relative group w-full h-64">
+          <Image
             src={preview}
             alt="Preview"
-            className="w-full h-64 object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
+            fill
+            className="object-cover rounded-lg border-2 border-gray-200 dark:border-gray-700"
+            unoptimized={preview.startsWith('data:')}
           />
           {isUploading && (
             <div className="absolute inset-0 bg-black/50 rounded-lg flex items-center justify-center">

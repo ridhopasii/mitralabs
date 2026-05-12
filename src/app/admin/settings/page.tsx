@@ -19,6 +19,7 @@ import {
   Briefcase
 } from "lucide-react";
 import { logActivity } from "@/lib/supabase";
+import { uploadImage } from "@/lib/imageUpload";
 import React from "react";
 
 const defaultInvoiceSettings = {
@@ -45,8 +46,8 @@ const defaultInvoiceSettings = {
 
 const defaultGlobalSettings = {
   waNumber: "6282381118520",
-  companyLogo: "/logo.png",
-  companyFavicon: "/favicon.ico",
+  logo_url: "/logo.png",
+  favicon_url: "/favicon.ico",
   businessMode: "agresif",
   waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial."
 };
@@ -101,6 +102,67 @@ const FormTextarea = React.memo(({ label, value, onChange, placeholder, rows = 3
 });
 
 FormTextarea.displayName = "FormTextarea";
+
+const ImageUploadField = ({ label, value, onChange, description }: any) => {
+  const [uploading, setUploading] = useState(false);
+
+  const handleUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+    const file = e.target.files?.[0];
+    if (!file) return;
+
+    setUploading(true);
+    try {
+      const result = await uploadImage(file, "images", "branding");
+      if (result.success && result.url) {
+        onChange(result.url);
+      } else {
+        alert(result.error || "Upload gagal");
+      }
+    } catch (err) {
+      console.error(err);
+      alert("Terjadi kesalahan saat upload");
+    } finally {
+      setUploading(false);
+    }
+  };
+
+  return (
+    <div className="space-y-4">
+      <label className="text-xs font-bold uppercase tracking-widest text-slate-400">{label}</label>
+      <div className="flex items-center gap-6 p-6 bg-slate-50 border border-slate-100 rounded-[2rem] group hover:bg-white hover:border-slate-200 transition-all">
+        <div className="w-20 h-20 bg-white rounded-2xl flex items-center justify-center overflow-hidden border border-slate-100 shadow-sm relative">
+           {value ? (
+             <img src={value} alt="Preview" className="w-full h-full object-contain p-2" />
+           ) : (
+             <Upload className="text-slate-300" size={24} />
+           )}
+           {uploading && (
+             <div className="absolute inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center">
+               <RefreshCcw size={20} className="animate-spin text-primary" />
+             </div>
+           )}
+        </div>
+        
+        <div className="flex-grow space-y-2">
+          <div className="relative">
+            <input 
+              type="file" 
+              accept="image/*"
+              onChange={handleUpload}
+              disabled={uploading}
+              className="absolute inset-0 opacity-0 cursor-pointer z-10" 
+            />
+            <button className="px-6 py-2.5 bg-white border border-slate-200 text-slate-900 rounded-xl font-bold text-[10px] uppercase tracking-widest hover:bg-slate-900 hover:text-white transition-all">
+              {uploading ? "Uploading..." : "Ganti Gambar"}
+            </button>
+          </div>
+          <p className="text-[10px] text-slate-400 font-medium">URL: {value || "Belum ada gambar"}</p>
+        </div>
+      </div>
+      {description && <p className="text-[10px] text-slate-400 font-medium">{description}</p>}
+    </div>
+  );
+};
 
 export default function SettingsPage() {
   const { data, updateData } = useData();
@@ -244,18 +306,17 @@ export default function SettingsPage() {
               </div>
 
               <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="URL Logo Perusahaan"
-                  value={globalSettings.companyLogo}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, companyLogo: val})}
-                  placeholder="/logo.png atau https://..."
-                  description="Path relatif atau URL lengkap"
+                <ImageUploadField
+                  label="Logo Perusahaan"
+                  value={globalSettings.logo_url}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, logo_url: val})}
+                  description="Akan muncul di Navbar dan Invoice"
                 />
-                <FormInput
-                  label="URL Favicon"
-                  value={globalSettings.companyFavicon}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, companyFavicon: val})}
-                  placeholder="/favicon.ico"
+                <ImageUploadField
+                  label="Favicon Website"
+                  value={globalSettings.favicon_url}
+                  onChange={(val: string) => setGlobalSettings({...globalSettings, favicon_url: val})}
+                  description="Ikon kecil di tab browser"
                 />
               </div>
             </div>

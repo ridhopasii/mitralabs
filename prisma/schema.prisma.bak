@@ -1,0 +1,300 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+}
+
+// --- CORE SETTINGS ---
+model SiteConfig {
+  id               Int      @id @default(1)
+  logo_text        String   @default("Mitralabs")
+  navbar_button    String   @default("Get Started")
+  footer_desc      String   @default("Technical precision in every pixel.")
+  wa_number        String   @default("6282381118520")
+  business_mode    String   @default("agresif")
+  wa_promo_msg     String   @default("🔥 Promo!")
+  phone            String   @default("6282381118520")
+  email            String   @default("ridhorobbipasi@gmail.com")
+  instagram        String   @default("@mitralabs.id")
+  address          String   @default("Medan, Indonesia")
+  maps_url         String   @default("")
+  json_content     Json?
+  updated_at       DateTime @default(now()) @updatedAt
+  
+  // New fields for Invoice/Kwitansi
+  company_tagline  String   @default("Mitra Digital Anda")
+  company_website  String   @default("mitralabs.id")
+  company_npwp     String   @default("01.234.567.8-901.000")
+  linkedin_url     String   @default("linkedin.com/company/mitralabs-id")
+}
+
+// --- HOME SECTIONS ---
+model HeroSection {
+  id         Int      @id @default(1)
+  tagline    String   @default("Mitra Digital Bisnis Mu")
+  promo      String   @default("Promo Aktif")
+  title      String   @default("Tampil Profesional Tanpa Ribet.")
+  subtitle   String   @default("Jasa pembuatan website profesional...")
+  image_url  String   @default("https://images.unsplash.com/...")
+  stats_label String  @default("Live Projects")
+  stats_value String  @default("150+")
+  stats_desc  String  @default("Website Berhasil Online")
+}
+
+// --- DYNAMIC CONTENT ---
+model ServicePlan {
+  id          Int      @id @default(autoincrement())
+  name        String
+  price       String
+  tier        String
+  pages       String
+  duration    String
+  features    String[]
+  missing     String[]
+  highlight   Boolean  @default(false)
+  order       Int      @default(0)
+}
+
+model Project {
+  id            Int       @id @default(autoincrement())
+  slug          String    @unique
+  title         String
+  category      String
+  image_url     String
+  description   String    @db.Text
+  challenge     String    @db.Text
+  solution      String    @db.Text
+  results       String[]
+  client_name   String?
+  project_date  String?
+  live_link     String?
+  tech_stack    String[]
+  gallery_urls  String[]
+  status        String    @default("Published")
+  created_at    DateTime  @default(now())
+  invoices      Invoice[]
+}
+
+model Booking {
+  id                   Int       @id @default(autoincrement())
+  customer_name        String
+  customer_email       String
+  customer_phone       String
+  organization_name    String?
+  position             String?
+  service_type         String
+  plan_name            String
+  project_brief        String    @db.Text
+  desired_domain       String?
+  business_industry    String?
+  reference_websites   String?
+  target_audience      String?
+  primary_cta          String?
+  competitors_list     String?
+  integrations_needed  String?
+  biggest_expectation  String?
+  status               String    @default("Pending")
+  total_price          Float
+  scheduled_date       DateTime?
+  tracking_password    String?   // For guest access tracking
+  client_id            String?   // Link to registered Client if exists
+  client               Client?   @relation(fields: [client_id], references: [id])
+  spk_url              String?
+  proposal_url         String?
+  created_at           DateTime  @default(now())
+  updated_at           DateTime  @updatedAt
+  invoices             Invoice[]
+  client_projects      ClientProject[]
+
+  @@index([client_id])
+}
+
+model Invoice {
+  id             Int      @id @default(autoincrement())
+  project_id     Int?
+  project        Project? @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  booking_id     Int?
+  booking        Booking? @relation(fields: [booking_id], references: [id], onDelete: Cascade)
+  invoice_number String   @unique
+  amount         Float
+  status         String   @default("Unpaid") // Unpaid, Partial, Paid, Cancelled
+  due_date       DateTime
+  items          Json     // Array of { desc: string, details?: string, qty: number, price: number }
+  client_name    String?
+  client_email   String?
+  client_company String?
+  client_address String?
+  project_period_start DateTime?
+  project_period_end   DateTime?
+  invoice_type   String   @default("Invoice") // Invoice, Kwitansi
+  created_at     DateTime @default(now())
+  updated_at     DateTime @updatedAt
+
+  @@index([project_id])
+  @@index([booking_id])
+}
+
+model BlogPost {
+  id          Int      @id @default(autoincrement())
+  slug        String   @unique
+  title       String
+  excerpt     String
+  content     String   @db.Text
+  category    String
+  author      String
+  image_url   String
+  published_at DateTime @default(now())
+}
+
+model TeamMember {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  bio        String
+  image_url  String
+  order      Int      @default(0)
+}
+
+model Testimonial {
+  id         Int      @id @default(autoincrement())
+  name       String
+  role       String
+  content    String
+  rating     Int      @default(5)
+  image_url  String
+}
+
+model FAQ {
+  id         Int      @id @default(autoincrement())
+  question   String
+  answer     String
+  category   String
+  order      Int      @default(0)
+}
+
+// --- MESSAGES & LOGS ---
+model SiteMessage {
+  id         Int       @id @default(autoincrement())
+  name       String
+  email      String
+  message    String
+  is_read    Boolean?  @default(false)
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model AdminLog {
+  id         Int       @id @default(autoincrement())
+  action     String
+  detail     String
+  created_at DateTime? @default(now()) @db.Timestamptz(6)
+}
+
+model NewsletterSub {
+  id         Int       @id @default(autoincrement())
+  email      String    @unique
+  created_at DateTime? @default(now()) @db.Timestamp(6)
+}
+
+// --- IMAGE MANAGEMENT ---
+model UploadedImage {
+  id            Int      @id @default(autoincrement())
+  filename      String
+  original_name String
+  storage_path  String
+  public_url    String
+  file_size     Int
+  mime_type     String
+  width         Int?
+  height        Int?
+  uploaded_by   String?
+  created_at    DateTime @default(now())
+
+  @@index([uploaded_by])
+}
+
+// --- USER MANAGEMENT & RBAC ---
+model User {
+  id            String   @id @default(uuid())
+  email         String   @unique
+  full_name     String
+  role          String   @default("viewer") // admin, staff, viewer
+  avatar_url    String?
+  is_active     Boolean  @default(true)
+  last_login    DateTime?
+  created_at    DateTime @default(now())
+  updated_at    DateTime @updatedAt
+
+  @@index([email])
+  @@index([role])
+}
+
+// --- CLIENT PORTAL ---
+model Client {
+  id              String    @id @default(uuid())
+  email           String    @unique
+  full_name       String
+  company_name    String?
+  phone           String?
+  avatar_url      String?
+  is_active       Boolean   @default(true)
+  created_at      DateTime  @default(now())
+  updated_at      DateTime  @updatedAt
+  projects        ClientProject[]
+  bookings        Booking[]
+
+  @@index([email])
+}
+
+model ClientProject {
+  id                String   @id @default(uuid())
+  client_id         String
+  client            Client   @relation(fields: [client_id], references: [id], onDelete: Cascade)
+  booking_id        Int?
+  booking           Booking? @relation(fields: [booking_id], references: [id])
+  project_name      String
+  status            String   @default("pending") // pending, in-progress, review, completed, cancelled
+  progress          Int      @default(0) // 0-100
+  description       String   @db.Text
+  start_date        DateTime?
+  deadline          DateTime?
+  completed_at      DateTime?
+  created_at        DateTime @default(now())
+  updated_at        DateTime @updatedAt
+  updates           ProjectUpdate[]
+  files             ProjectFile[]
+
+  @@index([client_id])
+  @@index([booking_id])
+  @@index([status])
+}
+
+model ProjectUpdate {
+  id                Int      @id @default(autoincrement())
+  project_id        String
+  project           ClientProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  title             String
+  description       String   @db.Text
+  progress          Int      // 0-100
+  created_by        String   // admin/editor name
+  is_approved       Boolean  @default(false)
+  approved_at       DateTime?
+  created_at        DateTime @default(now())
+
+  @@index([project_id])
+}
+
+model ProjectFile {
+  id                Int      @id @default(autoincrement())
+  project_id        String
+  project           ClientProject @relation(fields: [project_id], references: [id], onDelete: Cascade)
+  filename          String
+  file_url          String
+  file_size         Int
+  file_type         String
+  uploaded_by       String   // client or admin
+  created_at        DateTime @default(now())
+
+  @@index([project_id])
+}

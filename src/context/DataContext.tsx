@@ -1,6 +1,6 @@
 "use client";
 
-import React, { createContext, useContext, useState, useEffect, useCallback } from "react";
+import React, { createContext, useContext, useState, useEffect } from "react";
 import { supabase, isSupabaseConfigured } from "@/lib/supabase";
 import { initialData } from "./initialData";
 
@@ -207,6 +207,8 @@ export interface AppData {
     companyWebsite: string;
     companyNpwp: string;
     linkedinUrl: string;
+    logo_url: string;
+    favicon_url: string;
   };
   invoiceSettings: {
     companyName: string;
@@ -269,6 +271,21 @@ const DataContext = createContext<{
 import LoadingScreen from "@/components/LoadingScreen";
 import { AlertCircle, RefreshCcw } from "lucide-react";
 
+/**
+ * Deep merge utility for AppData
+ */
+function mergeData(target: any, source: any): any {
+  const merged = { ...target };
+  for (const key in source) {
+    if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
+      merged[key] = mergeData(merged[key] || {}, source[key]);
+    } else {
+      merged[key] = source[key];
+    }
+  }
+  return merged;
+}
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(() => {
     if (typeof window !== 'undefined') {
@@ -287,21 +304,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [error, setError] = useState<string | null>(null);
   const [hasSynced, setHasSynced] = useState(false);
 
-  const mergeData = useCallback((target: any, source: any) => {
-    const merged = { ...target };
-    for (const key in source) {
-      if (source[key] && typeof source[key] === 'object' && !Array.isArray(source[key])) {
-        merged[key] = mergeData(merged[key] || {}, source[key]);
-      } else {
-        merged[key] = source[key];
-      }
-    }
-    return merged;
-  }, []);
-
   useEffect(() => {
-    if (hasSynced) return;
-
     const syncFromSupabase = async () => {
       if (!isSupabaseConfigured()) {
         setHasSynced(true);
@@ -318,7 +321,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           teamRes,
           testimonialsRes,
           faqsRes,
-          bookingsRes
+          bookingsRes,
+          publicClientProjectsRes
         ] = await Promise.all([
           supabase.from("SiteConfig").select("*").eq("id", 1).maybeSingle(),
           supabase.from("HeroSection").select("*").eq("id", 1).maybeSingle(),
@@ -329,6 +333,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           supabase.from("Testimonial").select("*"),
           supabase.from("FAQ").select("*").order("order", { ascending: true }),
           supabase.from("Booking").select("*, Invoice(*)").order("created_at", { ascending: false }),
+          supabase.from("ClientProject").select("*, booking:Booking(*), files:ProjectFile(*)").eq("is_public", true)
         ]);
 
         const merged = { ...initialData };
@@ -350,6 +355,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           merged.settings.companyWebsite = configRes.data.company_website ?? initialData.settings.companyWebsite;
           merged.settings.companyNpwp = configRes.data.company_npwp ?? initialData.settings.companyNpwp;
           merged.settings.linkedinUrl = configRes.data.linkedin_url ?? initialData.settings.linkedinUrl;
+          merged.settings.logo_url = configRes.data.logo_url ?? initialData.settings.logo_url;
+          merged.settings.favicon_url = configRes.data.favicon_url ?? initialData.settings.favicon_url;
 
           if (configRes.data.json_content) {
             try {
@@ -384,12 +391,39 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         }
 
         if (plansRes.data?.length) merged.services.plans = plansRes.data;
-        if (projectsRes.data?.length) {
-          merged.portfolio.projects = projectsRes.data.map((p: any) => ({
+        if (projectsRes.data?.length || publicClientProjectsRes?.data?.length) {
+          const manualProjects = (projectsRes.data || []).map((p: any) => ({
             ...p,
             image: p.image_url,
             invoices: p.Invoice || []
           }));
+
+          const categoryMap: Record<string, string> = {
+            "UMKM Website": "UMKM",
+            "School System": "Educational",
+            "Corporate Website": "Corporate",
+            "Landing Page": "Creative"
+          };
+
+          const automatedProjects = (publicClientProjectsRes?.data || []).map((p: any) => ({
+            id: p.id,
+            slug: p.project_name.toLowerCase().replace(/\s+/g, '-'),
+            title: p.project_name,
+            category: categoryMap[p.booking?.service_type] || "Creative",
+            image: p.portfolio_image || (p.files?.find((f: any) => f.file_type?.startsWith('image'))?.file_url) || "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80",
+            description: p.description,
+            challenge: "Proyek klien yang berhasil diselesaikan dengan standar kualitas Mitralabs.",
+            solution: "Implementasi solusi digital kustom menggunakan teknologi modern.",
+            results: ["100% Client Satisfaction", "On-time Delivery"],
+            status: "Published",
+            client_name: p.booking?.customer_name,
+            project_date: new Date(p.created_at).getFullYear().toString(),
+            created_at: p.created_at
+          }));
+
+          merged.portfolio.projects = [...manualProjects, ...automatedProjects].sort((a: any, b: any) => 
+            new Date(b.created_at || 0).getTime() - new Date(a.created_at || 0).getTime()
+          );
         }
         if (postsRes.data?.length) {
           merged.blog.posts = postsRes.data.map((p: any) => ({
@@ -529,6 +563,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             company_website: newData.settings.companyWebsite,
             company_npwp: newData.settings.companyNpwp,
             linkedin_url: newData.settings.linkedinUrl,
+            logo_url: newData.settings.logo_url,
+            favicon_url: newData.settings.favicon_url,
             json_content: {
               home: newData.home,
               services: newData.services,

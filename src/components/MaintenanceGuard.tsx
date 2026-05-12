@@ -1,5 +1,6 @@
 "use client";
 
+import React from "react";
 import { useData } from "@/context/DataContext";
 import { Hammer, Clock, Phone, Mail } from "lucide-react";
 import { usePathname } from "next/navigation";

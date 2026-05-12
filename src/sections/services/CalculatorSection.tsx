@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useMemo } from "react";
+import React, { useState, useMemo } from "react";
 import { Calculator, Check, MessageCircle } from "lucide-react";
 import { useData } from "@/context/DataContext";
 

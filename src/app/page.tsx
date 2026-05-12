@@ -7,6 +7,7 @@ import StatsSection from "@/sections/home/StatsSection";
 import CTASection from "@/sections/home/CTASection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
 import FAQSection from "@/sections/home/FAQSection";
+import PortfolioSection from "@/sections/home/PortfolioSection";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -67,6 +68,7 @@ export default function Home() {
       <HeroSection />
       <ProblemSection />
       <SolutionSection />
+      <PortfolioSection />
       <ProcessSection />
       <StatsSection />
       <TestimonialsSection />

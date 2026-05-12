@@ -14,12 +14,13 @@ import {
   HelpCircle,
   ExternalLink,
   Image,
-  Users
+  Users,
+  Layers
 } from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useRouter } from "next/navigation";
-import { useEffect, useState } from "react";
+import React, { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 import GlobalSearch from "@/components/admin/GlobalSearch";
 
@@ -56,6 +57,7 @@ export default function AdminLayout({
 
   const menuItems = [
     { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
+    { name: "CRM Pipeline", icon: Layers, href: "/admin/crm", category: "Utama" },
     { name: "Users & Staff", icon: Users, href: "/admin/users", category: "Utama" },
     { name: "Clients", icon: Users, href: "/admin/clients", category: "Utama" },
     { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },

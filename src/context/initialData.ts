@@ -238,6 +238,8 @@ export const initialData: AppData = {
     companyWebsite: "mitralabs.web.id",
     companyNpwp: "01.234.567.8-901.000",
     linkedinUrl: "linkedin.com/company/mitralabs-id",
+    logo_url: "/logo.png",
+    favicon_url: "/favicon.ico",
   },
   invoiceSettings: {
     companyName: "MITRALABS.WEB.ID",

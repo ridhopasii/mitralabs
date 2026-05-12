@@ -194,7 +194,12 @@ export default function PortfolioCMS() {
                       </div>
                       <div>
                         <h4 className="text-base font-bold text-slate-900 tracking-tight leading-none mb-1.5">{project.title}</h4>
-                        <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">/{project.slug || "no-slug"}</p>
+                        <div className="flex items-center gap-2">
+                           <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">/{project.slug || "no-slug"}</p>
+                           {project.id.toString().length > 15 && (
+                              <span className="text-[8px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">ORDER-BASED</span>
+                           )}
+                        </div>
                       </div>
                     </div>
                   </td>
@@ -208,18 +213,30 @@ export default function PortfolioCMS() {
                   </td>
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-3">
-                      <button
-                        onClick={() => { setEditingProject(project); setActiveTab("identity"); }}
-                        className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm"
-                      >
-                        <Edit3 size={16} />
-                      </button>
-                      <button
-                        onClick={() => handleDelete(project.id)}
-                        className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-rose-500 hover:border-rose-500 transition-all shadow-sm"
-                      >
-                        <Trash2 size={16} />
-                      </button>
+                      {project.id.toString().length > 15 ? (
+                         <Link
+                           href={`/admin/booking/${project.id}`}
+                           className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm flex items-center gap-2"
+                         >
+                           <ExternalLink size={16} />
+                           <span className="text-[10px] font-bold uppercase tracking-widest px-2">Manage Order</span>
+                         </Link>
+                      ) : (
+                        <>
+                          <button
+                            onClick={() => { setEditingProject(project); setActiveTab("identity"); }}
+                            className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm"
+                          >
+                            <Edit3 size={16} />
+                          </button>
+                          <button
+                            onClick={() => handleDelete(project.id)}
+                            className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-rose-500 hover:border-rose-500 transition-all shadow-sm"
+                          >
+                            <Trash2 size={16} />
+                          </button>
+                        </>
+                      )}
                     </div>
                   </td>
                 </tr>

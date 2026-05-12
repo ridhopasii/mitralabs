@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect } from "react";
+import React, { useState, useEffect } from "react";
 import { useData, Booking, Invoice } from "@/context/DataContext";
 import Link from "next/link";
 import KwitansiPDFGenerator from "@/components/KwitansiPDFGenerator";
@@ -175,16 +175,31 @@ export default function BookingCMS() {
 
       const isNew = !bookings.some(b => b.id === editingBooking.id);
       
+      let finalBooking = { ...editingBooking };
+
+      // Kedepannya: Pastikan invoice otomatis tergenerate jika belum ada
+      if (isNew || (!editingBooking.invoices || editingBooking.invoices.length === 0)) {
+        // We need the actual ID from DB if it was new, but syncBooking handles upsert.
+        // For simplicity, if it's new, we'll refresh or wait for sync.
+        // But the user wants it "otomatis", so we'll trigger generation if missing.
+        if (editingBooking.id !== 0) {
+           const newInv = await generateInvoice(editingBooking);
+           if (newInv) {
+             finalBooking.invoices = [newInv];
+           }
+        }
+      }
+      
       if (isNew) {
-        setBookings([editingBooking, ...bookings]);
+        setBookings([finalBooking, ...bookings]);
       } else {
-        setBookings(bookings.map(b => b.id === editingBooking.id ? editingBooking : b));
+        setBookings(bookings.map(b => b.id === finalBooking.id ? finalBooking : b));
       }
 
       setShowSuccess(true);
       setEditingBooking(null);
       setTimeout(() => setShowSuccess(false), 3000);
-      await logActivity(isNew ? "Create Booking" : "Update Booking", `Customer: ${editingBooking.customer_name}`);
+      await logActivity(isNew ? "Create Booking" : "Update Booking", `Customer: ${finalBooking.customer_name}`);
     } catch (err) {
       console.error("Error saving booking:", err);
       alert("Failed to sync with database. Changes saved locally.");
@@ -254,7 +269,7 @@ export default function BookingCMS() {
     }
   };
 
-  const generateInvoice = async (booking: Booking) => {
+  const generateInvoice = async (booking: Booking): Promise<Invoice | null> => {
     setIsRefreshing(true);
     const invoiceNumber = `INV-${new Date().getFullYear()}-${Math.floor(1000 + Math.random() * 9000)}`;
     const dueDate = new Date(Date.now() + 7 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
@@ -308,9 +323,11 @@ export default function BookingCMS() {
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       await logActivity("Generate Invoice", `Booking ID: ${booking.id}`);
+      return newInvoice;
     } catch (err) {
       console.error("Error generating invoice:", err);
       alert("Gagal membuat kwitansi di database.");
+      return null;
     } finally {
       setIsRefreshing(false);
     }
@@ -520,16 +537,25 @@ export default function BookingCMS() {
                     <div className="space-y-2">
                        <p className="text-[14px] font-bold text-slate-900 tracking-tight leading-none">Rp {booking.total_price.toLocaleString()}</p>
                        <div className="flex gap-1.5">
-                          {booking.invoices?.slice(0, 1).map(inv => (
-                             <Link
-                               key={inv.id}
-                               href={`/invoice/${inv.invoice_number}`}
-                               target="_blank"
-                               className="text-[10px] font-bold text-blue-500 hover:underline"
-                             >
-                               {inv.invoice_number}
-                             </Link>
-                          ))}
+                          {booking.invoices && booking.invoices.length > 0 ? (
+                            booking.invoices.slice(0, 1).map(inv => (
+                               <Link
+                                 key={inv.id}
+                                 href={`/invoice/${inv.invoice_number}`}
+                                 target="_blank"
+                                 className="text-[10px] font-bold text-blue-500 hover:underline flex items-center gap-1"
+                               >
+                                 <FileText size={10} /> {inv.invoice_number}
+                               </Link>
+                            ))
+                          ) : (
+                            <button 
+                              onClick={() => generateInvoice(booking)}
+                              className="text-[10px] font-bold text-amber-500 hover:text-amber-600 flex items-center gap-1"
+                            >
+                              <Receipt size={10} /> DRAFT (GENERATE)
+                            </button>
+                          )}
                           {booking.invoices && booking.invoices.length > 1 && (
                              <span className="text-[10px] font-bold text-slate-300">+{booking.invoices.length - 1}</span>
                           )}
@@ -542,18 +568,23 @@ export default function BookingCMS() {
                   <td className="px-10 py-8 text-right">
                     <div className="flex items-center justify-end gap-2">
                        {/* View Invoice Button */}
-                       {booking.invoices && booking.invoices.length > 0 && (
-                         <Link
-                           href={`/invoice/${booking.invoices[0].invoice_number}`}
-                           target="_blank"
-                           className="p-3 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
-                           title="View Invoice"
-                         >
-                           <FileText size={16} />
-                         </Link>
-                       )}
+                       <button
+                         onClick={() => {
+                           if (booking.invoices && booking.invoices.length > 0) {
+                             window.open(`/invoice/${booking.invoices[0].invoice_number}`, '_blank');
+                           } else {
+                             generateInvoice(booking).then((inv) => {
+                               if (inv) window.open(`/invoice/${inv.invoice_number}`, '_blank');
+                             });
+                           }
+                         }}
+                         className="p-3 text-blue-400 hover:text-blue-600 hover:bg-blue-50 rounded-xl transition-all"
+                         title="View Invoice"
+                       >
+                         <FileText size={16} />
+                       </button>
 
-                        {/* Download Invoice Button - ALWAYS USE PREMIUM KWITANSI GENERATOR */}
+                        {/* Download/Generate Button */}
                         {booking.invoices && booking.invoices.length > 0 ? (
                           <KwitansiPDFGenerator
                             invoiceNumber={booking.invoices[0].invoice_number}
@@ -564,9 +595,9 @@ export default function BookingCMS() {
                           <button
                             onClick={() => generateInvoice(booking)}
                             className="p-3 text-amber-400 hover:text-amber-600 hover:bg-amber-50 rounded-xl transition-all"
-                            title="Generate Kwitansi Otomatis"
+                            title="Generate & Sync Kwitansi"
                           >
-                            <Receipt size={16} />
+                             <Receipt size={16} />
                           </button>
                         )}
 

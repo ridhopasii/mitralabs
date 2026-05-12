@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useEffect, useRef } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { Search, X, FileText, Briefcase, BookOpen, MessageSquare } from "lucide-react";
 import { useRouter } from "next/navigation";
 import { useData } from "@/context/DataContext";
@@ -15,7 +15,6 @@ interface SearchResult {
 
 export default function GlobalSearch() {
   const [query, setQuery] = useState("");
-  const [results, setResults] = useState<SearchResult[]>([]);
   const [isOpen, setIsOpen] = useState(false);
   const { data } = useData();
   const router = useRouter();
@@ -33,11 +32,8 @@ export default function GlobalSearch() {
   }, []);
 
   // Search logic
-  useEffect(() => {
-    if (!query.trim()) {
-      setResults([]);
-      return;
-    }
+  const results = React.useMemo(() => {
+    if (!query.trim()) return [];
 
     const searchTerm = query.toLowerCase();
     const allResults: SearchResult[] = [];
@@ -110,7 +106,7 @@ export default function GlobalSearch() {
       }
     });
 
-    setResults(allResults.slice(0, 10)); // Limit to 10 results
+    return allResults.slice(0, 10); // Limit to 10 results
   }, [query, data]);
 
   const handleResultClick = (url: string) => {
@@ -153,7 +149,6 @@ export default function GlobalSearch() {
           <button
             onClick={() => {
               setQuery("");
-              setResults([]);
             }}
             className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
           >

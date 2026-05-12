@@ -7,7 +7,7 @@ import { motion } from "framer-motion";
 
 export default function TestimonialsSection() {
   const { data } = useData();
-  const testimonials = data.testimonials || [];
+  const testimonials = (data.testimonials || []).filter((t: any) => t.is_published);
 
   if (testimonials.length === 0) return null;
 
@@ -56,7 +56,7 @@ export default function TestimonialsSection() {
 
               {/* Content */}
               <p className="text-on-surface-variant leading-relaxed mb-10 font-medium relative z-10 text-base italic">
-                "{t.content}"
+                &quot;{t.content}&quot;
               </p>
 
               {/* Author */}

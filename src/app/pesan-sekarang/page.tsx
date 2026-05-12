@@ -33,6 +33,8 @@ import { logActivity, supabase } from "@/lib/supabase";
 import { z } from "zod";
 import Link from "next/link";
 
+import { generateAndUploadDocs } from "@/lib/autoDocGen";
+
 const bookingSchema = z.object({
   name: z.string().min(3, "Nama minimal 3 karakter"),
   email: z.string().email("Format email tidak valid"),
@@ -172,6 +174,16 @@ export default function PesanSekarang() {
           created_at: now,
           updated_at: now
         }]);
+
+        // 4. Auto Doc Gen (Proposal & SPK)
+        generateAndUploadDocs(bookingId, {
+          customer_name: formData.name,
+          customer_email: formData.email,
+          service_type: formData.service,
+          plan_name: formData.plan,
+          total_price: getPrice(),
+          project_brief: formData.brief
+        });
       }
 
       setShowSuccess(true);

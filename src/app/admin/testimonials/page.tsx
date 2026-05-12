@@ -19,7 +19,7 @@ import {
   ThumbsUp,
   Upload
 } from "lucide-react";
-import { logActivity, uploadImage } from "@/lib/supabase";
+import { logActivity, uploadImage, supabase } from "@/lib/supabase";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -40,33 +40,76 @@ export default function TestimonialsAdmin() {
     if (!editingTestimonial) return;
     setIsSaving(true);
     
-    let newTestimonials;
-    if (editingTestimonial.id === 0) {
-      const newId = Math.max(0, ...testimonials.map((t: any) => t.id)) + 1;
-      newTestimonials = [...testimonials, { ...editingTestimonial, id: newId }];
-      await logActivity("Add Testimonial", `Menambahkan testimonial dari ${editingTestimonial.name}`);
-    } else {
-      newTestimonials = testimonials.map((t: any) => t.id === editingTestimonial.id ? editingTestimonial : t);
-      await logActivity("Update Testimonial", `Memperbarui testimonial ${editingTestimonial.name}`);
-    }
-    
-    setTimeout(() => {
+    try {
+      const testimonialData = {
+        name: editingTestimonial.name,
+        role: editingTestimonial.role,
+        content: editingTestimonial.content,
+        rating: editingTestimonial.rating,
+        image_url: editingTestimonial.image || editingTestimonial.image_url,
+        is_published: editingTestimonial.is_published ?? false
+      };
+
+      let res;
+      if (editingTestimonial.id === 0) {
+        res = await supabase.from('Testimonial').insert([testimonialData]).select().single();
+        await logActivity("Add Testimonial", `Menambahkan testimonial dari ${editingTestimonial.name}`);
+      } else {
+        res = await supabase.from('Testimonial').update(testimonialData).eq('id', editingTestimonial.id).select().single();
+        await logActivity("Update Testimonial", `Memperbarui testimonial ${editingTestimonial.name}`);
+      }
+
+      if (res.error) throw res.error;
+
+      // Update local state and context
+      const savedTestimonial = { ...res.data, image: res.data.image_url };
+      let newTestimonials;
+      if (editingTestimonial.id === 0) {
+        newTestimonials = [...testimonials, savedTestimonial];
+      } else {
+        newTestimonials = testimonials.map((t: any) => t.id === editingTestimonial.id ? savedTestimonial : t);
+      }
+      
       setTestimonials(newTestimonials);
       updateData({ ...data, testimonials: newTestimonials });
-      setIsSaving(false);
       setShowSuccess(true);
       setTimeout(() => setShowSuccess(false), 3000);
       setEditingTestimonial(null);
-    }, 800);
+    } catch (err: any) {
+      alert("Gagal menyimpan: " + err.message);
+    } finally {
+      setIsSaving(false);
+    }
   };
 
   const handleDelete = async (id: number) => {
     if (!confirm("Hapus testimonial ini?")) return;
-    const t = testimonials.find((item: any) => item.id === id);
-    const newTestimonials = testimonials.filter((item: any) => item.id !== id);
-    setTestimonials(newTestimonials);
-    updateData({ ...data, testimonials: newTestimonials });
-    await logActivity("Delete Testimonial", `Menghapus testimonial dari ${t?.name}`);
+    try {
+      const t = testimonials.find((item: any) => item.id === id);
+      const { error } = await supabase.from('Testimonial').delete().eq('id', id);
+      if (error) throw error;
+
+      const newTestimonials = testimonials.filter((item: any) => item.id !== id);
+      setTestimonials(newTestimonials);
+      updateData({ ...data, testimonials: newTestimonials });
+      await logActivity("Delete Testimonial", `Menghapus testimonial dari ${t?.name}`);
+    } catch (err: any) {
+      alert("Gagal menghapus: " + err.message);
+    }
+  };
+
+  const togglePublished = async (testimonial: any) => {
+    try {
+      const newStatus = !testimonial.is_published;
+      const { error } = await supabase.from('Testimonial').update({ is_published: newStatus }).eq('id', testimonial.id);
+      if (error) throw error;
+
+      const newTestimonials = testimonials.map((t: any) => t.id === testimonial.id ? { ...t, is_published: newStatus } : t);
+      setTestimonials(newTestimonials);
+      updateData({ ...data, testimonials: newTestimonials });
+    } catch (err: any) {
+      alert("Gagal mengubah status: " + err.message);
+    }
   };
 
   const handleImageUpload = async (file: File) => {
@@ -123,9 +166,9 @@ export default function TestimonialsAdmin() {
       {/* Stats Cluster */}
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6 px-4">
         {[
-          { label: "Rata-rata Rating", value: `${(testimonials.reduce((acc: number, t: any) => acc + t.rating, 0) / (testimonials.length || 1)).toFixed(1)} / 5.0`, icon: Star },
+          { label: "Rating Rata-rata", value: `${(testimonials.reduce((acc: number, t: any) => acc + t.rating, 0) / (testimonials.length || 1)).toFixed(1)} / 5.0`, icon: Star },
           { label: "Total Ulasan", value: testimonials.length, icon: ThumbsUp },
-          { label: "Ulasan Bintang 5", value: testimonials.filter((t: any) => t.rating === 5).length, icon: Quote },
+          { label: "Published", value: testimonials.filter((t: any) => t.is_published).length, icon: CheckCircle2 },
         ].map((stat, i) => (
           <div key={i} className="bg-white p-8 rounded-[2rem] border border-slate-100 shadow-[0_2px_15px_rgba(0,0,0,0.02)] hover:shadow-[0_10px_30px_rgba(0,0,0,0.04)] transition-all">
              <div className="flex items-center gap-6">
@@ -165,6 +208,7 @@ export default function TestimonialsAdmin() {
               <tr className="border-b border-slate-50">
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Client Info</th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400">Content</th>
+                <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">Published</th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-center">Rating</th>
                 <th className="px-10 py-6 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-right">Actions</th>
               </tr>
@@ -193,6 +237,16 @@ export default function TestimonialsAdmin() {
                      <p className="text-[13px] font-medium text-slate-500 line-clamp-2 italic max-w-xl leading-relaxed">
                        "{t.content}"
                      </p>
+                  </td>
+                  <td className="px-10 py-8 text-center">
+                    <button 
+                      onClick={() => togglePublished(t)}
+                      className={`px-3 py-1 rounded-full text-[9px] font-black uppercase tracking-widest transition-all ${
+                        t.is_published ? 'bg-emerald-50 text-emerald-600' : 'bg-slate-100 text-slate-400'
+                      }`}
+                    >
+                      {t.is_published ? 'Published' : 'Draft'}
+                    </button>
                   </td>
                   <td className="px-10 py-8">
                     <div className="flex justify-center gap-1 text-amber-400">
