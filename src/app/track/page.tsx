@@ -256,25 +256,30 @@ function TrackContent() {
     try {
       // Small delay to ensure all assets are ready
       await new Promise(resolve => setTimeout(resolve, 500));
-      
       const element = reportRef.current;
       if (!element) return;
 
-      // @ts-ignore - Browser only
-      const domtoimage = (await import("dom-to-image-more")).default;
-      const dataUrl = await domtoimage.toPng(element, {
-        bgcolor: '#ffffff',
-        width: element.scrollWidth,
-        height: element.scrollHeight,
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        onclone: (clonedDoc) => {
+          // Remove problematic styles in the clone
+          const style = clonedDoc.createElement('style');
+          style.innerHTML = `* { box-shadow: none !important; border-color: #e2e8f0 !important; }`;
+          clonedDoc.head.appendChild(style);
+        }
       });
 
+      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [element.scrollWidth, element.scrollHeight]
+        format: [canvas.width / 2, canvas.height / 2]
       });
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, element.scrollWidth, element.scrollHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
       pdf.save(`Laporan_Proyek_${projectData.client_projects[0].project_name.replace(/\s+/g, '_')}.pdf`);
     } catch (err: any) {
       alert("Gagal mengekspor laporan: " + err.message);
@@ -290,21 +295,29 @@ function TrackContent() {
       const element = docRef.current;
       if (!element) return;
       
-      // @ts-ignore - Browser only
-      const domtoimage = (await import("dom-to-image-more")).default;
-      const dataUrl = await domtoimage.toPng(element, {
-        bgcolor: '#ffffff',
-        width: element.scrollWidth,
-        height: element.scrollHeight,
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff",
+        windowWidth: 800, // Force a consistent width for capture
+        onclone: (clonedDoc) => {
+          const el = clonedDoc.querySelector('[ref="docRef"]') as HTMLElement;
+          if (el) {
+            el.style.transform = 'none';
+            el.style.boxShadow = 'none';
+          }
+        }
       });
 
+      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [element.scrollWidth, element.scrollHeight]
+        format: [canvas.width / 2, canvas.height / 2]
       });
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, element.scrollWidth, element.scrollHeight);
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
       pdf.save(`Dokumen_${viewingDoc}_${projectData?.customer_name || 'Mitralabs'}.pdf`);
     } catch (err: any) {
       console.error("Export error:", err);
