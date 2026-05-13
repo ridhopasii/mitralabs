@@ -8,6 +8,7 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
 import html2canvas from "html2canvas";
+import domtoimage from "dom-to-image-more";
 import jsPDF from "jspdf";
 import { uploadImage } from "@/lib/imageUpload";
 
@@ -260,21 +261,19 @@ function TrackContent() {
       const element = reportRef.current;
       if (!element) return;
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff"
+      const dataUrl = await domtoimage.toPng(element, {
+        bgcolor: '#ffffff',
+        width: element.scrollWidth,
+        height: element.scrollHeight,
       });
 
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [canvas.width / 2, canvas.height / 2]
+        format: [element.scrollWidth, element.scrollHeight]
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.addImage(dataUrl, "PNG", 0, 0, element.scrollWidth, element.scrollHeight);
       pdf.save(`Laporan_Proyek_${projectData.client_projects[0].project_name.replace(/\s+/g, '_')}.pdf`);
     } catch (err: any) {
       alert("Gagal mengekspor laporan: " + err.message);
@@ -288,23 +287,24 @@ function TrackContent() {
     setIsLoading(true);
     try {
       const element = docRef.current;
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff"
+      
+      // dom-to-image-more handles modern CSS colors (oklch/lab) better than html2canvas
+      const dataUrl = await domtoimage.toPng(element, {
+        bgcolor: '#ffffff',
+        width: element.scrollWidth,
+        height: element.scrollHeight,
       });
 
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "px",
-        format: [canvas.width / 2, canvas.height / 2]
+        format: [element.scrollWidth, element.scrollHeight]
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.addImage(dataUrl, "PNG", 0, 0, element.scrollWidth, element.scrollHeight);
       pdf.save(`Dokumen_${viewingDoc}_${projectData?.customer_name || 'Mitralabs'}.pdf`);
     } catch (err: any) {
+      console.error("Export error:", err);
       alert("Gagal mengunduh dokumen: " + err.message);
     } finally {
       setIsLoading(false);
