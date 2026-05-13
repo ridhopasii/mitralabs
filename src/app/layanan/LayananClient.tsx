@@ -10,10 +10,10 @@ import { motion } from "framer-motion";
 
 export default function LayananClient() {
   const { data } = useData();
-  const { services, settings } = data;
+  const { services, brand } = data;
   const { plans, notes } = services;
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin bertanya tentang paket ")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin bertanya tentang paket ")}`;
 
   return (
     <>

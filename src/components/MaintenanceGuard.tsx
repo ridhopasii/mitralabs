@@ -36,7 +36,7 @@ export default function MaintenanceGuard({ children }: { children: React.ReactNo
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             <a 
-              href={`https://wa.me/${data.settings.waNumber}`} 
+              href={`https://wa.me/${data.brand.whatsapp}`} 
               className="flex items-center justify-center gap-4 p-8 bg-surface-container-low rounded-3xl border border-surface-container-highest hover:bg-primary hover:text-on-primary transition-all group"
             >
               <Phone className="group-hover:animate-bounce" />

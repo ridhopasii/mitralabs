@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function FloatingWhatsApp() {
   const { data } = useData();
-  const { settings } = data;
+  const { brand } = data;
   const pathname = usePathname();
   const [isOpen, setIsOpen] = useState(false);
   const [showNotification, setShowNotification] = useState(false);
@@ -23,7 +23,7 @@ export default function FloatingWhatsApp() {
 
   if (pathname?.startsWith("/admin") || pathname?.startsWith("/login")) return null;
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin berdiskusi tentang projek saya.")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin berdiskusi tentang projek saya.")}`;
 
   return (
     <div className="fixed bottom-8 right-8 z-[9999] flex flex-col items-end gap-4 font-sans">

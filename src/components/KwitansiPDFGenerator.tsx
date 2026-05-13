@@ -221,34 +221,44 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
             </div>
 
             <!-- Signature Area -->
-            <div style="padding: 64px; background: white; border-top: 1px solid #F2F2F7;">
-              <div style="display: flex; justify-content: space-between; text-align: center;">
+            <div style="padding: 64px; background: white; border-top: 1px sol              <div style="display: flex; justify-content: space-between; text-align: center;">
                 <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 80px 0;">Pelanggan,</p>
+                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0;">Pelanggan,</p>
+                  <div style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                    ${invoiceData.client_signature ? `<img src="${invoiceData.client_signature}" style="max-height: 100%; max-width: 150px; mix-blend-multiply: multiply;" />` : ''}
+                  </div>
                   <div style="width: 80%; border-top: 1px solid #D2D2D7; padding-top: 12px;">
                     <p style="font-size: 11px; font-weight: 700; color: #1D1D1F; margin: 0; text-transform: uppercase;">${invoiceData.client_name}</p>
                     <p style="font-size: 9px; color: #94A3B8; font-weight: 500; font-style: italic; text-transform: uppercase; margin-top: 2px;">Signature / Digital Verified</p>
                   </div>
                 </div>
                 <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
-                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 80px 0;">Marketing,</p>
+                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0;">Marketing,</p>
+                  <div style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                    ${globalData.invoiceSettings.signatureFields?.marketingSignature ? `<img src="${globalData.invoiceSettings.signatureFields.marketingSignature}" style="max-height: 100%; max-width: 150px; mix-blend-multiply: multiply;" />` : ''}
+                  </div>
                   <div style="width: 80%; border-top: 1px solid #D2D2D7; padding-top: 12px;">
-                    <p style="font-size: 11px; font-weight: 700; color: #1D1D1F; margin: 0; text-transform: uppercase; font-style: italic;">${globalData.invoiceSettings.signatureFields?.marketing || "Marketing Officer"}</p>
-                    <p style="font-size: 9px; color: #94A3B8; font-weight: 500; text-transform: uppercase; margin-top: 2px;">Finance Department</p>
+                    <p style="font-size: 11px; font-weight: 700; color: #1D1D1F; margin: 0; text-transform: uppercase; font-style: italic;">${globalData.invoiceSettings.signatureFields?.marketingName || "Marketing Officer"}</p>
+                    <p style="font-size: 9px; color: #94A3B8; font-weight: 500; text-transform: uppercase; margin-top: 2px;">${globalData.invoiceSettings.signatureFields?.marketingTitle || "Finance Department"}</p>
                   </div>
                 </div>
                 <div style="flex: 1; display: flex; flex-direction: column; align-items: center; position: relative;">
-                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 80px 0;">Owner,</p>
+                  <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0;">Owner,</p>
                   ${total > 5000000 ? `
                   <div style="position: absolute; top: 30px; left: 50%; transform: translateX(-50%) rotate(-10deg); border: 2px dashed #D2D2D7; padding: 10px 15px; border-radius: 8px; background: rgba(245, 245, 247, 0.2); width: 80px; text-align: center;">
                     <p style="font-size: 7px; color: #94A3B8; font-weight: 700; text-transform: uppercase; margin-bottom: 2px;">E-Stamp Duty</p>
                     <p style="font-size: 10px; color: #94A3B8; font-weight: 900; line-height: 1;">MATERAI<br/>10.000</p>
                   </div>
                   ` : ''}
+                  <div style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
+                    ${globalData.invoiceSettings.signatureFields?.ownerSignature ? `<img src="${globalData.invoiceSettings.signatureFields.ownerSignature}" style="max-height: 100%; max-width: 150px; mix-blend-multiply: multiply;" />` : ''}
+                  </div>
                   <div style="width: 80%; border-top: 1px solid #D2D2D7; padding-top: 12px; position: relative; z-index: 2;">
-                    <p style="font-size: 11px; font-weight: 700; color: #1D1D1F; margin: 0; text-transform: uppercase;">${globalData.invoiceSettings.signatureFields?.owner || "Direktur Utama"}</p>
+                    <p style="font-size: 11px; font-weight: 700; color: #1D1D1F; margin: 0; text-transform: uppercase;">${globalData.invoiceSettings.signatureFields?.ownerName || "Direktur Utama"}</p>
+                    <p style="font-size: 9px; color: #94A3B8; font-weight: 500; text-transform: uppercase; margin-top: 2px;">${globalData.invoiceSettings.signatureFields?.ownerTitle || "Chief Executive"}</p>
                   </div>
                 </div>
+              </div>命中�中        </div>
               </div>
 
               <div style="margin-top: 64px; display: flex; flex-direction: column; align-items: center; gap: 16px;">

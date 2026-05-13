@@ -15,7 +15,7 @@ const options = [
 
 export default function CalculatorSection() {
   const { data } = useData();
-  const { settings } = data;
+  const { brand } = data;
   const [selections, setSelections] = useState<any>({
     pages: 1,
     cms: false,
@@ -54,7 +54,7 @@ export default function CalculatorSection() {
     setSelections((prev: any) => ({ ...prev, pages: parseInt(e.target.value) }));
   };
 
-  const WA_NUMBER = settings.waNumber;
+  const WA_NUMBER = brand.whatsapp;
   const WA_MESSAGE = `Halo Mitralabs! Saya sudah menghitung estimasi di website untuk:
 - ${selections.pages} Halaman
 - Admin Panel: ${selections.cms ? 'Ya' : 'Tidak'}

@@ -73,8 +73,15 @@ export const initialData: AppData = {
       { id: 2, label: "Client Satisfaction", value: "4.9/5", desc: "Customer Rating" },
     ],
     cta: {
+      title: "Siap Mewujudkan Visi Digital Anda?",
+      subtitle: "Mari berkolaborasi membangun infrastruktur digital yang tangguh dan berorientasi pada hasil.",
       buttonText: "Jadwalkan Konsultasi Gratis",
       promoText: "Sesi Strategi Digital Gratis (Terbatas untuk 5 Klien/Bulan)",
+    },
+    pricing: {
+      badge: "Paket Harga",
+      title: "Transparan, Terjangkau, Berkualitas",
+      subtitle: "Pilih paket yang sesuai dengan kebutuhan bisnis kamu. Tidak ada biaya tersembunyi.",
     },
     faqLabels: {
       title: "Pertanyaan yang Sering Ditanyakan",
@@ -238,6 +245,24 @@ export const initialData: AppData = {
       ctaSecondary: "Lihat Paket",
     },
   },
+  brand: {
+    name: "Mitralabs",
+    tagline: "Precision Web Engineering",
+    logo: "/logo.png",
+    favicon: "/favicon.ico",
+    phone: "6282381118520",
+    whatsapp: "6282381118520",
+    email: "contact@mitralabs.web.id",
+    website: "www.mitralabs.web.id",
+    address: "Jl. Contoh No. 123",
+    city: "Medan",
+    province: "Sumatera Utara",
+    postalCode: "20111",
+    npwp: "00.000.000.0-000.000",
+    linkedin: "linkedin.com/company/mitralabs-id",
+    instagram: "@mitralabs.id",
+    mapsUrl: "https://maps.google.com/?q=Medan",
+  },
   contact: {
     title: "Hubungi Kami",
     subtitle: "Siap mendiskusikan project Anda? Tim kami siap membantu 24/7.",
@@ -268,17 +293,8 @@ export const initialData: AppData = {
     ],
   },
   settings: {
-    waNumber: "6282381118520",
-    companyLogo: "/logo.png",
-    companyFavicon: "/favicon.ico",
     businessMode: "agresif",
     waPromoMessage: "🔥 Promo Bulan Ini! Hubungi kami sekarang untuk penawaran spesial.",
-    companyTagline: "Mitra Digital Anda",
-    companyWebsite: "mitralabs.web.id",
-    companyNpwp: "01.234.567.8-901.000",
-    linkedinUrl: "linkedin.com/company/mitralabs-id",
-    logo_url: "/logo.png",
-    favicon_url: "/favicon.ico",
     metaTitle: "Mitralabs - Precision Web Engineering & Tech Agency",
     metaDescription: "Membangun infrastruktur digital yang tangguh, cepat, dan berfokus pada konversi untuk UMKM dan Industri.",
     metaKeywords: "jasa website, agency digital medan, software house medan, mitralabs",
@@ -307,8 +323,12 @@ export const initialData: AppData = {
     termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
     signatureFields: {
-      marketing: "Marketing Officer",
-      owner: "Direktur Utama"
+      marketingName: "Ghazy Muhalla",
+      marketingTitle: "Marketing Officer",
+      marketingSignature: "",
+      ownerName: "Ridho Robbi Pasi",
+      ownerTitle: "Direktur Utama",
+      ownerSignature: ""
     },
     stampDutyRequired: false,
     stampDutyAmount: 10000
@@ -388,5 +408,10 @@ export const initialData: AppData = {
         },
       },
     },
+  },
+  legal: {
+    terms: "Mitralabs menyediakan jasa pembuatan website, pengembangan sistem informasi, dan konsultasi IT. Setiap proyek akan dikerjakan berdasarkan kesepakatan dalam SPK (Surat Perjanjian Kerja).\n\nPembayaran dilakukan dalam beberapa termin sesuai yang disepakati. Pekerjaan akan dimulai setelah Down Payment (DP) diterima. Invoice akan diterbitkan melalui sistem tracking kami.\n\nSetelah pelunasan pembayaran, hak atas kode sumber dan aset desain akan diserahkan sepenuhnya kepada klien, kecuali modul-modul pihak ketiga yang memiliki lisensi tersendiri.\n\nMitralabs tidak bertanggung jawab atas kerugian bisnis yang disebabkan oleh penggunaan website yang tidak semestinya oleh klien atau gangguan dari penyedia layanan hosting pihak ketiga.",
+    privacy: "Kami mengumpulkan informasi yang Anda berikan secara langsung kepada kami saat melakukan pemesanan layanan, termasuk nama, alamat email, nomor telepon, dan detail proyek Anda.\n\nInformasi yang kami kumpulkan digunakan untuk memproses pesanan Anda, memberikan pembaruan status proyek melalui dashboard track, dan berkomunikasi dengan Anda mengenai layanan kami.\n\nKami mengimplementasikan langkah-langkah keamanan teknis yang sesuai untuk melindungi data pribadi Anda dari akses yang tidak sah, perubahan, atau penghapusan.\n\nAnda berhak untuk mengakses, memperbaiki, atau meminta penghapusan data pribadi Anda yang kami simpan di sistem kami kapan saja melalui kontak admin kami.",
+    lastUpdated: "13 Mei 2026",
   },
 };

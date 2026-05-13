@@ -10,7 +10,7 @@ import { motion, AnimatePresence } from "framer-motion";
 
 export default function PortfolioClient() {
   const { data } = useData();
-  const { portfolio, settings } = data;
+  const { portfolio, brand } = data;
   const { projects, categories, cta } = portfolio;
   
   const [filter, setFilter] = useState("All Works");
@@ -28,7 +28,7 @@ export default function PortfolioClient() {
 
   const displayedProjects = filteredProjects.slice(0, visibleCount);
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik untuk memulai project baru.")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik untuk memulai project baru.")}`;
 
   return (
     <>

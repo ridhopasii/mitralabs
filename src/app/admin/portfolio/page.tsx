@@ -32,6 +32,7 @@ import { uploadImage } from "@/lib/supabase";
 import Image from "next/image";
 import { motion, AnimatePresence } from "framer-motion";
 import ImageUploader from "@/components/admin/ImageUploader";
+import Link from "next/link";
 
 export default function PortfolioCMS() {
   const { data, updateData } = useData();
@@ -43,9 +44,13 @@ export default function PortfolioCMS() {
   const [isUploading, setIsUploading] = useState(false);
   const [uploadingField, setUploadingField] = useState<string | null>(null);
   const [activeTab, setActiveTab] = useState("identity");
+  const [isLoading, setIsLoading] = useState(true);
 
   useEffect(() => {
     setProjects(data.portfolio.projects);
+    // Simulate loading for shimmer effect
+    const timer = setTimeout(() => setIsLoading(false), 500);
+    return () => clearTimeout(timer);
   }, [data.portfolio.projects]);
 
   const generateSlug = (title: string) => {
@@ -447,7 +452,7 @@ export default function PortfolioCMS() {
                            <ImageUploader
                              currentImage={editingProject.image}
                              onUploadSuccess={(url, filename) => {
-                               setEditingProject({ ...editingProject, image: url });
+                                setEditingProject({ ...editingProject, image: url });
                              }}
                              folder="portfolio"
                            />

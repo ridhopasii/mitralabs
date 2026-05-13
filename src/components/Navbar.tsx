@@ -9,7 +9,7 @@ import ThemeToggle from "./ThemeToggle";
 
 export default function Navbar() {
   const { data } = useData();
-  const { settings, navbar } = data;
+  const { brand, navbar } = data;
   const [isScrolled, setIsScrolled] = useState(false);
   const [mobileOpen, setMobileOpen] = useState(false);
   const pathname = usePathname();
@@ -22,7 +22,7 @@ export default function Navbar() {
 
   if (pathname?.startsWith("/admin") || pathname?.startsWith("/login") || pathname?.startsWith("/register")) return null;
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
 
   return (
     <>

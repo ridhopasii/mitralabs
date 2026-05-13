@@ -172,23 +172,58 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Use state but only update on save to avoid massive re-renders while typing
+  // Initialize from centralized brand or fallback to legacy
+  const [brandSettings, setBrandSettings] = useState(() => data.brand || {
+    name: data.invoiceSettings?.companyName || "Mitralabs",
+    tagline: data.invoiceSettings?.companyTagline || "Precision Web Engineering",
+    logo: data.settings?.logo_url || "/logo.png",
+    favicon: data.settings?.favicon_url || "/favicon.ico",
+    phone: data.contact?.phone || "6282381118520",
+    whatsapp: data.settings?.waNumber || "6282381118520",
+    email: data.contact?.email || "contact@mitralabs.id",
+    website: data.settings?.companyWebsite || "www.mitralabs.id",
+    address: data.contact?.address || "Jl. Contoh No. 123",
+    city: data.invoiceSettings?.companyCity || "Medan",
+    province: data.invoiceSettings?.companyProvince || "Sumatera Utara",
+    postalCode: data.invoiceSettings?.companyPostalCode || "20111",
+    npwp: data.settings?.companyNpwp || "00.000.000.0-000.000",
+    linkedin: data.settings?.linkedinUrl || "linkedin.com/company/mitralabs-id",
+    instagram: data.contact?.instagram || "@mitralabs.id",
+    mapsUrl: data.contact?.mapsUrl || "https://maps.google.com/?q=Medan",
+  });
+
   const [invoiceSettings, setInvoiceSettings] = useState(() => data.invoiceSettings || defaultInvoiceSettings);
   const [globalSettings, setGlobalSettings] = useState(() => data.settings || defaultGlobalSettings);
+  const [legalSettings, setLegalSettings] = useState(() => data.legal || {
+    terms: "",
+    privacy: "",
+    lastUpdated: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+  });
+
+  // CRITICAL: Sync local state when dynamic data arrives from DataContext
+  React.useEffect(() => {
+    if (data && data.brand) {
+      setBrandSettings(data.brand);
+      setInvoiceSettings(data.invoiceSettings || defaultInvoiceSettings);
+      setGlobalSettings(data.settings || defaultGlobalSettings);
+      setLegalSettings(data.legal || {
+        terms: "",
+        privacy: "",
+        lastUpdated: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+      });
+    }
+  }, [data]);
 
   const exportData = () => {
     setIsExporting(true);
     try {
       const dataStr = JSON.stringify(data, null, 2);
       const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
-
       const exportFileDefaultName = `mitralabs_backup_${new Date().toISOString().split('T')[0]}.json`;
-
       const linkElement = document.createElement('a');
       linkElement.setAttribute('href', dataUri);
       linkElement.setAttribute('download', exportFileDefaultName);
       linkElement.click();
-
       setSuccess("Backup berhasil diunduh!");
       setTimeout(() => setSuccess(null), 3000);
     } catch (e) {
@@ -201,7 +236,6 @@ export default function SettingsPage() {
   const importData = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0];
     if (!file) return;
-
     setIsImporting(true);
     const reader = new FileReader();
     reader.onload = (event) => {
@@ -222,12 +256,53 @@ export default function SettingsPage() {
     reader.readAsText(file);
   };
 
-  const saveInvoiceSettings = async () => {
+  const saveAllSettings = async () => {
     setIsSaving(true);
     try {
-      const newData = { ...data, invoiceSettings, settings: globalSettings };
+      // Synchronize brand settings to legacy fields for backward compatibility
+      const syncedInvoiceSettings = {
+        ...invoiceSettings,
+        companyName: brandSettings.name,
+        companyTagline: brandSettings.tagline,
+        companyAddress: brandSettings.address,
+        companyCity: brandSettings.city,
+        companyProvince: brandSettings.province,
+        companyPostalCode: brandSettings.postalCode,
+        companyPhone: brandSettings.phone,
+        companyEmail: brandSettings.email,
+        companyWebsite: brandSettings.website,
+        companyNPWP: brandSettings.npwp,
+        companyLinkedin: brandSettings.linkedin,
+        companyInstagram: brandSettings.instagram,
+      };
+
+      const syncedContact = {
+        ...data.contact,
+        phone: brandSettings.phone,
+        email: brandSettings.email,
+        instagram: brandSettings.instagram,
+        address: brandSettings.address,
+        mapsUrl: brandSettings.mapsUrl,
+      };
+
+      const newData = { 
+        ...data, 
+        brand: brandSettings,
+        invoiceSettings: syncedInvoiceSettings, 
+        settings: globalSettings,
+        contact: syncedContact,
+        navbar: {
+          ...data.navbar,
+          logo: brandSettings.name // Sync logo text if needed
+        },
+        legal: {
+          ...legalSettings,
+          lastUpdated: new Date().toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })
+        }
+      };
+
       updateData(newData);
-      await logActivity("Update Settings", "Invoice & Global settings berhasil diperbarui");
+      await logActivity("Update Settings", "Brand & System settings berhasil diperbarui secara terpusat");
       setSuccess("Pengaturan berhasil disimpan!");
       setTimeout(() => setSuccess(null), 3000);
     } catch (err) {
@@ -242,9 +317,21 @@ export default function SettingsPage() {
     <div className="space-y-12 pb-20">
       <div className="max-w-4xl space-y-12">
         {/* Header */}
-        <div>
-          <h1 className="text-4xl font-black tracking-tight uppercase mb-2">Pengaturan Sistem</h1>
-          <p className="text-on-surface-variant font-medium opacity-60">Kelola invoice, backup, restore, dan integritas data website Anda.</p>
+        <div className="flex flex-col md:flex-row md:items-end justify-between gap-6">
+          <div>
+            <h1 className="text-4xl font-black tracking-tight uppercase mb-2">Pusat Konfigurasi</h1>
+            <p className="text-on-surface-variant font-medium opacity-60">Single Source of Truth untuk identitas brand dan operasional sistem.</p>
+          </div>
+          <div className="flex gap-4">
+            <button
+              onClick={saveAllSettings}
+              disabled={isSaving}
+              className="px-8 py-4 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-[10px] flex items-center gap-3 hover:scale-105 transition-all shadow-xl shadow-primary/20 disabled:opacity-50"
+            >
+              {isSaving ? <RefreshCcw size={16} className="animate-spin" /> : <Save size={16} />}
+              Simpan Perubahan
+            </button>
+          </div>
         </div>
 
         {success && (
@@ -254,340 +341,359 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {error && (
-          <div className="p-6 bg-error text-white rounded-3xl flex items-center gap-4 animate-in slide-in-from-top-4">
-            <AlertCircle size={24} />
-            <p className="font-black">{error}</p>
+        {/* 1. Brand Identity Section (NEW & CENTRALIZED) */}
+        <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-blue-500/10 text-blue-500 rounded-2xl flex items-center justify-center">
+              <Building2 size={32} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Identitas Brand</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Informasi Dasar & Branding Utama</p>
+            </div>
           </div>
-        )}
 
-        {/* Invoice Settings Section */}
+          <div className="space-y-10">
+            <div className="grid md:grid-cols-2 gap-8">
+              <ImageUploadField
+                label="Logo Utama"
+                value={brandSettings.logo}
+                onChange={(url: string) => setBrandSettings({ ...brandSettings, logo: url })}
+                description="Muncul di Navbar dan Dokumen Resmi"
+              />
+              <ImageUploadField
+                label="Favicon"
+                value={brandSettings.favicon}
+                onChange={(url: string) => setBrandSettings({ ...brandSettings, favicon: url })}
+                description="Ikon kecil di tab browser (16x16 / 32x32)"
+              />
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6">
+              <FormInput
+                label="Nama Perusahaan / Brand"
+                value={brandSettings.name}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, name: val })}
+              />
+              <FormInput
+                label="Tagline Profesional"
+                value={brandSettings.tagline}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, tagline: val })}
+              />
+            </div>
+
+            <div className="grid md:grid-cols-3 gap-6">
+              <FormInput
+                label="WhatsApp"
+                value={brandSettings.whatsapp}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, whatsapp: val })}
+                placeholder="628..."
+              />
+              <FormInput
+                label="Email Bisnis"
+                value={brandSettings.email}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, email: val })}
+              />
+              <FormInput
+                label="Website URL"
+                value={brandSettings.website}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, website: val })}
+              />
+            </div>
+
+            <div className="space-y-6 pt-6 border-t border-slate-50">
+               <div className="grid md:grid-cols-2 gap-6">
+                <FormInput
+                  label="Alamat Kantor"
+                  value={brandSettings.address}
+                  onChange={(val: string) => setBrandSettings({ ...brandSettings, address: val })}
+                />
+                <FormInput
+                  label="Kota"
+                  value={brandSettings.city}
+                  onChange={(val: string) => setBrandSettings({ ...brandSettings, city: val })}
+                />
+              </div>
+              <div className="grid md:grid-cols-3 gap-6">
+                <FormInput
+                  label="Provinsi"
+                  value={brandSettings.province}
+                  onChange={(val: string) => setBrandSettings({ ...brandSettings, province: val })}
+                />
+                <FormInput
+                  label="Kode Pos"
+                  value={brandSettings.postalCode}
+                  onChange={(val: string) => setBrandSettings({ ...brandSettings, postalCode: val })}
+                />
+                <FormInput
+                  label="NPWP"
+                  value={brandSettings.npwp}
+                  onChange={(val: string) => setBrandSettings({ ...brandSettings, npwp: val })}
+                />
+              </div>
+            </div>
+
+            <div className="grid md:grid-cols-2 gap-6 pt-6 border-t border-slate-50">
+              <FormInput
+                label="LinkedIn URL"
+                value={brandSettings.linkedin}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, linkedin: val })}
+              />
+              <FormInput
+                label="Instagram Handle"
+                value={brandSettings.instagram}
+                onChange={(val: string) => setBrandSettings({ ...brandSettings, instagram: val })}
+              />
+            </div>
+          </div>
+        </section>
+
+        {/* 2. Operational & Finance Section */}
         <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
               <Receipt size={32} />
             </div>
             <div>
-              <h3 className="text-2xl font-black uppercase tracking-tight">Pengaturan Invoice</h3>
-              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Konfigurasi Default Invoice</p>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Finansial & Dokumen</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Rekening Bank & Aturan Invoice</p>
             </div>
           </div>
 
-          <div className="space-y-8">
-            {/* Company Info */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 text-slate-400">
-                <Building2 size={18} />
-                <h4 className="text-sm font-bold uppercase tracking-widest">Informasi Perusahaan</h4>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Nama Perusahaan"
-                  value={invoiceSettings.companyName}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyName: val})}
-                />
-                <FormInput
-                  label="Tagline"
-                  value={invoiceSettings.companyTagline}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyTagline: val})}
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Alamat Lengkap"
-                  value={invoiceSettings.companyAddress}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyAddress: val})}
-                  placeholder="Jl. Jend. Sudirman Kav. 52"
-                />
-                <FormInput
-                  label="Kota"
-                  value={invoiceSettings.companyCity}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyCity: val})}
-                  placeholder="Bandung"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Provinsi"
-                  value={invoiceSettings.companyProvince}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyProvince: val})}
-                  placeholder="Jawa Barat"
-                />
-                <FormInput
-                  label="Kode Pos"
-                  value={invoiceSettings.companyPostalCode}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyPostalCode: val})}
-                  placeholder="12190"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Telepon"
-                  value={invoiceSettings.companyPhone}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyPhone: val})}
-                />
-                <FormInput
-                  label="Email"
-                  type="email"
-                  value={invoiceSettings.companyEmail}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyEmail: val})}
-                />
-              </div>
-
-              <div className="grid md:grid-cols-3 gap-6">
-                <FormInput
-                  label="Website"
-                  value={invoiceSettings.companyWebsite}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyWebsite: val})}
-                  placeholder="www.mitralabs.id"
-                />
-                <FormInput
-                  label="NPWP Perusahaan"
-                  value={invoiceSettings.companyNPWP}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyNPWP: val})}
-                  placeholder="01.234.567.8-901.000"
-                />
-                <FormInput
-                  label="LinkedIn"
-                  value={invoiceSettings.companyLinkedin || ""}
-                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyLinkedin: val})}
-                  placeholder="linkedin.com/company/mitralabs-id"
-                />
-              </div>
-
-              <FormInput
-                label="Instagram"
-                value={invoiceSettings.companyInstagram || ""}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, companyInstagram: val})}
-                placeholder="@mitralabs.id"
-              />
-            </div>
-
+          <div className="space-y-10">
             {/* Bank Info */}
-            <div className="space-y-6 pt-8 border-t border-slate-100">
+            <div className="space-y-6">
               <div className="flex items-center gap-3 text-slate-400">
                 <CreditCard size={18} />
                 <h4 className="text-sm font-bold uppercase tracking-widest">Informasi Bank</h4>
               </div>
 
-              <FormInput
-                label="Nama Bank"
-                value={invoiceSettings.bankName}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankName: val})}
-                placeholder="Bank Central Asia (BCA)"
-              />
-
-              <div className="grid md:grid-cols-2 gap-6">
+              <div className="grid md:grid-cols-3 gap-6">
+                <FormInput
+                  label="Nama Bank"
+                  value={invoiceSettings.bankName}
+                  onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankName: val})}
+                />
                 <FormInput
                   label="Nomor Rekening"
                   value={invoiceSettings.bankAccountNumber}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountNumber: val})}
                 />
                 <FormInput
-                  label="Nama Pemilik Rekening"
+                  label="Atas Nama"
                   value={invoiceSettings.bankAccountName}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankAccountName: val})}
                 />
               </div>
-
-              <FormInput
-                label="Cabang Bank (Opsional)"
-                value={invoiceSettings.bankBranch}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, bankBranch: val})}
-                placeholder="KCP Medan Petisah"
-              />
             </div>
 
-            {/* Additional Settings */}
-            <div className="space-y-6 pt-8 border-t border-slate-100">
-              <div className="grid md:grid-cols-2 gap-6">
+            {/* Tax & Terms */}
+            <div className="space-y-6 pt-10 border-t border-slate-100">
+               <div className="grid md:grid-cols-2 gap-6">
                 <FormInput
                   label="Pajak (%)"
                   type="number"
                   value={invoiceSettings.taxRate}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxRate: parseFloat(val) || 0})}
-                  placeholder="0"
-                  description="Set ke 0 untuk menghilangkan pajak di kwitansi"
                 />
                 <FormInput
                   label="Label Pajak"
                   value={invoiceSettings.taxLabel}
                   onChange={(val: string) => setInvoiceSettings({...invoiceSettings, taxLabel: val})}
-                  placeholder="PPN (11%)"
                 />
               </div>
 
-              <FormInput
-                label="Catatan Footer (Branding)"
-                value={invoiceSettings.footerNote}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, footerNote: val})}
-                placeholder="Verified by Mitralabs Cryptographic Protocol"
-              />
-
               <FormTextarea
-                label="Instruksi Pembayaran"
-                value={invoiceSettings.paymentInstructions}
-                onChange={(val: string) => setInvoiceSettings({...invoiceSettings, paymentInstructions: val})}
-                rows={3}
-                placeholder="Silakan transfer ke rekening yang tertera..."
-              />
-
-              <FormTextarea
-                label="Syarat & Ketentuan"
+                label="Syarat & Ketentuan Dokumen"
                 value={invoiceSettings.termsAndConditions}
                 onChange={(val: string) => setInvoiceSettings({...invoiceSettings, termsAndConditions: val})}
                 rows={5}
-                placeholder="Gunakan baris baru untuk setiap poin..."
               />
             </div>
-
-            {/* Signature & Stamp Settings */}
-            <div className="space-y-6 pt-8 border-t border-slate-100">
-              <div className="flex items-center gap-3 text-slate-400">
-                <ShieldCheck size={18} />
-                <h4 className="text-sm font-bold uppercase tracking-widest">Tanda Tangan & Materai</h4>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Nama Marketing Officer (Tanda Tangan 1)"
-                  value={invoiceSettings.signatureFields?.marketing || ""}
-                  onChange={(val: string) => setInvoiceSettings({
-                    ...invoiceSettings,
-                    signatureFields: { ...invoiceSettings.signatureFields, marketing: val }
-                  })}
-                  placeholder="Nama Marketing"
-                />
-                <FormInput
-                  label="Nama Owner/Direktur (Tanda Tangan 2)"
-                  value={invoiceSettings.signatureFields?.owner || ""}
-                  onChange={(val: string) => setInvoiceSettings({
-                    ...invoiceSettings,
-                    signatureFields: { ...invoiceSettings.signatureFields, owner: val }
-                  })}
-                  placeholder="Nama Direktur Utama"
-                />
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <div className="space-y-3">
-                  <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Materai Otomatis</label>
-                  <select
-                    value={invoiceSettings.stampDutyRequired ? "true" : "false"}
-                    onChange={(e) => setInvoiceSettings({
-                      ...invoiceSettings,
-                      stampDutyRequired: e.target.value === "true"
-                    })}
-                    className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
-                  >
-                    <option value="true">Ya, tampilkan materai jika total &gt; limit</option>
-                    <option value="false">Jangan tampilkan materai</option>
-                  </select>
-                </div>
-                <FormInput
-                  label="Nominal Materai (Rp)"
-                  type="text"
-                  value={invoiceSettings.stampDutyAmount?.toString() || "10000"}
-                  onChange={(val: string) => setInvoiceSettings({
-                    ...invoiceSettings,
-                    stampDutyAmount: parseInt(val.replace(/\D/g, "")) || 0
-                  })}
-                  placeholder="10000"
-                />
-              </div>
-            </div>
-
-            {/* Save Button */}
-            <button
-              onClick={saveInvoiceSettings}
-              disabled={isSaving}
-              className="w-full py-6 bg-primary text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl disabled:opacity-50"
-            >
-              {isSaving ? <RefreshCcw size={18} className="animate-spin" /> : <Save size={18} />}
-              Simpan Semua Pengaturan (Global + Invoice)
-            </button>
           </div>
         </section>
 
-        {/* Backup & Restore Section */}
+        {/* 3. Authority & Signatures Section */}
+        <section className="bg-slate-900 text-white rounded-[4rem] p-12 md:p-16 shadow-2xl space-y-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-white/10 text-white rounded-2xl flex items-center justify-center">
+              <ShieldCheck size={32} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Otoritas Digital</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Penandatangan Resmi Dokumen</p>
+            </div>
+          </div>
+
+          <div className="grid md:grid-cols-2 gap-12">
+            {/* Authority 1 */}
+            <div className="space-y-8 p-8 bg-white/5 rounded-[2.5rem] border border-white/10">
+              <div className="flex justify-between items-center">
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Otoritas 01 (Marketing)</p>
+                <Briefcase size={16} className="opacity-40" />
+              </div>
+              
+              <div className="space-y-6">
+                <FormInput
+                  label="Nama Pejabat"
+                  value={invoiceSettings.signatureFields?.marketingName || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, marketingName: val }
+                  })}
+                  className="!text-white"
+                />
+                <FormInput
+                  label="Jabatan"
+                  value={invoiceSettings.signatureFields?.marketingTitle || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, marketingTitle: val }
+                  })}
+                />
+                <ImageUploadField
+                  label="Tanda Tangan"
+                  value={invoiceSettings.signatureFields?.marketingSignature || ""}
+                  onChange={(url: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, marketingSignature: url }
+                  })}
+                />
+              </div>
+            </div>
+
+            {/* Authority 2 */}
+            <div className="space-y-8 p-8 bg-white/5 rounded-[2.5rem] border border-white/10">
+              <div className="flex justify-between items-center">
+                <p className="text-[10px] font-black text-blue-400 uppercase tracking-[0.2em]">Otoritas 02 (Owner)</p>
+                <ShieldCheck size={16} className="opacity-40" />
+              </div>
+
+              <div className="space-y-6">
+                <FormInput
+                  label="Nama Pejabat"
+                  value={invoiceSettings.signatureFields?.ownerName || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, ownerName: val }
+                  })}
+                />
+                <FormInput
+                  label="Jabatan"
+                  value={invoiceSettings.signatureFields?.ownerTitle || ""}
+                  onChange={(val: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, ownerTitle: val }
+                  })}
+                />
+                <ImageUploadField
+                  label="Tanda Tangan"
+                  value={invoiceSettings.signatureFields?.ownerSignature || ""}
+                  onChange={(url: string) => setInvoiceSettings({
+                    ...invoiceSettings,
+                    signatureFields: { ...invoiceSettings.signatureFields, ownerSignature: url }
+                  })}
+                />
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* 4. Legal & Policy Section (NEW) */}
         <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
           <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
+            <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center">
+              <ShieldCheck size={32} />
+            </div>
+            <div>
+              <h3 className="text-2xl font-black uppercase tracking-tight">Legal & Kebijakan</h3>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Syarat Layanan & Privasi Klien</p>
+            </div>
+          </div>
+
+          <div className="space-y-10">
+            <div className="space-y-6">
+              <FormTextarea
+                label="Syarat & Ketentuan (Terms of Service)"
+                value={legalSettings.terms}
+                onChange={(val: string) => setLegalSettings({ ...legalSettings, terms: val })}
+                rows={10}
+                placeholder="Tuliskan syarat dan ketentuan layanan di sini..."
+              />
+            </div>
+
+            <div className="space-y-6 pt-10 border-t border-slate-100">
+              <FormTextarea
+                label="Kebijakan Privasi (Privacy Policy)"
+                value={legalSettings.privacy}
+                onChange={(val: string) => setLegalSettings({ ...legalSettings, privacy: val })}
+                rows={10}
+                placeholder="Tuliskan kebijakan privasi data di sini..."
+              />
+            </div>
+            
+            <div className="p-6 bg-slate-50 rounded-2xl border border-slate-100">
+              <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest">Terakhir Diperbarui Otomatis</p>
+              <p className="text-sm font-bold text-slate-900 mt-1">{legalSettings.lastUpdated}</p>
+            </div>
+          </div>
+        </section>
+
+        {/* 5. Backup & Restore Section */}
+        <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
+          <div className="flex items-center gap-6">
+            <div className="w-16 h-16 bg-slate-100 text-slate-400 rounded-2xl flex items-center justify-center">
               <Database size={32} />
             </div>
             <div>
               <h3 className="text-2xl font-black uppercase tracking-tight">Manajemen Data</h3>
-              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Backup & Restore JSON Data</p>
+              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">Backup & Restore Seluruh Sistem</p>
             </div>
           </div>
 
           <div className="grid md:grid-cols-2 gap-8">
-            {/* Export */}
-            <div className="p-8 bg-surface-container-low rounded-[2.5rem] border border-surface-container space-y-6 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-primary mb-6 shadow-sm">
-                  <Download size={24} />
-                </div>
-                <h4 className="text-xl font-black mb-2">Ekspor Data (Backup)</h4>
-                <p className="text-on-surface-variant text-sm font-medium leading-relaxed">
-                  Unduh seluruh konfigurasi dan konten website dalam format file JSON.
-                </p>
+            <button
+              onClick={exportData}
+              disabled={isExporting}
+              className="flex flex-col items-start p-10 bg-slate-50 rounded-[2.5rem] border border-slate-100 hover:bg-white hover:shadow-xl transition-all group"
+            >
+              <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-primary mb-6 shadow-sm group-hover:scale-110 transition-transform">
+                <Download size={24} />
               </div>
-              <button
-                onClick={exportData}
-                disabled={isExporting}
-                className="w-full py-5 bg-on-surface text-surface rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl"
-              >
-                {isExporting ? <RefreshCcw size={18} className="animate-spin" /> : <FileJson size={18} />}
-                Download Backup
-              </button>
-            </div>
+              <h4 className="text-xl font-black mb-2 uppercase tracking-tight">Ekspor Backup</h4>
+              <p className="text-slate-400 text-xs font-bold uppercase tracking-widest leading-relaxed text-left">
+                Download JSON data untuk keamanan arsip.
+              </p>
+            </button>
 
-            {/* Import */}
-            <div className="p-8 bg-surface-container-low rounded-[2.5rem] border border-surface-container space-y-6 flex flex-col justify-between">
-              <div>
-                <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-error mb-6 shadow-sm">
+            <div className="relative">
+              <input
+                type="file"
+                accept=".json"
+                onChange={importData}
+                className="absolute inset-0 opacity-0 cursor-pointer z-10"
+              />
+              <div className="flex flex-col items-start p-10 bg-red-50/50 rounded-[2.5rem] border border-red-100 hover:bg-white hover:shadow-xl transition-all group">
+                <div className="w-12 h-12 bg-white rounded-2xl flex items-center justify-center text-red-500 mb-6 shadow-sm group-hover:scale-110 transition-transform">
                   <Upload size={24} />
                 </div>
-                <h4 className="text-xl font-black mb-2">Impor Data (Restore)</h4>
-                <p className="text-on-surface-variant text-sm font-medium leading-relaxed text-error/80 font-bold">
-                  PERINGATAN: Mengunggah file akan menimpa seluruh konten website saat ini.
+                <h4 className="text-xl font-black mb-2 uppercase tracking-tight text-red-600">Impor Restore</h4>
+                <p className="text-red-400 text-xs font-bold uppercase tracking-widest leading-relaxed text-left">
+                  Upload file backup untuk menimpa data saat ini.
                 </p>
-              </div>
-              <div className="relative">
-                <input
-                  type="file"
-                  accept=".json"
-                  onChange={importData}
-                  className="absolute inset-0 opacity-0 cursor-pointer z-10"
-                />
-                <button
-                  className="w-full py-5 bg-error text-white rounded-2xl font-black uppercase tracking-widest text-xs flex items-center justify-center gap-4 hover:scale-[1.02] transition-all shadow-xl shadow-error/20"
-                >
-                  <Upload size={18} />
-                  Restore dari File
-                </button>
               </div>
             </div>
           </div>
         </section>
 
-        {/* Security Info */}
-        <section className="bg-inverse-surface text-inverse-on-surface rounded-[3.5rem] p-12 shadow-premium flex flex-col md:flex-row items-center gap-10">
-          <div className="w-24 h-24 bg-primary rounded-[2rem] flex items-center justify-center shrink-0 shadow-2xl shadow-primary/40 rotate-3">
-             <ShieldCheck size={48} className="text-white" />
-          </div>
-          <div>
-            <h3 className="text-2xl font-black uppercase tracking-tight mb-2">Keamanan Sistem</h3>
-            <p className="opacity-60 font-medium leading-relaxed">
-              Seluruh data Anda dienkripsi dan disimpan di infrastruktur Supabase yang aman. Pastikan Anda melakukan backup secara berkala sebelum melakukan perubahan besar pada struktur konten.
-            </p>
-          </div>
-        </section>
+        <button
+          onClick={saveAllSettings}
+          disabled={isSaving}
+          className="w-full py-8 bg-primary text-white rounded-[2rem] font-black uppercase tracking-[0.3em] text-xs flex items-center justify-center gap-6 hover:scale-[1.02] active:scale-[0.98] transition-all shadow-2xl shadow-primary/40 disabled:opacity-50"
+        >
+          {isSaving ? <RefreshCcw size={24} className="animate-spin" /> : <CheckCircle2 size={24} />}
+          Konfirmasi & Simpan Seluruh Perubahan
+        </button>
       </div>
     </div>
   );

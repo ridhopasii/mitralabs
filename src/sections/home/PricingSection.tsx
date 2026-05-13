@@ -6,7 +6,7 @@ import { useData } from "@/context/DataContext";
 
 export default function PricingSection() {
   const { data } = useData();
-  const { settings } = data;
+  const { brand } = data;
   const { plans } = data.services;
 
   const iconMap: Record<string, any> = {
@@ -31,15 +31,13 @@ export default function PricingSection() {
         {/* Header */}
         <div className="max-w-3xl mx-auto text-center mb-16">
           <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold mb-6">
-            Paket Harga
+            {data.home.pricing?.badge || "Paket Harga"}
           </div>
           <h2 className="font-manrope text-4xl md:text-5xl font-extrabold text-[#131b2e] leading-tight mb-6">
-            Transparan,{" "}
-            <span className="text-gradient">Terjangkau,</span>{" "}
-            Berkualitas
+            {data.home.pricing?.title || "Transparan, Terjangkau, Berkualitas"}
           </h2>
           <p className="text-lg text-[#434656]">
-            Pilih paket yang sesuai dengan kebutuhan bisnis kamu. Tidak ada biaya tersembunyi.
+            {data.home.pricing?.subtitle || "Pilih paket yang sesuai dengan kebutuhan bisnis kamu. Tidak ada biaya tersembunyi."}
           </p>
         </div>
 
@@ -146,7 +144,7 @@ export default function PricingSection() {
         <div className="mt-10 text-center text-sm text-[#434656]">
           Tidak yakin pilih paket mana?{" "}
           <a
-            href={`https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo, saya ingin konsultasi paket website yang cocok untuk bisnis saya.")}`}
+            href={`https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo, saya ingin konsultasi paket website yang cocok untuk bisnis saya.")}`}
             className="text-[#1A5CFF] font-semibold hover:underline"
             target="_blank"
             rel="noopener noreferrer"

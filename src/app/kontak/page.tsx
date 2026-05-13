@@ -17,7 +17,7 @@ const contactSchema = z.object({
 
 export default function ContactPage() {
   const { data } = useData();
-  const { contact, settings } = data;
+  const { contact, brand } = data;
 
   const [formData, setFormData] = useState({ name: "", email: "", message: "" });
   const [errors, setErrors] = useState<Record<string, string>>({});
@@ -26,7 +26,7 @@ export default function ContactPage() {
   const [lastSubmitTime, setLastSubmitTime] = useState(0);
   const [hcaptchaToken, setHcaptchaToken] = useState<string | null>(null);
 
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin diskusi tentang project saya.")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin diskusi tentang project saya.")}`;
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -126,7 +126,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Kirim Email</p>
-                      <p className="text-2xl font-semibold text-on-background tracking-tight">{contact.email}</p>
+                      <p className="text-2xl font-semibold text-on-background tracking-tight">{brand.email}</p>
                     </div>
                   </div>
 
@@ -136,7 +136,7 @@ export default function ContactPage() {
                     </div>
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Instagram</p>
-                      <p className="text-2xl font-semibold text-on-background tracking-tight">{contact.instagram}</p>
+                      <p className="text-2xl font-semibold text-on-background tracking-tight">{brand.instagram}</p>
                     </div>
                   </div>
 
@@ -164,7 +164,7 @@ export default function ContactPage() {
               >
                 <div className="p-10 md:p-14">
                   <h3 className="text-3xl font-semibold mb-3 tracking-tight text-on-background">Studio Kami</h3>
-                  <p className="text-secondary font-medium leading-relaxed">{contact.address}</p>
+                  <p className="text-secondary font-medium leading-relaxed">{brand.address}</p>
                 </div>
                 <div className="h-[300px] relative overflow-hidden bg-background">
                   <img

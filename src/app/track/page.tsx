@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send, LogOut } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send, LogOut, Building2, ClipboardList } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -9,6 +9,17 @@ import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
 import html2canvas from "html2canvas";
 import jsPDF from "jspdf";
+import { uploadImage } from "@/lib/imageUpload";
+
+// Document Templates
+import CompanyProfileDoc from "@/components/documents/CompanyProfileDoc";
+import RateCardDoc from "@/components/documents/RateCardDoc";
+import SOPDoc from "@/components/documents/SOPDoc";
+import ProposalDoc from "@/components/documents/ProposalDoc";
+import MoUDoc from "@/components/documents/MoUDoc";
+import SPKDoc from "@/components/documents/SPKDoc";
+import FormBriefDoc from "@/components/documents/FormBriefDoc";
+import { X } from "lucide-react";
 
 function TrackContent() {
   const searchParams = useSearchParams();
@@ -32,6 +43,8 @@ function TrackContent() {
   const [isSubmittingDoc, setIsSubmittingDoc] = useState(false);
   const [selectedChatFile, setSelectedChatFile] = useState<File | null>(null);
   const [isUploadingChatFile, setIsUploadingChatFile] = useState(false);
+  const [isUploadingSignature, setIsUploadingSignature] = useState(false);
+  const [viewingDoc, setViewingDoc] = useState<string | null>(null);
   
   const chatEndRef = React.useRef<HTMLDivElement>(null);
   const chatFileInputRef = React.useRef<HTMLInputElement>(null);
@@ -296,6 +309,33 @@ function TrackContent() {
       alert(err.message);
     } finally {
       setIsApproving(prev => ({ ...prev, [updateId]: false }));
+    }
+  }
+
+  async function handleUserSignatureUpload(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    if (!file || !projectData) return;
+
+    setIsUploadingSignature(true);
+    try {
+      const result = await uploadImage(file, "signatures", `client_${projectData.id}`);
+      if (result.success && result.url) {
+        const { error: updateError } = await supabase
+          .from('Booking')
+          .update({ user_signature: result.url })
+          .eq('id', projectData.id);
+
+        if (updateError) throw updateError;
+
+        setProjectData((prev: any) => ({ ...prev, user_signature: result.url }));
+        alert("Tanda tangan berhasil disimpan!");
+      } else {
+        throw new Error(result.error || "Upload gagal");
+      }
+    } catch (err: any) {
+      alert("Gagal upload tanda tangan: " + err.message);
+    } finally {
+      setIsUploadingSignature(false);
     }
   }
 
@@ -623,99 +663,95 @@ function TrackContent() {
                 </div>
               )}
 
-              {/* Tab: Dokumen */}
-              {activeTab === "dokumen" && (
-                <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-sm p-10 space-y-8">
-                  <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-4">
-                    <div>
-                      <h3 className="text-xl font-bold">Dokumen Projek</h3>
-                      <p className="text-sm text-slate-500 mt-1">File, kontrak, dan dokumen yang dikirimkan tim Mitralabs untuk projek Anda.</p>
+                   {/* Digital Signature Section */}
+                  <div className="p-8 bg-slate-900 text-white rounded-[2.5rem] flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
+                    <div className="space-y-2">
+                       <p className="text-[10px] font-black text-primary uppercase tracking-[0.2em]">Otoritas Klien</p>
+                       <h4 className="text-xl font-bold italic">Tanda Tangan Digital</h4>
+                       <p className="text-[10px] opacity-40 uppercase font-bold tracking-widest max-w-[300px]">Gunakan untuk menandatangani MoU, SPK, dan Proposal secara otomatis.</p>
                     </div>
-                    <button 
-                      onClick={() => setIsRequestingDoc(true)}
-                      className="px-6 py-3 bg-slate-900 text-white rounded-2xl font-bold text-[10px] uppercase tracking-widest flex items-center gap-2 hover:bg-slate-800 transition-all shadow-lg shrink-0"
-                    >
-                      <Plus size={14} /> Request Dokumen Baru
-                    </button>
+                    
+                    <div className="flex items-center gap-6">
+                       {projectData.user_signature ? (
+                         <div className="w-32 h-20 bg-white rounded-2xl flex items-center justify-center p-3 relative group">
+                            <img src={projectData.user_signature} alt="Tanda Tangan" className="max-h-full object-contain mix-blend-multiply" />
+                            <label className="absolute inset-0 bg-slate-900/80 opacity-0 group-hover:opacity-100 transition-opacity rounded-2xl flex items-center justify-center cursor-pointer">
+                               <Plus size={20} className="text-white" />
+                               <input type="file" className="hidden" onChange={handleUserSignatureUpload} />
+                            </label>
+                         </div>
+                       ) : (
+                         <label className="px-8 py-4 bg-white text-slate-900 rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all cursor-pointer flex items-center gap-3">
+                            {isUploadingSignature ? <Loader2 size={16} className="animate-spin" /> : <Upload size={16} />}
+                            Unggah Tanda Tangan (PNG)
+                            <input type="file" className="hidden" onChange={handleUserSignatureUpload} />
+                         </label>
+                       )}
+                    </div>
                   </div>
 
-                  {/* Document Requests History */}
-                  {proj?.documentRequests?.length > 0 && (
-                    <div className="space-y-4 pt-4">
-                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Riwayat Request Dokumen</p>
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        {proj.documentRequests.map((req: any) => (
-                          <div key={req.id} className="p-5 bg-slate-50 rounded-2xl border border-slate-100 flex justify-between items-center">
-                             <div>
-                                <p className="text-xs font-bold text-slate-900">{req.title}</p>
-                                <p className="text-[9px] text-slate-400 mt-1">{new Date(req.created_at).toLocaleDateString('id-ID')}</p>
+                  {/* Generated Documents List */}
+                  <div className="space-y-4 pt-4">
+                     <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Automated Generated Documents</p>
+                     <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                        {[
+                          { id: 'mou', name: 'Memorandum of Understanding (MoU)', desc: 'Kesepakatan Awal', icon: <FileText className="text-blue-500" /> },
+                          { id: 'spk', name: 'Surat Perjanjian Kerja Sama (SPK)', desc: 'Dokumen Legal Utama', icon: <ShieldCheck className="text-emerald-500" /> },
+                          { id: 'proposal', name: 'Proposal Penawaran Resmi', desc: 'Detail Solusi & Paket', icon: <Zap className="text-amber-500" /> },
+                          { id: 'profile', name: 'Company Profile Mitralabs', desc: 'Tentang Kami & Layanan', icon: <Building2 className="text-indigo-500" /> },
+                          { id: 'ratecard', name: 'Rate Card & Investasi', desc: 'Daftar Harga & Paket', icon: <CreditCard className="text-rose-500" /> },
+                          { id: 'sop', name: 'SOP Operasional', desc: 'Standar Prosedur Kerja', icon: <ClipboardList className="text-slate-500" /> },
+                          { id: 'brief', name: 'Form Brief Klien', desc: 'Requirement & Identitas', icon: <Package className="text-slate-500" /> }
+                        ].map((doc) => (
+                          <div key={doc.id} className="p-6 bg-white border border-slate-200/60 rounded-[2rem] shadow-sm hover:shadow-xl transition-all group">
+                             <div className="flex justify-between items-start mb-6">
+                                <div className="w-12 h-12 bg-slate-50 rounded-2xl flex items-center justify-center group-hover:bg-slate-900 group-hover:text-white transition-all">
+                                   {doc.icon}
+                                </div>
+                                <div className="px-2 py-1 bg-slate-50 rounded text-[8px] font-black uppercase text-slate-400">Generated</div>
                              </div>
-                             <span className={`px-2 py-1 rounded-md text-[8px] font-black uppercase tracking-tighter ${
-                               req.status === 'Fulfilled' ? 'bg-emerald-100 text-emerald-600' : 
-                               req.status === 'Rejected' ? 'bg-rose-100 text-rose-600' : 'bg-amber-100 text-amber-600'
-                             }`}>
-                                {req.status}
-                             </span>
+                             <div className="space-y-1 mb-6">
+                                <h5 className="text-[11px] font-black text-slate-900 uppercase">{doc.name}</h5>
+                                <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{doc.desc}</p>
+                             </div>
+                             <button 
+                               onClick={() => setViewingDoc(doc.id)}
+                               className="w-full py-3 bg-slate-50 text-slate-900 rounded-xl text-[9px] font-black uppercase tracking-[0.2em] hover:bg-slate-900 hover:text-white transition-all"
+                             >
+                                Buka Dokumen
+                             </button>
                           </div>
                         ))}
+                     </div>
+                  </div>
+
+                  <div className="space-y-4 pt-8">
+                    <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">File & Dokumen Tambahan</p>
+                    {(proj?.files?.length > 0) ? (
+                      <div className="grid md:grid-cols-2 gap-4">
+                        {proj?.files?.map((file: any) => (
+                          <a key={file.id} href={file.file_url} target="_blank"
+                            className="flex items-center justify-between p-5 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 rounded-2xl transition-all group shadow-sm hover:shadow-lg">
+                            <div className="flex items-center gap-4">
+                              <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:text-red-500 transition-colors shadow-sm">
+                                <FileText size={22} />
+                              </div>
+                              <div>
+                                <p className="text-[12px] font-bold text-slate-900 uppercase">{file.filename}</p>
+                                <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{file.file_type || 'PDF'} · {(file.file_size / 1024).toFixed(0)} KB</p>
+                              </div>
+                            </div>
+                            <Download size={16} className="text-slate-300 group-hover:text-slate-900" />
+                          </a>
+                        ))}
                       </div>
-                    </div>
-                  )}
-                  {((proj?.files?.length > 0) || projectData.spk_url || projectData.proposal_url) ? (
-                    <div className="grid md:grid-cols-2 gap-4">
-                      {projectData.proposal_url && (
-                        <a href={projectData.proposal_url} target="_blank"
-                          className="flex items-center justify-between p-5 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 rounded-2xl transition-all group shadow-sm hover:shadow-lg">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shadow-sm">
-                              <FileText size={22} />
-                            </div>
-                            <div>
-                              <p className="text-[12px] font-bold text-slate-900 uppercase">PROPOSAL PROJEK</p>
-                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">OFFICIAL DOCUMENT</p>
-                            </div>
-                          </div>
-                          <Download size={16} className="text-slate-300 group-hover:text-slate-900 transition-colors" />
-                        </a>
-                      )}
-                      {projectData.spk_url && (
-                        <a href={projectData.spk_url} target="_blank"
-                          className="flex items-center justify-between p-5 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 rounded-2xl transition-all group shadow-sm hover:shadow-lg">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:text-blue-500 transition-colors shadow-sm">
-                              <ShieldCheck size={22} />
-                            </div>
-                            <div>
-                              <p className="text-[12px] font-bold text-slate-900 uppercase">KONTRAK KERJA (SPK)</p>
-                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">SIGNED DOCUMENT</p>
-                            </div>
-                          </div>
-                          <Download size={16} className="text-slate-300 group-hover:text-slate-900 transition-colors" />
-                        </a>
-                      )}
-                      {proj?.files?.map((file: any) => (
-                        <a key={file.id} href={file.file_url} target="_blank"
-                          className="flex items-center justify-between p-5 bg-slate-50 hover:bg-white border border-transparent hover:border-slate-200 rounded-2xl transition-all group shadow-sm hover:shadow-lg">
-                          <div className="flex items-center gap-4">
-                            <div className="w-12 h-12 bg-white rounded-xl flex items-center justify-center text-slate-400 group-hover:text-red-500 transition-colors shadow-sm">
-                              <FileText size={22} />
-                            </div>
-                            <div>
-                              <p className="text-[12px] font-bold text-slate-900 uppercase">{file.filename}</p>
-                              <p className="text-[9px] font-bold text-slate-400 uppercase tracking-widest">{file.file_type || 'PDF'} · {(file.file_size / 1024).toFixed(0)} KB</p>
-                            </div>
-                          </div>
-                          <Download size={16} className="text-slate-300 group-hover:text-slate-900" />
-                        </a>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="py-20 border-2 border-dashed border-slate-200 rounded-3xl text-center">
-                      <FileText size={40} className="mx-auto text-slate-200 mb-4" />
-                      <p className="font-bold text-slate-400 text-sm">Belum ada dokumen yang dikirimkan.</p>
-                      <p className="text-xs text-slate-300 mt-2">Dokumen akan muncul di sini setelah tim Mitralabs mengunggahnya.</p>
-                    </div>
-                  )}
+                    ) : (
+                      <div className="py-20 border-2 border-dashed border-slate-200 rounded-3xl text-center">
+                        <FileText size={40} className="mx-auto text-slate-200 mb-4" />
+                        <p className="font-bold text-slate-400 text-sm">Belum ada file tambahan.</p>
+                      </div>
+                    )}
+                  </div>
                 </div>
               )}
 
@@ -936,6 +972,54 @@ function TrackContent() {
                   )}
                 </div>
               )}
+            </motion.div>
+          )}
+        </AnimatePresence>
+
+        {/* Document Viewer Modal */}
+        <AnimatePresence>
+          {viewingDoc && (
+            <motion.div 
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              exit={{ opacity: 0 }}
+              className="fixed inset-0 bg-slate-900/90 backdrop-blur-md z-[100] flex flex-col items-center p-4 md:p-10"
+            >
+              <div className="w-full max-w-4xl flex justify-between items-center mb-6">
+                 <div className="flex items-center gap-4 text-white">
+                    <div className="w-10 h-10 bg-primary text-white rounded-xl flex items-center justify-center font-black italic shadow-lg shadow-primary/20">M</div>
+                    <div>
+                       <h4 className="font-black uppercase tracking-tight leading-none">Document Preview</h4>
+                       <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mt-1">Generated by Mitralabs Engine</p>
+                    </div>
+                 </div>
+                 <div className="flex items-center gap-3">
+                   <button 
+                     onClick={() => window.print()}
+                     className="px-6 py-2.5 bg-white text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all"
+                   >
+                     Cetak Dokumen
+                   </button>
+                   <button 
+                     onClick={() => setViewingDoc(null)}
+                     className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all"
+                   >
+                     <X size={20} />
+                   </button>
+                 </div>
+              </div>
+              
+              <div className="w-full flex-grow overflow-y-auto rounded-[2.5rem] bg-slate-100/50 p-2 md:p-4 print:p-0">
+                 <div className="origin-top transform scale-100 print:scale-100">
+                    {viewingDoc === 'mou' && <MoUDoc data={data} booking={projectData} />}
+                    {viewingDoc === 'spk' && <SPKDoc data={data} booking={projectData} />}
+                    {viewingDoc === 'proposal' && <ProposalDoc data={data} booking={projectData} />}
+                    {viewingDoc === 'brief' && <FormBriefDoc data={data} booking={projectData} />}
+                    {viewingDoc === 'profile' && <CompanyProfileDoc data={data} />}
+                    {viewingDoc === 'ratecard' && <RateCardDoc data={data} />}
+                    {viewingDoc === 'sop' && <SOPDoc data={data} />}
+                 </div>
+              </div>
             </motion.div>
           )}
         </AnimatePresence>

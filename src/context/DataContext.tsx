@@ -62,6 +62,7 @@ export interface Booking {
   scheduled_date?: string;
   total_price: number;
   invoices?: Invoice[];
+  user_signature?: string;
 }
 
 export interface Project {
@@ -146,6 +147,11 @@ export interface AppData {
       subtitle: string;
       buttonText: string;
       promoText: string;
+    };
+    pricing?: {
+      title: string;
+      subtitle: string;
+      badge: string;
     };
   };
   services: {
@@ -238,18 +244,27 @@ export interface AppData {
     links: { label: string; href: string }[];
     socials: { label: string; href: string }[];
   };
+  brand: {
+    name: string;
+    tagline: string;
+    logo: string;
+    favicon: string;
+    phone: string;
+    whatsapp: string;
+    email: string;
+    website: string;
+    address: string;
+    city: string;
+    province: string;
+    postalCode: string;
+    npwp: string;
+    linkedin: string;
+    instagram: string;
+    mapsUrl: string;
+  };
   settings: {
-    waNumber: string;
-    companyLogo: string;
-    companyFavicon: string;
     businessMode: string;
     waPromoMessage: string;
-    companyTagline: string;
-    companyWebsite: string;
-    companyNpwp: string;
-    linkedinUrl: string;
-    logo_url: string;
-    favicon_url: string;
     metaTitle: string;
     metaDescription: string;
     metaKeywords: string;
@@ -278,8 +293,12 @@ export interface AppData {
     termsAndConditions: string;
     paymentInstructions: string;
     signatureFields?: {
-      marketing?: string;
-      owner?: string;
+      marketingName?: string;
+      marketingTitle?: string;
+      marketingSignature?: string;
+      ownerName?: string;
+      ownerTitle?: string;
+      ownerSignature?: string;
     };
     stampDutyRequired?: boolean;
     stampDutyAmount?: number;
@@ -340,6 +359,11 @@ export interface AppData {
         };
       };
     };
+  };
+  legal: {
+    terms: string;
+    privacy: string;
+    lastUpdated: string;
   };
 }
 
@@ -421,24 +445,30 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         const merged = { ...initialData };
 
         if (configRes.data) {
+          merged.brand = {
+            name: configRes.data.company_name ?? initialData.brand.name,
+            tagline: configRes.data.company_tagline ?? initialData.brand.tagline,
+            logo: configRes.data.logo_url ?? initialData.brand.logo,
+            favicon: configRes.data.favicon_url ?? initialData.brand.favicon,
+            phone: configRes.data.phone ?? initialData.brand.phone,
+            whatsapp: configRes.data.wa_number ?? initialData.brand.whatsapp,
+            email: configRes.data.email ?? initialData.brand.email,
+            website: configRes.data.company_website ?? initialData.brand.website,
+            address: configRes.data.address ?? initialData.brand.address,
+            city: configRes.data.city ?? initialData.brand.city,
+            province: configRes.data.province ?? initialData.brand.province,
+            postalCode: configRes.data.postal_code ?? initialData.brand.postalCode,
+            npwp: configRes.data.company_npwp ?? initialData.brand.npwp,
+            linkedin: configRes.data.linkedin_url ?? initialData.brand.linkedin,
+            instagram: configRes.data.instagram ?? initialData.brand.instagram,
+            mapsUrl: configRes.data.maps_url ?? initialData.brand.mapsUrl,
+          };
+
           merged.navbar.logo = configRes.data.logo_text ?? initialData.navbar.logo;
           merged.navbar.buttonText = configRes.data.navbar_button ?? initialData.navbar.buttonText;
           merged.footer.description = configRes.data.footer_desc ?? initialData.footer.description;
-          merged.settings.waNumber = configRes.data.wa_number ?? initialData.settings.waNumber;
           merged.settings.businessMode = configRes.data.business_mode ?? initialData.settings.businessMode;
           merged.settings.waPromoMessage = configRes.data.wa_promo_msg ?? initialData.settings.waPromoMessage;
-          merged.contact.phone = configRes.data.phone ?? initialData.contact.phone;
-          merged.contact.email = configRes.data.email ?? initialData.contact.email;
-          merged.contact.instagram = configRes.data.instagram ?? initialData.contact.instagram;
-          merged.contact.address = configRes.data.address ?? initialData.contact.address;
-          merged.contact.mapsUrl = configRes.data.maps_url ?? initialData.contact.mapsUrl;
-          
-          merged.settings.companyTagline = configRes.data.company_tagline ?? initialData.settings.companyTagline;
-          merged.settings.companyWebsite = configRes.data.company_website ?? initialData.settings.companyWebsite;
-          merged.settings.companyNpwp = configRes.data.company_npwp ?? initialData.settings.companyNpwp;
-          merged.settings.linkedinUrl = configRes.data.linkedin_url ?? initialData.settings.linkedinUrl;
-          merged.settings.logo_url = configRes.data.logo_url ?? initialData.settings.logo_url;
-          merged.settings.favicon_url = configRes.data.favicon_url ?? initialData.settings.favicon_url;
 
           if (configRes.data.json_content) {
             try {
@@ -446,6 +476,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
                 ? JSON.parse(configRes.data.json_content)
                 : configRes.data.json_content;
 
+              if (structural.brand) merged.brand = mergeData(merged.brand, structural.brand);
               if (structural.home) merged.home = mergeData(merged.home, structural.home);
               if (structural.services) merged.services = mergeData(merged.services, structural.services);
               if (structural.portfolio) merged.portfolio = mergeData(merged.portfolio, structural.portfolio);
@@ -455,6 +486,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               if (structural.navbar) merged.navbar = mergeData(merged.navbar, structural.navbar);
               if (structural.invoiceSettings) merged.invoiceSettings = mergeData(merged.invoiceSettings, structural.invoiceSettings);
               if (structural.settings) merged.settings = mergeData(merged.settings, structural.settings);
+              if (structural.legal) merged.legal = mergeData(merged.legal, structural.legal);
             } catch (e) {
               console.error("Failed to parse structural json_content", e);
             }
@@ -630,24 +662,29 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         await Promise.all([
           supabase.from("SiteConfig").upsert({
             id: 1,
+            company_name: newData.brand.name,
+            company_tagline: newData.brand.tagline,
+            logo_url: newData.brand.logo,
+            favicon_url: newData.brand.favicon,
+            phone: newData.brand.phone,
+            wa_number: newData.brand.whatsapp,
+            email: newData.brand.email,
+            company_website: newData.brand.website,
+            address: newData.brand.address,
+            city: newData.brand.city,
+            province: newData.brand.province,
+            postal_code: newData.brand.postalCode,
+            company_npwp: newData.brand.npwp,
+            linkedin_url: newData.brand.linkedin,
+            instagram: newData.brand.instagram,
+            maps_url: newData.brand.mapsUrl,
             logo_text: newData.navbar.logo,
             navbar_button: newData.navbar.buttonText,
             footer_desc: newData.footer.description,
-            wa_number: newData.settings.waNumber,
             business_mode: newData.settings.businessMode,
             wa_promo_msg: newData.settings.waPromoMessage,
-            phone: newData.contact.phone,
-            email: newData.contact.email,
-            instagram: newData.contact.instagram,
-            address: newData.contact.address,
-            maps_url: newData.contact.mapsUrl,
-            company_tagline: newData.settings.companyTagline,
-            company_website: newData.settings.companyWebsite,
-            company_npwp: newData.settings.companyNpwp,
-            linkedin_url: newData.settings.linkedinUrl,
-            logo_url: newData.settings.logo_url,
-            favicon_url: newData.settings.favicon_url,
             json_content: {
+              brand: newData.brand,
               home: newData.home,
               services: newData.services,
               portfolio: newData.portfolio,
@@ -656,7 +693,8 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
               footer: newData.footer,
               navbar: newData.navbar,
               invoiceSettings: newData.invoiceSettings,
-              settings: newData.settings
+              settings: newData.settings,
+              legal: newData.legal
             }
           }),
           supabase.from("HeroSection").upsert({

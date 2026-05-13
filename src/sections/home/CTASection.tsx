@@ -21,7 +21,7 @@ export default function CTASection() {
           </p>
           <div className="flex flex-col items-center gap-6 md:gap-8">
             <Link
-              href="/pesan-sekarang"
+              href="/layanan"
               className="btn-apple w-full sm:w-auto text-lg md:text-xl px-12 py-4 md:py-5"
             >
               {cta.buttonText}

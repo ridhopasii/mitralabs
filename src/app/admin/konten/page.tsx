@@ -187,6 +187,7 @@ export default function GlobalContentCMS() {
     { id: "footer", label: "Footer", icon: List },
     { id: "track", label: "Dashboard", icon: Monitor },
     { id: "seo", label: "SEO & Marketing", icon: Search },
+    { id: "legal", label: "Legal & Policy", icon: FileText },
     { id: "finance", label: "Keuangan", icon: CreditCard },
   ];
 
@@ -238,24 +239,24 @@ export default function GlobalContentCMS() {
                <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
                   <SectionTitle title="Corporate Branding" subtitle="Logo, favicon, dan identitas inti perusahaan." icon={Globe} />
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField onChange={updateField} label="Logo Text" path="navbar.logo" value={formData.navbar.logo} icon={Type} />
-                    <InputField onChange={updateField} label="Website Tagline" path="settings.companyTagline" value={formData.settings.companyTagline} />
+                    <InputField onChange={updateField} label="Logo Text" path="brand.name" value={formData.brand?.name} icon={Type} />
+                    <InputField onChange={updateField} label="Website Tagline" path="brand.tagline" value={formData.brand?.tagline} />
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === "settings.logo_url"} label="Primary Logo Image" path="settings.logo_url" value={formData.settings.logo_url} />
-                    <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === "settings.favicon_url"} label="Site Favicon" path="settings.favicon_url" value={formData.settings.favicon_url} />
+                    <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === "brand.logo"} label="Primary Logo Image" path="brand.logo" value={formData.brand?.logo} />
+                    <ImageInput onUpload={handleImageUpload} isUploading={uploadingPath === "brand.favicon"} label="Site Favicon" path="brand.favicon" value={formData.brand?.favicon} />
                   </div>
                </div>
 
                <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
                   <SectionTitle title="Social & Integration" subtitle="Tautan media sosial dan nomor WhatsApp utama." icon={Linkedin} />
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField onChange={updateField} label="WhatsApp Number" path="settings.waNumber" value={formData.settings.waNumber} icon={Phone} />
+                    <InputField onChange={updateField} label="WhatsApp Number" path="brand.whatsapp" value={formData.brand?.whatsapp} icon={Phone} />
                     <InputField onChange={updateField} label="WhatsApp Promo Message" path="settings.waPromoMessage" value={formData.settings.waPromoMessage} type="textarea" />
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField onChange={updateField} label="Instagram Username" path="contact.instagram" value={formData.contact.instagram} icon={Instagram} />
-                    <InputField onChange={updateField} label="LinkedIn Handle" path="settings.linkedinUrl" value={formData.settings.linkedinUrl} icon={Linkedin} />
+                    <InputField onChange={updateField} label="Instagram Handle" path="brand.instagram" value={formData.brand?.instagram} icon={Instagram} />
+                    <InputField onChange={updateField} label="LinkedIn Handle" path="brand.linkedin" value={formData.brand?.linkedin} icon={Linkedin} />
                   </div>
                   <div className="pt-8 border-t border-outline/5 space-y-6">
                     <SectionTitle title="Business Strategy" subtitle="Pengaturan tone dan mode operasional bisnis." icon={Briefcase} />
@@ -440,6 +441,27 @@ export default function GlobalContentCMS() {
                       </div>
                     )}
                   />
+               </div>
+
+               <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <SectionTitle title="Call to Action (CTA)" subtitle="Penutup halaman beranda." icon={CheckCircle2} />
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField onChange={updateField} label="CTA Title" path="home.cta.title" value={formData.home.cta.title} type="textarea" />
+                    <InputField onChange={updateField} label="CTA Subtitle" path="home.cta.subtitle" value={formData.home.cta.subtitle} type="textarea" />
+                  </div>
+                  <div className="grid md:grid-cols-2 gap-12">
+                    <InputField onChange={updateField} label="Button Text" path="home.cta.buttonText" value={formData.home.cta.buttonText} />
+                    <InputField onChange={updateField} label="Promo / Footnote Text" path="home.cta.promoText" value={formData.home.cta.promoText} />
+                  </div>
+               </div>
+
+               <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <SectionTitle title="Pricing Header" subtitle="Teks pengantar harga di beranda." icon={BarChart3} />
+                  <div className="grid md:grid-cols-3 gap-12">
+                    <InputField onChange={updateField} label="Price Badge" path="home.pricing.badge" value={formData.home.pricing?.badge} />
+                    <InputField onChange={updateField} label="Price Title" path="home.pricing.title" value={formData.home.pricing?.title} />
+                    <InputField onChange={updateField} label="Price Subtitle" path="home.pricing.subtitle" value={formData.home.pricing?.subtitle} type="textarea" />
+                  </div>
                </div>
             </motion.div>
           )}
@@ -657,7 +679,21 @@ export default function GlobalContentCMS() {
             </motion.div>
           )}
 
-          {/* 8. KEUANGAN / INVOICE */}
+          {/* 9. LEGAL & POLICY */}
+          {activeTab === "legal" && (
+            <motion.div key="legal" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
+               <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
+                  <SectionTitle title="Legal Documents" subtitle="Syarat layanan dan kebijakan privasi." icon={FileText} />
+                  <div className="space-y-10">
+                    <InputField onChange={updateField} label="Terms of Service" path="legal.terms" value={formData.legal?.terms} type="textarea" />
+                    <InputField onChange={updateField} label="Privacy Policy" path="legal.privacy" value={formData.legal?.privacy} type="textarea" />
+                    <InputField onChange={updateField} label="Last Updated" path="legal.lastUpdated" value={formData.legal?.lastUpdated} />
+                  </div>
+               </div>
+            </motion.div>
+          )}
+
+          {/* 10. KEUANGAN / INVOICE */}
           {activeTab === "finance" && (
             <motion.div key="finance" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} className="space-y-10">
                <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">

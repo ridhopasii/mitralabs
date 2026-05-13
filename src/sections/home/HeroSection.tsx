@@ -8,9 +8,9 @@ import { motion } from "framer-motion";
 export default function HeroSection() {
   const { data } = useData();
   const { hero } = data.home;
-  const { settings } = data;
+  const { brand } = data;
   
-  const waUrl = `https://wa.me/${settings.waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
+  const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin konsultasi gratis untuk website bisnis saya.")}`;
 
   return (
     <section className="relative pt-20 pb-16 md:pt-44 md:pb-40 overflow-hidden bg-background">
@@ -37,13 +37,13 @@ export default function HeroSection() {
             >
               {data.navbar.buttonText}
             </Link>
-            <a
+            <Link
               href="/layanan"
               className="btn-apple-secondary w-full sm:w-auto text-base md:text-lg text-center group flex items-center justify-center gap-2"
             >
               Lihat Paket 
               <span className="transition-transform group-hover:translate-x-1">&rarr;</span>
-            </a>
+            </Link>
           </div>
         </motion.div>
 
