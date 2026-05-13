@@ -261,20 +261,22 @@ function TrackContent() {
       const element = reportRef.current;
       if (!element) return;
 
-      const scale = 1.5;
+      const scale = 2;
       const dataUrl = await domtoimage.toJpeg(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
         scale: scale,
-        quality: 0.9,
+        quality: 0.95,
         bgcolor: '#ffffff',
         cacheBust: true,
         style: {
-          // Force all colors to be simple for the renderer
           'color-scheme': 'light',
           '--tw-shadow': 'none',
           '--tw-ring-color': 'transparent',
           'outline': 'none',
+          'filter': 'none',
+          'backdrop-filter': 'none',
+          'box-shadow': 'none',
         }
       });
 
@@ -307,12 +309,12 @@ function TrackContent() {
       const element = docRef.current;
       if (!element) return;
       
-      const scale = 1.5;
+      const scale = 2;
       const dataUrl = await domtoimage.toJpeg(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
         scale: scale,
-        quality: 0.9,
+        quality: 0.95,
         bgcolor: '#ffffff',
         cacheBust: true,
         style: {
@@ -320,7 +322,9 @@ function TrackContent() {
           '--tw-shadow': 'none',
           '--tw-ring-color': 'transparent',
           'outline': 'none',
-          'border-color': '#e2e8f0', // slate-200
+          'filter': 'none',
+          'backdrop-filter': 'none',
+          'box-shadow': 'none',
         }
       });
 
