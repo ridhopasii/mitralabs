@@ -221,7 +221,8 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
             </div>
 
             <!-- Signature Area -->
-            <div style="padding: 64px; background: white; border-top: 1px sol              <div style="display: flex; justify-content: space-between; text-align: center;">
+            <div style="padding: 64px; background: white; border-top: 1px solid #F2F2F7;">
+              <div style="display: flex; justify-content: space-between; text-align: center;">
                 <div style="flex: 1; display: flex; flex-direction: column; align-items: center;">
                   <p style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px; margin: 0 0 10px 0;">Pelanggan,</p>
                   <div style="height: 60px; display: flex; align-items: center; justify-content: center; margin-bottom: 10px;">
@@ -258,36 +259,35 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
                     <p style="font-size: 9px; color: #94A3B8; font-weight: 500; text-transform: uppercase; margin-top: 2px;">${globalData.invoiceSettings.signatureFields?.ownerTitle || "Chief Executive"}</p>
                   </div>
                 </div>
-              </div>命中�中        </div>
-              </div>
-
-              <div style="margin-top: 64px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
-                <div style="background: #F5F5F7; padding: 8px 20px; border-radius: 50px; border: 1px solid #F1F1F1; display: flex; align-items: center; gap: 8px;">
-                  <span style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px;">NPWP: <span style="color: #1D1D1F;">${globalData.invoiceSettings.companyNPWP}</span></span>
-                </div>
-                <div style="display: flex; gap: 24px; color: #D2D2D7; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
-                  <span>${globalData.invoiceSettings.companyLinkedin}</span>
-                  <span>${globalData.invoiceSettings.companyInstagram}</span>
-                </div>
               </div>
             </div>
 
-            <!-- Footer Dark -->
-            <div style="background: #1D1D1F; padding: 40px 64px; display: flex; justify-content: space-between; align-items: center; color: white;">
-              <div style="display: flex; align-items: center; gap: 12px;">
-                <div style="width: 32px; height: 32px; background: white; border-radius: 8px; color: #1D1D1F; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-style: italic;">M</div>
-                <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; font-style: italic;">MITRALABS.WEB.ID</span>
+            <div style="margin-top: 64px; display: flex; flex-direction: column; align-items: center; gap: 16px;">
+              <div style="background: #F5F5F7; padding: 8px 20px; border-radius: 50px; border: 1px solid #F1F1F1; display: flex; align-items: center; gap: 8px;">
+                <span style="font-size: 10px; font-weight: 700; color: #86868B; text-transform: uppercase; letter-spacing: 2px;">NPWP: <span style="color: #1D1D1F;">${globalData.invoiceSettings.companyNPWP}</span></span>
               </div>
-              <div style="display: flex; gap: 32px; align-items: center;">
-                <div style="text-align: right;">
-                  <p style="font-size: 10px; font-weight: 700; margin: 0 0 4px 0; color: white;">E-Verification</p>
-                  <p style="font-size: 9px; opacity: 0.4; margin: 0; letter-spacing: 1px;">HASH: ML-${invoiceData.invoice_number}-SECURE</p>
-                </div>
-                <div style="width: 1px; height: 32px; background: #3A3A3C;"></div>
-                <div style="text-align: right;">
-                  <p style="font-size: 10px; font-weight: 700; margin: 0 0 4px 0; color: white;">Timestamp</p>
-                  <p style="font-size: 9px; opacity: 0.4; margin: 0; font-style: italic;">${new Date().toLocaleString('id-ID')} WIB</p>
-                </div>
+              <div style="display: flex; gap: 24px; color: #D2D2D7; font-size: 10px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px;">
+                <span>${globalData.invoiceSettings.companyLinkedin}</span>
+                <span>${globalData.invoiceSettings.companyInstagram}</span>
+              </div>
+            </div>
+          </div>
+
+          <!-- Footer Dark -->
+          <div style="background: #1D1D1F; padding: 40px 64px; display: flex; justify-content: space-between; align-items: center; color: white;">
+            <div style="display: flex; align-items: center; gap: 12px;">
+              <div style="width: 32px; height: 32px; background: white; border-radius: 8px; color: #1D1D1F; display: flex; align-items: center; justify-content: center; font-size: 14px; font-weight: 700; font-style: italic;">M</div>
+              <span style="font-size: 12px; font-weight: 700; letter-spacing: 1px; font-style: italic;">MITRALABS.WEB.ID</span>
+            </div>
+            <div style="display: flex; gap: 32px; align-items: center;">
+              <div style="text-align: right;">
+                <p style="font-size: 10px; font-weight: 700; margin: 0 0 4px 0; color: white;">E-Verification</p>
+                <p style="font-size: 9px; opacity: 0.4; margin: 0; letter-spacing: 1px;">HASH: ML-${invoiceData.invoice_number}-SECURE</p>
+              </div>
+              <div style="width: 1px; height: 32px; background: #3A3A3C;"></div>
+              <div style="text-align: right;">
+                <p style="font-size: 10px; font-weight: 700; margin: 0 0 4px 0; color: white;">Timestamp</p>
+                <p style="font-size: 9px; opacity: 0.4; margin: 0; font-style: italic;">${new Date().toLocaleString('id-ID')} WIB</p>
               </div>
             </div>
           </div>

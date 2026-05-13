@@ -660,8 +660,6 @@ function TrackContent() {
                       <p className="text-[10px] text-amber-700/80 leading-relaxed mt-1">Gunakan file beresolusi tinggi (PNG/SVG untuk logo) untuk memastikan tampilan website Anda tetap tajam dan profesional di semua layar.</p>
                     </div>
                   </div>
-                </div>
-              )}
 
                    {/* Digital Signature Section */}
                   <div className="p-8 bg-slate-900 text-white rounded-[2.5rem] flex flex-col md:flex-row justify-between items-center gap-8 shadow-xl">
