@@ -351,7 +351,7 @@ export default function PublicInvoicePage() {
               <div className="h-28 flex flex-col justify-end">
                 <div className="border-b border-[#D2D2D7] w-full mx-auto"></div>
                 <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight italic">
-                  {globalData.invoiceSettings.signatureFields?.marketing || "Marketing Officer"}
+                  {globalData.invoiceSettings.signatureFields?.marketingName || "Marketing Officer"}
                 </p>
                 <p className="text-[9px] text-slate-400 font-medium uppercase tracking-tighter">Finance Department</p>
               </div>
@@ -368,7 +368,7 @@ export default function PublicInvoicePage() {
                 )}
                 <div className="border-b border-[#D2D2D7] w-full mx-auto z-10"></div>
                 <p className="text-[11px] font-bold text-[#1D1D1F] mt-3 uppercase tracking-tight z-10">
-                  {globalData.invoiceSettings.signatureFields?.owner || "Direktur Utama"}
+                  {globalData.invoiceSettings.signatureFields?.ownerName || "Direktur Utama"}
                 </p>
               </div>
             </div>
