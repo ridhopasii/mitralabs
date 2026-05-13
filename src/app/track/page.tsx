@@ -716,6 +716,17 @@ function TrackContent() {
                     </div>
                   </div>
 
+                </div>
+              )}
+
+              {/* Tab: Dokumen */}
+              {activeTab === "dokumen" && (
+                <div className="bg-white rounded-[2.5rem] border border-slate-200/60 shadow-sm p-10 space-y-8">
+                  <div>
+                    <h3 className="text-xl font-bold">Dokumen Proyek</h3>
+                    <p className="text-sm text-slate-500 mt-1">Akses dokumen legal dan requirement proyek Anda di sini.</p>
+                  </div>
+
                   {/* Generated Documents List */}
                   <div className="space-y-4 pt-4">
                      <p className="text-[10px] font-black uppercase tracking-widest text-slate-400">Automated Generated Documents</p>
@@ -777,6 +788,15 @@ function TrackContent() {
                         <p className="font-bold text-slate-400 text-sm">Belum ada file tambahan.</p>
                       </div>
                     )}
+                  </div>
+
+                  <div className="flex justify-center pt-8">
+                    <button 
+                      onClick={() => setIsRequestingDoc(true)}
+                      className="px-8 py-4 bg-slate-900 text-white rounded-2xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-800 transition-all shadow-xl flex items-center gap-3"
+                    >
+                      <Plus size={16} /> Request Dokumen Baru
+                    </button>
                   </div>
                 </div>
               )}
