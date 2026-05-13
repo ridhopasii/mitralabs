@@ -25,6 +25,7 @@ interface InvoiceData {
   amount: number;
   invoice_type?: string;
   status: string;
+  client_signature?: string;
 }
 
 interface KwitansiPDFGeneratorProps {

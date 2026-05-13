@@ -153,6 +153,14 @@ export interface AppData {
       subtitle: string;
       badge: string;
     };
+    faqLabels?: {
+      title: string;
+      subtitle: string;
+      badge: string;
+      ctaTitle: string;
+      ctaSubtitle: string;
+      ctaButton: string;
+    };
   };
   services: {
     title: string;
@@ -314,6 +322,7 @@ export interface AppData {
     role: string;
     content: string;
     rating: number;
+    is_published: boolean;
     image: string;
   }[];
   faqs: {

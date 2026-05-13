@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "@/lib/prisma";
+
+export const dynamic = 'force-dynamic';
 
 export async function GET(
   request: NextRequest,
@@ -7,6 +8,8 @@ export async function GET(
 ) {
   try {
     const { id } = await params;
+    const { prisma } = await import("@/lib/prisma");
+    
     const assets = await prisma.projectAsset.findMany({
       where: { project_id: id },
       orderBy: { id: "asc" },
@@ -25,6 +28,7 @@ export async function POST(
 ) {
   try {
     const { id } = await params;
+    const { prisma } = await import("@/lib/prisma");
     const body = await request.json();
     const { name, category, url, file_size, file_type } = body;
 

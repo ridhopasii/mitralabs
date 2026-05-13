@@ -185,7 +185,8 @@ export const initialData: AppData = {
     cta: {
       title: "Mulai Project Anda",
       subtitle: "Konsultasikan kebutuhan digital Anda dengan tim ahli kami.",
-      buttonText: "Hubungi Kami"
+      buttonText: "Hubungi Kami",
+      promoText: "Gratis Konsultasi & Estimasi Biaya"
     },
     labels: {
       viewDetail: "Detail Project",
