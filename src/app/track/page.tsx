@@ -7,8 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
-import domtoimage from "dom-to-image-more";
-import jsPDF from "jspdf";
+// Dynamic imports for browser-only libraries below
 import { uploadImage } from "@/lib/imageUpload";
 
 // Document Templates
@@ -254,6 +253,9 @@ function TrackContent() {
     setIsExporting(true);
     
     try {
+      const domtoimage = (await import("dom-to-image-more")).default;
+      const { jsPDF } = await import("jspdf");
+
       // Small delay to ensure all assets are ready
       await new Promise(resolve => setTimeout(resolve, 500));
       const element = reportRef.current;
@@ -297,6 +299,9 @@ function TrackContent() {
     if (!docRef.current) return;
     setIsLoading(true);
     try {
+      const domtoimage = (await import("dom-to-image-more")).default;
+      const { jsPDF } = await import("jspdf");
+      
       const element = docRef.current;
       if (!element) return;
       

@@ -17,7 +17,7 @@ export const isSupabaseConfigured = () => {
          !!process.env.NEXT_PUBLIC_SUPABASE_PUBLISHABLE_KEY
 }
 
-import imageCompression from 'browser-image-compression';
+// Dynamic import for browser-image-compression below
 
 // Helper to upload image and return public URL
 export const uploadImage = async (file: File) => {
@@ -25,6 +25,7 @@ export const uploadImage = async (file: File) => {
 
   try {
     // 1. Compress Image
+    const imageCompression = (await import('browser-image-compression')).default;
     const options = {
       maxSizeMB: 1,
       maxWidthOrHeight: 1920,

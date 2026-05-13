@@ -1,5 +1,5 @@
 import { supabase } from "./supabase";
-import imageCompression from "browser-image-compression";
+// Dynamic import for browser-image-compression below
 
 export interface UploadResult {
   success: boolean;
@@ -24,6 +24,7 @@ export async function uploadImage(
     }
 
     // Compress image
+    const imageCompression = (await import("browser-image-compression")).default;
     const options = {
       maxSizeMB: 1,
       maxWidthOrHeight: 1920,
