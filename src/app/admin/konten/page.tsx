@@ -378,7 +378,7 @@ export default function GlobalContentCMS() {
                     <InputField onChange={updateField} label="Solution Title" path="home.solution.title" value={formData.home.solution.title} />
                   </div>
                   <div className="grid md:grid-cols-2 gap-12">
-                    {Object.keys(formData.home.solution.cards).map((key) => (
+                    {(Object.keys(formData.home.solution.cards) as Array<keyof typeof formData.home.solution.cards>).map((key) => (
                       <div key={key} className="p-8 bg-background border border-outline/5 rounded-[2.5rem] shadow-inner space-y-6">
                         <p className="text-[11px] font-black uppercase text-primary tracking-widest">{key} Card</p>
                         <InputField label="Title" value={formData.home.solution.cards[key].title} onChange={(p: string, v: any) => updateField(`home.solution.cards.${key}.title`, v)} />
