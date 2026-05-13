@@ -118,7 +118,7 @@ export interface AppData {
       title: string;
       subtitle: string;
       image: string;
-      stats: { label: string; value: string; desc: string };
+      stats: { label: string; value: string; desc: string; statusLabel?: string; statusValue?: string };
     };
     problem: {
       title: string;

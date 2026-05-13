@@ -19,7 +19,7 @@ export const initialData: AppData = {
       title: "Solusi Digital Presisi Untuk Bisnis Anda.",
       subtitle: "Kami membangun infrastruktur digital yang tangguh untuk UMKM, Institusi Pendidikan, dan Industri Pariwisata. Fokus kami adalah fungsionalitas, kecepatan, dan konversi nyata.",
       image: "/mitralabs_hero_premium_1778227502346.png",
-      stats: { label: "Success Projects", value: "240+", statusLabel: "Sistem Status", statusValue: "Aktif" }
+      stats: { label: "Success Projects", value: "240+", desc: "Projects completed successfully", statusLabel: "Sistem Status", statusValue: "Aktif" }
     },
     problem: {
       title: "Masalah Umum Bisnis di Era Digital",
