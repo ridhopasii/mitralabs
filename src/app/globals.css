@@ -1,22 +1,21 @@
 @import "tailwindcss";
 
 :root {
-  --font-inter: "Aptos", "Segoe UI", "Helvetica Neue", sans-serif;
-  --font-manrope: "Aptos Display", "Segoe UI", "Helvetica Neue", sans-serif;
+  --font-inter: "Inter", "Aptos", "Segoe UI", system-ui, sans-serif;
 }
 
 @theme {
   /* Apple-inspired Minimalist Palette */
   --color-background: #ffffff;
-  --color-on-background: #000000;
+  --color-on-background: #111111;
   
   --color-surface: #fbfbfd;
   --color-on-surface: #1d1d1f;
   
-  --color-primary: #0066cc; /* Apple Blue */
+  --color-primary: #0071e3; /* Updated Apple Blue */
   --color-on-primary: #ffffff;
   
-  --color-secondary: #86868b;
+  --color-secondary: #6e6e73;
   --color-on-secondary: #ffffff;
   
   --color-surface-container: #f5f5f7;
@@ -29,8 +28,8 @@
   --color-outline-variant: #e8e8ed;
 
   /* Typography: Inter is the closest free equivalent to San Francisco */
-  --font-display: 'Inter', var(--font-inter), sans-serif;
-  --font-body: 'Inter', var(--font-inter), sans-serif;
+  --font-display: var(--font-inter);
+  --font-body: var(--font-inter);
 
   /* Accent Colors */
   --color-error: #ff3b30;
@@ -64,46 +63,50 @@
     color: var(--color-on-surface);
     @apply font-body antialiased;
     overflow-x: hidden;
-    letter-spacing: -0.011em; /* San Francisco-like tracking */
+    letter-spacing: -0.011em;
+    line-height: 1.5;
   }
 
   h1, h2, h3, h4, h5, h6 {
-    @apply font-display;
-    letter-spacing: -0.022em;
-    font-weight: 600;
+    @apply font-display font-semibold;
+    letter-spacing: -0.03em;
+    line-height: 1.1;
+    color: var(--color-on-background);
   }
 }
 
 @layer components {
   .shadow-apple {
-    box-shadow: 0 4px 24px rgba(0,0,0,0.04);
+    box-shadow: 0 8px 32px rgba(0,0,0,0.04);
   }
 
   .shadow-apple-hover {
-    box-shadow: 0 8px 32px rgba(0,0,0,0.08);
+    box-shadow: 0 12px 48px rgba(0,0,0,0.08);
   }
 
   .glass-apple {
-    backdrop-filter: blur(25px) saturate(190%);
-    background: rgba(255, 255, 255, 0.72);
+    backdrop-filter: blur(20px) saturate(180%);
+    background: rgba(255, 255, 255, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.3);
   }
 
   .dark .glass-apple {
-    background: rgba(0, 0, 0, 0.72);
+    background: rgba(0, 0, 0, 0.7);
+    border: 1px solid rgba(255, 255, 255, 0.1);
   }
 
   .btn-apple {
-    @apply px-8 py-3 rounded-full font-semibold transition-all duration-400;
-    @apply bg-on-background text-background hover:scale-[1.02] active:scale-[0.98];
+    @apply px-7 py-3 rounded-full font-semibold transition-all duration-300;
+    @apply bg-on-background text-background hover:opacity-90 active:scale-[0.97];
   }
 
   .btn-apple-secondary {
-    @apply px-8 py-3 rounded-full font-semibold transition-all duration-400;
-    @apply text-primary hover:bg-surface-container active:scale-[0.98];
+    @apply px-7 py-3 rounded-full font-semibold transition-all duration-300;
+    @apply text-primary hover:bg-surface-container active:scale-[0.97];
   }
 
   .section-container {
-    @apply max-w-7xl mx-auto px-6 md:px-12;
+    @apply max-w-6xl mx-auto px-6 md:px-10;
   }
 }
 

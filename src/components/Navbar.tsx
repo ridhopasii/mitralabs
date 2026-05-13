@@ -30,15 +30,15 @@ export default function Navbar() {
         <div className="section-container">
           <div className="flex justify-between items-center mb-2 md:mb-0">
             {/* Logo */}
-            <Link href="/" onClick={() => setMobileOpen(false)} className="text-lg font-bold tracking-tight text-on-background flex items-center gap-2 group shrink-0">
-               <div className="w-6 h-6 bg-on-background text-background rounded-md flex items-center justify-center font-bold text-[10px] transition-transform group-hover:scale-110">
+            <Link href="/" onClick={() => setMobileOpen(false)} className="text-xl font-bold tracking-tight text-on-background flex items-center gap-2.5 group shrink-0">
+               <div className="w-7 h-7 bg-on-background text-background rounded-lg flex items-center justify-center font-bold text-xs transition-transform group-hover:scale-110">
                   {navbar.logo.charAt(0)}
                </div>
                <span className="hidden sm:inline">{navbar.logo}</span>
             </Link>
 
             {/* Desktop Nav Links (Hidden on Mobile) */}
-            <nav className="hidden md:flex items-center gap-10 text-[12px] font-semibold text-secondary tracking-wide">
+            <nav className="hidden md:flex items-center gap-10 text-[13px] font-semibold text-secondary tracking-tight">
               {navbar.links.map((link) => {
                 const isActive = pathname === link.href;
                 return (
@@ -52,10 +52,6 @@ export default function Navbar() {
                   </Link>
                 );
               })}
-              <Link href="/track" className="transition-colors hover:text-on-background relative group">
-                {pathname?.startsWith("/track") ? "Dashboard Projek" : "Lacak Projek"}
-                <span className="absolute -bottom-1 left-0 w-full h-px bg-on-background scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
-              </Link>
             </nav>
 
             {/* CTA & Mobile Toggle */}
@@ -65,7 +61,7 @@ export default function Navbar() {
               {/* Desktop CTA */}
               <Link
                 href="/pesan-sekarang"
-                className="hidden md:block bg-on-background text-background px-5 py-1.5 rounded-full text-[11px] font-bold hover:opacity-80 transition-all active:scale-95"
+                className="hidden md:block bg-on-background text-background px-6 py-2.5 rounded-full text-[12px] font-bold hover:opacity-90 transition-all active:scale-[0.98]"
               >
                 {navbar.buttonText}
               </Link>

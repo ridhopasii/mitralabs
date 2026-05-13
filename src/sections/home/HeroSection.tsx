@@ -21,25 +21,25 @@ export default function HeroSection() {
           transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
           className="z-10 w-full"
         >
-          <span className="text-primary font-semibold text-[10px] md:text-sm tracking-[0.2em] uppercase mb-4 md:mb-6 block">
+          <span className="text-primary font-bold text-[10px] md:text-xs tracking-[0.25em] uppercase mb-5 md:mb-8 block">
             {hero.tagline}
           </span>
-          <h1 className="text-4xl md:text-8xl lg:text-9xl font-semibold text-on-background mb-6 md:mb-10 leading-[1.1] md:leading-[1.05] tracking-tight md:tracking-[-0.03em] text-balance reveal-text">
+          <h1 className="text-5xl md:text-7xl lg:text-8xl font-semibold text-on-background mb-8 md:mb-12 leading-[1.05] tracking-tight md:tracking-[-0.04em] text-balance reveal-text">
             {hero.title}
           </h1>
-          <p className="text-lg md:text-2xl text-secondary mb-10 md:mb-14 max-w-3xl mx-auto leading-relaxed font-medium text-balance">
+          <p className="text-lg md:text-xl text-secondary mb-12 md:mb-16 max-w-2xl mx-auto leading-relaxed font-medium text-balance">
             {hero.subtitle}
           </p>
-          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-16 md:mb-24 px-4">
+          <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 mb-20 md:mb-28 px-4">
             <Link
               href="/layanan"
-              className="btn-apple w-full sm:w-auto text-base md:text-lg text-center"
+              className="btn-apple w-full sm:w-auto text-base text-center"
             >
               {data.navbar.buttonText}
             </Link>
             <Link
               href="/layanan"
-              className="btn-apple-secondary w-full sm:w-auto text-base md:text-lg text-center group flex items-center justify-center gap-2"
+              className="btn-apple-secondary w-full sm:w-auto text-base text-center group flex items-center justify-center gap-2"
             >
               Lihat Paket 
               <span className="transition-transform group-hover:translate-x-1">&rarr;</span>

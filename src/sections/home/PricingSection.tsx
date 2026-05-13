@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { CheckCircle2, Star, Zap, Diamond, ArrowRight } from "lucide-react";
 import { useData } from "@/context/DataContext";
+import { motion } from "framer-motion";
 
 export default function PricingSection() {
   const { data } = useData();
@@ -16,109 +17,89 @@ export default function PricingSection() {
   };
 
   const taglineMap: Record<string, string> = {
-    "Basic": "Usaha baru yang butuh online presence cepat",
-    "Standard": "UMKM & Sekolah yang ingin tampil lengkap",
-    "Premium": "Bisnis Travel & Usaha Premium"
-  };
-
-  const badgeMap: Record<string, string | null> = {
-    "Standard": "Paling Populer"
+    "Basic": "Cocok untuk perkenalan awal bisnis kamu.",
+    "Standard": "Pilihan paling lengkap & hemat buat UMKM.",
+    "Premium": "Sistem custom buat bisnis yang sudah jalan."
   };
 
   return (
-    <section id="harga" className="py-24 bg-white">
-      <div className="max-w-7xl mx-auto px-6">
+    <section id="harga" className="py-24 md:py-40 bg-background">
+      <div className="section-container">
         {/* Header */}
-        <div className="max-w-3xl mx-auto text-center mb-16">
-          <div className="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-blue-50 text-blue-600 text-sm font-semibold mb-6">
-            {data.home.pricing?.badge || "Paket Harga"}
-          </div>
-          <h2 className="font-manrope text-4xl md:text-5xl font-extrabold text-[#131b2e] leading-tight mb-6">
-            {data.home.pricing?.title || "Transparan, Terjangkau, Berkualitas"}
+        <div className="max-w-3xl mx-auto text-center mb-16 md:mb-24">
+          <h2 className="text-4xl md:text-7xl font-semibold mb-6 md:mb-8 tracking-tight reveal-text">
+            {data.home.pricing?.title || "Harga Jujur & Transparan"}
           </h2>
-          <p className="text-lg text-[#434656]">
+          <p className="text-lg md:text-2xl text-secondary max-w-2xl mx-auto font-medium">
             {data.home.pricing?.subtitle || "Pilih paket yang sesuai dengan kebutuhan bisnis kamu. Tidak ada biaya tersembunyi."}
           </p>
         </div>
 
         {/* Pricing grid */}
-        <div className="grid md:grid-cols-3 gap-8 items-center">
-          {plans.map((plan) => {
+        <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 items-stretch">
+          {plans.map((plan, idx) => {
             const IconComponent = iconMap[plan.name] || Zap;
             const tagline = taglineMap[plan.name] || "Solusi digital profesional";
-            const badge = badgeMap[plan.name];
             
             return (
-              <div
+              <motion.div
                 key={plan.name}
-                className={`relative rounded-minimal p-8 border transition-all duration-300 ${
+                initial={{ opacity: 0, y: 20 }}
+                whileInView={{ opacity: 1, y: 0 }}
+                viewport={{ once: true }}
+                transition={{ duration: 0.8, delay: idx * 0.1 }}
+                className={`relative rounded-[2.5rem] p-8 md:p-10 border transition-all duration-500 flex flex-col ${
                   plan.highlight
-                    ? "bg-primary text-white border-primary shadow-lg scale-105"
-                    : "bg-white text-[#131b2e] border-slate-100 shadow-sm hover:shadow-md"
+                    ? "bg-on-background text-background border-on-background shadow-apple-hover scale-100 md:scale-105 z-10"
+                    : "bg-surface-container text-on-background border-outline/10 shadow-apple hover:shadow-apple-hover"
                 }`}
               >
-                {badge && (
-                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-4 py-1.5 bg-white text-[#1A5CFF] rounded-full text-xs font-bold shadow-lg border border-blue-100">
-                    {badge}
+                {plan.highlight && (
+                  <div className="absolute -top-4 left-1/2 -translate-x-1/2 px-5 py-1.5 bg-primary text-white rounded-full text-[10px] font-bold uppercase tracking-widest shadow-lg">
+                    Paling Populer
                   </div>
                 )}
 
-                <div className="flex items-center gap-3 mb-6">
+                <div className="flex items-center gap-4 mb-8">
                   <div
-                    className={`w-10 h-10 rounded-xl flex items-center justify-center ${
-                      plan.highlight ? "bg-white/20" : "bg-[#1A5CFF]/10"
+                    className={`w-12 h-12 rounded-2xl flex items-center justify-center ${
+                      plan.highlight ? "bg-background/10" : "bg-primary/10"
                     }`}
                   >
                     <IconComponent
-                      size={20}
-                      className={plan.highlight ? "text-white" : "text-[#1A5CFF]"}
+                      size={24}
+                      className={plan.highlight ? "text-background" : "text-primary"}
                     />
                   </div>
                   <div>
-                    <h3
-                      className={`font-manrope text-xl font-bold ${
-                        plan.highlight ? "text-white" : "text-[#131b2e]"
-                      }`}
-                    >
+                    <h3 className="text-2xl font-bold tracking-tight">
                       {plan.name}
                     </h3>
-                    <p
-                      className={`text-xs ${plan.highlight ? "text-white/70" : "text-[#434656]"}`}
-                    >
+                    <p className={`text-xs font-medium uppercase tracking-wider ${plan.highlight ? "text-background/60" : "text-secondary"}`}>
                       {tagline}
                     </p>
                   </div>
                 </div>
 
-                <div className="mb-8">
-                  <span
-                    className={`font-manrope text-3xl font-extrabold ${
-                      plan.highlight ? "text-white" : "text-[#1A5CFF]"
-                    }`}
-                  >
+                <div className="mb-10">
+                  <span className="text-4xl md:text-5xl font-bold tracking-tight">
                     {plan.price}
                   </span>
-                  <span
-                    className={`text-sm ${plan.highlight ? "text-white/60" : "text-[#434656]"}`}
-                  >
+                  <span className={`text-sm ml-2 font-medium ${plan.highlight ? "text-background/50" : "text-secondary"}`}>
                     /projek
                   </span>
                 </div>
 
-                <ul className="space-y-3 mb-8">
+                <ul className="space-y-4 mb-12 flex-grow">
                   {plan.features.map((feat) => (
                     <li key={feat} className="flex items-start gap-3">
                       <CheckCircle2
-                        size={16}
+                        size={18}
                         className={`mt-0.5 flex-shrink-0 ${
-                          plan.highlight ? "text-[#0ECFAA]" : "text-[#0ECFAA]"
+                          plan.highlight ? "text-success" : "text-success"
                         }`}
                       />
-                      <span
-                        className={`text-sm ${
-                          plan.highlight ? "text-white/85" : "text-[#434656]"
-                        }`}
-                      >
+                      <span className={`text-sm md:text-base font-medium ${plan.highlight ? "text-background/90" : "text-on-background/80"}`}>
                         {feat}
                       </span>
                     </li>
@@ -127,29 +108,29 @@ export default function PricingSection() {
 
                 <Link
                   href={`/kontak?paket=${plan.name.toLowerCase()}`}
-                  className={`flex items-center justify-center gap-2 w-full py-3.5 rounded-2xl font-bold text-sm transition-all duration-200 ${
+                  className={`flex items-center justify-center gap-2 w-full py-4 rounded-full font-bold text-base transition-all duration-300 ${
                     plan.highlight
-                      ? "bg-white text-[#1A5CFF] hover:bg-blue-50"
-                      : "border-2 border-[#1A5CFF] text-[#1A5CFF] hover:bg-[#1A5CFF] hover:text-white"
+                      ? "bg-background text-on-background hover:bg-background/90"
+                      : "bg-on-background text-background hover:opacity-90"
                   }`}
                 >
                   Pilih {plan.name}
-                  <ArrowRight size={16} />
+                  <ArrowRight size={18} />
                 </Link>
-              </div>
+              </motion.div>
             );
           })}
         </div>
 
-        <div className="mt-10 text-center text-sm text-[#434656]">
+        <div className="mt-16 text-center text-lg font-medium text-secondary">
           Tidak yakin pilih paket mana?{" "}
           <a
             href={`https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo, saya ingin konsultasi paket website yang cocok untuk bisnis saya.")}`}
-            className="text-[#1A5CFF] font-semibold hover:underline"
+            className="text-primary font-bold hover:underline"
             target="_blank"
             rel="noopener noreferrer"
           >
-            Konsultasi gratis dengan tim kami →
+            Konsultasi gratis &rarr;
           </a>
         </div>
       </div>

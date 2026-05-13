@@ -19,7 +19,7 @@ export default function ProblemSection() {
               {problem.subtitle}
             </p>
           </div>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-20 gap-y-16 md:gap-y-24">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-12 md:gap-y-16">
             {problem.items.map((item, i) => (
               <motion.div 
                 key={item.id}
@@ -27,12 +27,12 @@ export default function ProblemSection() {
                 whileInView={{ opacity: 1, y: 0 }}
                 viewport={{ once: true }}
                 transition={{ duration: 0.8, delay: i * 0.1 }}
-                className="space-y-4 md:space-y-6"
+                className="space-y-3 md:space-y-4"
               >
-                <h3 className="text-2xl md:text-3xl font-semibold text-on-background tracking-tight">
+                <h3 className="text-xl md:text-2xl font-semibold text-on-background tracking-tight">
                   {item.title}
                 </h3>
-                <p className="text-lg md:text-xl text-secondary leading-relaxed font-medium">
+                <p className="text-base md:text-lg text-secondary leading-relaxed font-medium">
                   {item.desc}
                 </p>
               </motion.div>

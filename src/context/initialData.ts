@@ -14,25 +14,25 @@ export const initialData: AppData = {
   },
   home: {
     hero: {
-      tagline: "Precision Tech Agency",
-      promo: "Special Launch Promo",
-      title: "Solusi Digital Presisi Untuk Bisnis Anda.",
-      subtitle: "Kami membangun infrastruktur digital yang tangguh untuk UMKM, Institusi Pendidikan, dan Industri Pariwisata. Fokus kami adalah fungsionalitas, kecepatan, dan konversi nyata.",
+      tagline: "Jasa Website & Digital Agency",
+      promo: "Promo Launching - Slot Terbatas!",
+      title: "Bikin Bisnis Kamu Online & Otomatis dalam 7 Hari.",
+      subtitle: "Kami bantu UMKM, Sekolah, dan Bisnis Lokal punya website profesional yang bantu jualan lebih mudah, kelola data otomatis, dan tampil lebih terpercaya di depan pelanggan.",
       image: "/mitralabs_hero_premium_1778227502346.png",
-      stats: { label: "Success Projects", value: "240+", desc: "Projects completed successfully", statusLabel: "Sistem Status", statusValue: "Aktif" }
+      stats: { label: "Project Selesai", value: "240+", desc: "Project yang berhasil kami kembangkan", statusLabel: "Sistem Status", statusValue: "Aktif" }
     },
     problem: {
-      title: "Masalah Umum Bisnis di Era Digital",
-      subtitle: "Banyak bisnis kehilangan momentum karena infrastruktur digital yang dikelola secara amatir.",
+      title: "Kenapa Bisnis Kamu Perlu Website Sekarang?",
+      subtitle: "Banyak peluang hilang karena bisnis kamu belum terlihat profesional di internet.",
       items: [
-        { id: 1, title: "Kehilangan Trust", desc: "Calon klien ragu bertransaksi karena website terlihat ketinggalan zaman atau tidak aman." },
-        { id: 2, title: "Konversi Rendah", desc: "Website hanya jadi pajangan tanpa sistem yang memudahkan pelanggan untuk membeli atau memesan." },
+        { id: 1, title: "Kurang Dipercaya Pelanggan", desc: "Orang ragu beli kalau bisnis kamu nggak punya website resmi yang jelas informasinya." },
+        { id: 2, title: "Capek Balas Chat Satu-Satu", desc: "Tanpa sistem otomatis, waktu kamu habis cuma buat jawab pertanyaan yang itu-itu saja." },
       ],
     },
     solution: {
-      tagline: "Our Expertise",
-      title: "Arsitektur Digital yang Menghasilkan Pertumbuhan",
-      subtitle: "Setiap baris kode yang kami tulis bertujuan untuk memecahkan masalah spesifik di industri Anda.",
+      tagline: "Layanan Kami",
+      title: "Solusi Website yang Bantu Bisnis Kamu Tumbuh",
+      subtitle: "Kami buatkan website yang bukan cuma pajangan, tapi alat yang beneran bantu kerjaan kamu.",
       cards: {
         umkm: {
           tag: "Most Requested",

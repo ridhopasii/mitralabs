@@ -261,13 +261,21 @@ function TrackContent() {
       const element = reportRef.current;
       if (!element) return;
 
-      const scale = 2;
-      const dataUrl = await domtoimage.toPng(element, {
+      const scale = 1.5;
+      const dataUrl = await domtoimage.toJpeg(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
         scale: scale,
+        quality: 0.9,
         bgcolor: '#ffffff',
-        cacheBust: true
+        cacheBust: true,
+        style: {
+          // Force all colors to be simple for the renderer
+          'color-scheme': 'light',
+          '--tw-shadow': 'none',
+          '--tw-ring-color': 'transparent',
+          'outline': 'none',
+        }
       });
 
       const pdf = new jsPDF({
@@ -280,7 +288,7 @@ function TrackContent() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Laporan_Proyek_${projectData.client_projects[0].project_name.replace(/\s+/g, '_')}.pdf`);
     } catch (err: any) {
       alert("Gagal mengekspor laporan: " + err.message);
@@ -299,13 +307,21 @@ function TrackContent() {
       const element = docRef.current;
       if (!element) return;
       
-      const scale = 2;
-      const dataUrl = await domtoimage.toPng(element, {
+      const scale = 1.5;
+      const dataUrl = await domtoimage.toJpeg(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
         scale: scale,
+        quality: 0.9,
         bgcolor: '#ffffff',
-        cacheBust: true
+        cacheBust: true,
+        style: {
+          'color-scheme': 'light',
+          '--tw-shadow': 'none',
+          '--tw-ring-color': 'transparent',
+          'outline': 'none',
+          'border-color': '#e2e8f0', // slate-200
+        }
       });
 
       const pdf = new jsPDF({
@@ -318,7 +334,7 @@ function TrackContent() {
       const pdfWidth = pdf.internal.pageSize.getWidth();
       const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
-      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
+      pdf.addImage(dataUrl, "JPEG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Dokumen_${viewingDoc}_${projectData?.customer_name || 'Mitralabs'}.pdf`);
     } catch (err: any) {
       console.error("Export error:", err);
