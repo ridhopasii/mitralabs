@@ -172,24 +172,24 @@ export default function SettingsPage() {
   const [success, setSuccess] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
-  // Initialize from centralized brand or fallback to legacy
+  // Initialize from centralized brand or default empty values
   const [brandSettings, setBrandSettings] = useState(() => data.brand || {
-    name: data.invoiceSettings?.companyName || "Mitralabs",
-    tagline: data.invoiceSettings?.companyTagline || "Precision Web Engineering",
-    logo: data.settings?.logo_url || "/logo.png",
-    favicon: data.settings?.favicon_url || "/favicon.ico",
-    phone: data.contact?.phone || "6282381118520",
-    whatsapp: data.settings?.waNumber || "6282381118520",
-    email: data.contact?.email || "contact@mitralabs.id",
-    website: data.settings?.companyWebsite || "www.mitralabs.id",
-    address: data.contact?.address || "Jl. Contoh No. 123",
-    city: data.invoiceSettings?.companyCity || "Medan",
-    province: data.invoiceSettings?.companyProvince || "Sumatera Utara",
-    postalCode: data.invoiceSettings?.companyPostalCode || "20111",
-    npwp: data.settings?.companyNpwp || "00.000.000.0-000.000",
-    linkedin: data.settings?.linkedinUrl || "linkedin.com/company/mitralabs-id",
-    instagram: data.contact?.instagram || "@mitralabs.id",
-    mapsUrl: data.contact?.mapsUrl || "https://maps.google.com/?q=Medan",
+    name: "",
+    tagline: "",
+    logo: "",
+    favicon: "",
+    phone: "",
+    whatsapp: "",
+    email: "",
+    website: "",
+    address: "",
+    city: "",
+    province: "",
+    postalCode: "",
+    npwp: "",
+    linkedin: "",
+    instagram: "",
+    mapsUrl: "",
   });
 
   const [invoiceSettings, setInvoiceSettings] = useState(() => data.invoiceSettings || defaultInvoiceSettings);
