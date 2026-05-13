@@ -71,29 +71,22 @@ export default function PublicInvoicePage() {
 
   // PDF Download Handler
   const handleDownloadPDF = async () => {
-    const element = document.getElementById("invoice-content");
-    if (!element) return;
+    const container = document.getElementById("invoice-content");
+    if (!container) return;
 
     setIsGenerating(true);
     try {
       const domtoimage = (await import("dom-to-image-more")).default;
       const { jsPDF } = await import("jspdf");
 
-      // Use a higher scale for better quality
+      // Gunakan scale tinggi untuk hasil tajam (retina quality)
       const scale = 2;
-      const style = {
-        transform: `scale(${scale})`,
-        transformOrigin: "top left",
-        width: element.offsetWidth + "px",
-        height: element.offsetHeight + "px",
-      };
-
-      const dataUrl = await domtoimage.toPng(element, {
-        width: element.offsetWidth * scale,
-        height: element.offsetHeight * scale,
-        style: style,
-        copyStyles: true,
-        cacheBust: true,
+      const dataUrl = await domtoimage.toPng(container, {
+        width: container.offsetWidth * scale,
+        height: container.offsetHeight * scale,
+        scale: scale,
+        bgcolor: '#F5F5F7',
+        cacheBust: true
       });
 
       const pdf = new jsPDF({

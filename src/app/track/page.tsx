@@ -265,14 +265,8 @@ function TrackContent() {
       const dataUrl = await domtoimage.toPng(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
-        style: {
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: element.offsetWidth + 'px',
-          height: element.offsetHeight + 'px'
-        },
+        scale: scale,
         bgcolor: '#ffffff',
-        copyStyles: true,
         cacheBust: true
       });
 
@@ -309,14 +303,8 @@ function TrackContent() {
       const dataUrl = await domtoimage.toPng(element, {
         width: element.offsetWidth * scale,
         height: element.offsetHeight * scale,
-        style: {
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: element.offsetWidth + 'px',
-          height: element.offsetHeight + 'px'
-        },
+        scale: scale,
         bgcolor: '#ffffff',
-        copyStyles: true,
         cacheBust: true
       });
 

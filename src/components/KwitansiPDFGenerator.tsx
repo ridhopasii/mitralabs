@@ -302,14 +302,8 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
       const dataUrl = await domtoimage.toPng(container, {
         width: container.offsetWidth * scale,
         height: container.offsetHeight * scale,
-        style: {
-          transform: `scale(${scale})`,
-          transformOrigin: 'top left',
-          width: container.offsetWidth + 'px',
-          height: container.offsetHeight + 'px'
-        },
+        scale: scale,
         bgcolor: '#F5F5F7',
-        copyStyles: true,
         cacheBust: true
       });
 
