@@ -8,7 +8,6 @@ import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
 import html2canvas from "html2canvas";
-import domtoimage from "dom-to-image-more";
 import jsPDF from "jspdf";
 import { uploadImage } from "@/lib/imageUpload";
 
@@ -261,6 +260,8 @@ function TrackContent() {
       const element = reportRef.current;
       if (!element) return;
 
+      // @ts-ignore - Browser only
+      const domtoimage = (await import("dom-to-image-more")).default;
       const dataUrl = await domtoimage.toPng(element, {
         bgcolor: '#ffffff',
         width: element.scrollWidth,
@@ -287,8 +288,10 @@ function TrackContent() {
     setIsLoading(true);
     try {
       const element = docRef.current;
+      if (!element) return;
       
-      // dom-to-image-more handles modern CSS colors (oklch/lab) better than html2canvas
+      // @ts-ignore - Browser only
+      const domtoimage = (await import("dom-to-image-more")).default;
       const dataUrl = await domtoimage.toPng(element, {
         bgcolor: '#ffffff',
         width: element.scrollWidth,
