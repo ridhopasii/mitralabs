@@ -600,7 +600,7 @@ export default function GlobalContentCMS() {
                   <SectionTitle title="Operational Intelligence" subtitle="Konfigurasi teknis kontak." icon={Settings} />
                   <div className="grid md:grid-cols-2 gap-12">
                     <InputField onChange={updateField} label="Maps Embed/URL" path="contact.mapsUrl" value={formData.contact.mapsUrl} icon={MapPin} />
-                    <InputField onChange={updateField} label="Form Success Message" path="contact.labels.successTitle" value={formData.contact.labels.successTitle} />
+                    <InputField onChange={updateField} label="Form Success Message" path="contact.labels.successTitle" value={formData.contact.labels?.successTitle} />
                   </div>
                </div>
             </motion.div>
@@ -666,14 +666,14 @@ export default function GlobalContentCMS() {
                <div className="bg-surface-container p-12 md:p-16 rounded-[4rem] border border-outline/5 shadow-apple space-y-12">
                   <SectionTitle title="Track Dashboard Labels" subtitle="Semua teks di halaman /track." icon={Monitor} />
                   <div className="grid md:grid-cols-2 gap-12">
-                    <InputField onChange={updateField} label="Main Title" path="track.title" value={formData.track.title} />
-                    <InputField onChange={updateField} label="Subtitle" path="track.subtitle" value={formData.track.subtitle} type="textarea" />
-                    <InputField onChange={updateField} label="Login Header" path="track.labels.secureBadge" value={formData.track.labels.secureBadge} />
-                    <InputField onChange={updateField} label="Submit Button" path="track.labels.submitButton" value={formData.track.labels.submitButton} />
+                    <InputField onChange={updateField} label="Main Title" path="track.title" value={formData.track?.title} />
+                    <InputField onChange={updateField} label="Subtitle" path="track.subtitle" value={formData.track?.subtitle} type="textarea" />
+                    <InputField onChange={updateField} label="Login Header" path="track.labels.secureBadge" value={formData.track?.labels?.secureBadge} />
+                    <InputField onChange={updateField} label="Submit Button" path="track.labels.submitButton" value={formData.track?.labels?.submitButton} />
                   </div>
                   <div className="grid md:grid-cols-2 lg:grid-cols-3 gap-8 p-8 bg-background rounded-3xl border border-outline/5 shadow-inner">
-                    {Object.keys(formData.track.labels.tabs).map((key) => (
-                      <InputField key={key} label={`Tab ${key}`} value={formData.track.labels.tabs[key]} onChange={(p: string, v: any) => updateField(`track.labels.tabs.${key}`, v)} />
+                    {formData.track?.labels?.tabs && Object.keys(formData.track.labels.tabs).map((key) => (
+                      <InputField key={key} label={`Tab ${key}`} value={(formData.track?.labels?.tabs as any)[key]} onChange={(p: string, v: any) => updateField(`track.labels.tabs.${key}`, v)} />
                     ))}
                   </div>
                </div>
