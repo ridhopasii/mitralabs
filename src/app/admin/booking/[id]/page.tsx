@@ -6,7 +6,7 @@ import { supabase, logActivity } from "@/lib/supabase";
 import {
   ArrowLeft, Package, User, Mail, Phone, Calendar, CheckCircle2,
   Clock, AlertCircle, TrendingUp, Upload, FileText, Plus, MessageSquare,
-  Loader2, Trash2, Link2, ExternalLink, Download, Target, Play, Send, Image as ImageIcon
+  Loader2, Trash2, Link2, ExternalLink, Download, Target, Play, Send, Sparkles, Image as ImageIcon
 } from "lucide-react";
 import Link from "next/link";
 import { motion, AnimatePresence } from "framer-motion";
