@@ -76,29 +76,41 @@ export default function PublicInvoicePage() {
 
     setIsGenerating(true);
     try {
-      const html2canvas = (await import("html2canvas")).default;
+      const domtoimage = (await import("dom-to-image-more")).default;
       const { jsPDF } = await import("jspdf");
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-      });
+      // Use a higher scale for better quality
+      const scale = 2;
+      const style = {
+        transform: `scale(${scale})`,
+        transformOrigin: "top left",
+        width: element.offsetWidth + "px",
+        height: element.offsetHeight + "px",
+      };
 
-      const imgData = canvas.toDataURL("image/png");
-      const imgWidth = 210; 
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
+      const dataUrl = await domtoimage.toPng(element, {
+        width: element.offsetWidth * scale,
+        height: element.offsetHeight * scale,
+        style: style,
+        copyStyles: true,
+        cacheBust: true,
+      });
 
       const pdf = new jsPDF({
         orientation: "portrait",
         unit: "mm",
-        format: [imgWidth, imgHeight],
+        format: "a4",
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, imgWidth, imgHeight);
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Kwitansi-${invoice?.invoice_number}.pdf`);
-    } catch (error) {
+    } catch (error: any) {
       console.error("PDF Error:", error);
+      alert("Gagal mengunduh dokumen: " + (error.message || "Terjadi kesalahan saat memproses gambar."));
     } finally {
       setIsGenerating(false);
     }

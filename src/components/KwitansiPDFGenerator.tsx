@@ -41,7 +41,7 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
   const generatePDF = async () => {
     setIsGenerating(true);
     try {
-      const html2canvas = (await import('html2canvas')).default;
+      const domtoimage = (await import('dom-to-image-more')).default;
       const { jsPDF } = await import('jspdf');
 
       const items = typeof invoiceData.items === 'string'
@@ -298,28 +298,34 @@ export default function KwitansiPDFGenerator({ invoiceNumber, invoiceData, class
       document.body.appendChild(container);
 
       // Gunakan scale tinggi untuk hasil tajam (retina quality)
-      const canvas = await html2canvas(container, {
-        scale: 2,
-        useCORS: true,
-        backgroundColor: '#F5F5F7',
-        logging: false
+      const scale = 2;
+      const dataUrl = await domtoimage.toPng(container, {
+        width: container.offsetWidth * scale,
+        height: container.offsetHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          width: container.offsetWidth + 'px',
+          height: container.offsetHeight + 'px'
+        },
+        bgcolor: '#F5F5F7',
+        copyStyles: true,
+        cacheBust: true
       });
 
       document.body.removeChild(container);
 
-      // Flexibel Height: Mengikuti tinggi konten, bukan memaksa A4
-      const imgWidth = 210; // mm
-      const imgHeight = (canvas.height * imgWidth) / canvas.width;
-
       const pdf = new jsPDF({
         orientation: 'p',
         unit: 'mm',
-        format: [imgWidth, imgHeight] // CUSTOM FORMAT SESUAI KONTEN
+        format: 'a4'
       });
 
-      const imgData = canvas.toDataURL('image/png', 1.0);
-      pdf.addImage(imgData, 'PNG', 0, 0, imgWidth, imgHeight);
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
 
+      pdf.addImage(dataUrl, 'PNG', 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Kwitansi-${invoiceNumber}.pdf`);
 
     } catch (error) {

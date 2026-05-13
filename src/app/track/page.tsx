@@ -7,7 +7,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
 import { useSearchParams } from "next/navigation";
 import { useData } from "@/context/DataContext";
-import html2canvas from "html2canvas";
+import domtoimage from "dom-to-image-more";
 import jsPDF from "jspdf";
 import { uploadImage } from "@/lib/imageUpload";
 
@@ -259,27 +259,32 @@ function TrackContent() {
       const element = reportRef.current;
       if (!element) return;
 
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        onclone: (clonedDoc) => {
-          // Remove problematic styles in the clone
-          const style = clonedDoc.createElement('style');
-          style.innerHTML = `* { box-shadow: none !important; border-color: #e2e8f0 !important; }`;
-          clonedDoc.head.appendChild(style);
-        }
+      const scale = 2;
+      const dataUrl = await domtoimage.toPng(element, {
+        width: element.offsetWidth * scale,
+        height: element.offsetHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          width: element.offsetWidth + 'px',
+          height: element.offsetHeight + 'px'
+        },
+        bgcolor: '#ffffff',
+        copyStyles: true,
+        cacheBust: true
       });
 
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
-        unit: "px",
-        format: [canvas.width / 2, canvas.height / 2]
+        unit: "mm",
+        format: "a4",
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Laporan_Proyek_${projectData.client_projects[0].project_name.replace(/\s+/g, '_')}.pdf`);
     } catch (err: any) {
       alert("Gagal mengekspor laporan: " + err.message);
@@ -295,29 +300,32 @@ function TrackContent() {
       const element = docRef.current;
       if (!element) return;
       
-      const canvas = await html2canvas(element, {
-        scale: 2,
-        useCORS: true,
-        logging: false,
-        backgroundColor: "#ffffff",
-        windowWidth: 800, // Force a consistent width for capture
-        onclone: (clonedDoc) => {
-          const el = clonedDoc.querySelector('[ref="docRef"]') as HTMLElement;
-          if (el) {
-            el.style.transform = 'none';
-            el.style.boxShadow = 'none';
-          }
-        }
+      const scale = 2;
+      const dataUrl = await domtoimage.toPng(element, {
+        width: element.offsetWidth * scale,
+        height: element.offsetHeight * scale,
+        style: {
+          transform: `scale(${scale})`,
+          transformOrigin: 'top left',
+          width: element.offsetWidth + 'px',
+          height: element.offsetHeight + 'px'
+        },
+        bgcolor: '#ffffff',
+        copyStyles: true,
+        cacheBust: true
       });
 
-      const imgData = canvas.toDataURL("image/png");
       const pdf = new jsPDF({
         orientation: "portrait",
-        unit: "px",
-        format: [canvas.width / 2, canvas.height / 2]
+        unit: "mm",
+        format: "a4",
       });
 
-      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      const imgProps = pdf.getImageProperties(dataUrl);
+      const pdfWidth = pdf.internal.pageSize.getWidth();
+      const pdfHeight = (imgProps.height * pdfWidth) / imgProps.width;
+
+      pdf.addImage(dataUrl, "PNG", 0, 0, pdfWidth, pdfHeight);
       pdf.save(`Dokumen_${viewingDoc}_${projectData?.customer_name || 'Mitralabs'}.pdf`);
     } catch (err: any) {
       console.error("Export error:", err);
