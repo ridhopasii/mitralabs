@@ -5,7 +5,6 @@ import { Search, X, FileText, Briefcase, BookOpen, MessageSquare } from "lucide-
 import { useRouter } from "next/navigation";
 import { useData } from "@/context/DataContext";
 import { motion, AnimatePresence } from "framer-motion";
-命中
 
 interface SearchResult {
   type: "blog" | "portfolio" | "booking" | "faq";
