@@ -131,9 +131,9 @@ export default function GlobalSearch() {
   };
 
   return (
-    <div ref={searchRef} className="relative w-full max-w-md">
+    <div ref={searchRef} className="relative w-full max-w-lg group">
       <div className="relative">
-        <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+        <Search className="absolute left-5 top-1/2 -translate-y-1/2 w-5 h-5 text-slate-400 group-focus-within:text-slate-900 transition-colors" />
         <input
           type="text"
           value={query}
@@ -142,59 +142,65 @@ export default function GlobalSearch() {
             setIsOpen(true);
           }}
           onFocus={() => setIsOpen(true)}
-          placeholder="Search blog, portfolio, bookings, FAQs..."
-          className="w-full pl-10 pr-10 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-white dark:bg-gray-800 text-gray-900 dark:text-gray-100 focus:ring-2 focus:ring-blue-500 focus:border-transparent"
+          placeholder="Command + K to search everything..."
+          className="w-full pl-14 pr-12 py-4 bg-slate-100 border-none rounded-2xl outline-none focus:bg-white focus:ring-2 focus:ring-slate-200 font-bold text-sm transition-all shadow-inner"
         />
         {query && (
           <button
-            onClick={() => {
-              setQuery("");
-            }}
-            className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+            onClick={() => setQuery("")}
+            className="absolute right-4 top-1/2 -translate-y-1/2 p-1.5 hover:bg-slate-100 rounded-full text-slate-400 hover:text-slate-900 transition-all"
           >
-            <X className="w-5 h-5" />
+            <X className="w-4 h-4" />
           </button>
         )}
       </div>
 
-      {/* Results dropdown */}
-      {isOpen && results.length > 0 && (
-        <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg max-h-96 overflow-y-auto z-50">
-          {results.map((result, index) => (
-            <button
-              key={`${result.type}-${result.id}-${index}`}
-              onClick={() => handleResultClick(result.url)}
-              className="w-full px-4 py-3 flex items-start gap-3 hover:bg-gray-50 dark:hover:bg-gray-700 border-b border-gray-100 dark:border-gray-700 last:border-0 text-left transition-colors"
-            >
-              <div className="mt-1 text-gray-500 dark:text-gray-400">
-                {getIcon(result.type)}
+      {/* Results dropdown with Glassmorphism */}
+      <AnimatePresence>
+        {isOpen && (query || results.length > 0) && (
+          <motion.div 
+            initial={{ opacity: 0, y: 10, scale: 0.98 }}
+            animate={{ opacity: 1, y: 0, scale: 1 }}
+            exit={{ opacity: 0, y: 10, scale: 0.98 }}
+            className="absolute top-full mt-4 w-full bg-white/80 backdrop-blur-2xl border border-white/20 rounded-[2rem] shadow-[0_20px_50px_rgba(0,0,0,0.15)] max-h-[32rem] overflow-y-auto z-[1000] custom-scrollbar p-3"
+          >
+            {results.length > 0 ? (
+              <div className="space-y-1">
+                <p className="px-5 py-3 text-[10px] font-black uppercase tracking-[0.25em] text-slate-400">Search Results</p>
+                {results.map((result, index) => (
+                  <button
+                    key={`${result.type}-${result.id}-${index}`}
+                    onClick={() => handleResultClick(result.url)}
+                    className="w-full px-5 py-4 flex items-center gap-5 hover:bg-white hover:shadow-lg rounded-2xl transition-all text-left group/item"
+                  >
+                    <div className="w-10 h-10 bg-slate-100 group-hover/item:bg-slate-900 group-hover/item:text-white rounded-xl flex items-center justify-center text-slate-500 transition-colors">
+                      {getIcon(result.type)}
+                    </div>
+                    <div className="flex-1 min-w-0">
+                      <div className="font-bold text-slate-900 truncate tracking-tight">
+                        {result.title}
+                      </div>
+                      {result.subtitle && (
+                        <div className="text-[11px] text-slate-400 font-bold uppercase tracking-widest truncate mt-0.5">
+                          {result.subtitle}
+                        </div>
+                      )}
+                    </div>
+                    <div className="text-[9px] font-black text-slate-300 uppercase tracking-widest group-hover/item:text-slate-900 transition-colors">
+                      {result.type}
+                    </div>
+                  </button>
+                ))}
               </div>
-              <div className="flex-1 min-w-0">
-                <div className="font-medium text-gray-900 dark:text-gray-100 truncate">
-                  {result.title}
-                </div>
-                {result.subtitle && (
-                  <div className="text-sm text-gray-500 dark:text-gray-400 truncate">
-                    {result.subtitle}
-                  </div>
-                )}
+            ) : query && (
+              <div className="p-12 text-center space-y-4 opacity-30">
+                <Search size={48} className="mx-auto" strokeWidth={1} />
+                <p className="text-[11px] font-black uppercase tracking-widest">No matching records found</p>
               </div>
-              <div className="text-xs text-gray-400 uppercase tracking-wider mt-1">
-                {result.type}
-              </div>
-            </button>
-          ))}
-        </div>
-      )}
-
-      {/* No results */}
-      {isOpen && query && results.length === 0 && (
-        <div className="absolute top-full mt-2 w-full bg-white dark:bg-gray-800 border border-gray-200 dark:border-gray-700 rounded-lg shadow-lg p-4 z-50">
-          <p className="text-gray-500 dark:text-gray-400 text-center">
-            No results found for "{query}"
-          </p>
-        </div>
-      )}
+            )}
+          </motion.div>
+        )}
+      </AnimatePresence>
     </div>
   );
 }

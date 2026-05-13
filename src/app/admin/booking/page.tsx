@@ -662,7 +662,25 @@ export default function BookingCMS() {
             </div>
           )}
 
-          {filteredBookings.length === 0 && (
+          {isRefreshing && bookings.length === 0 ? (
+            <div className="divide-y divide-slate-50">
+              {Array(5).fill(0).map((_, i) => (
+                <div key={i} className="px-10 py-8 flex items-center justify-between animate-pulse">
+                  <div className="flex items-center gap-6">
+                    <div className="w-10 h-10 bg-slate-100 rounded-full" />
+                    <div className="space-y-2">
+                      <div className="w-32 h-3 bg-slate-100 rounded-full" />
+                      <div className="w-24 h-2 bg-slate-50 rounded-full" />
+                    </div>
+                  </div>
+                  <div className="flex gap-4">
+                    <div className="w-20 h-8 bg-slate-50 rounded-xl" />
+                    <div className="w-20 h-8 bg-slate-50 rounded-xl" />
+                  </div>
+                </div>
+              ))}
+            </div>
+          ) : filteredBookings.length === 0 && (
              <div className="py-40 text-center">
                 {fetchError ? (
                   <div className="flex flex-col items-center gap-6">

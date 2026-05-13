@@ -32,9 +32,9 @@ export default function Navbar() {
             {/* Logo */}
             <Link href="/" onClick={() => setMobileOpen(false)} className="text-lg font-bold tracking-tight text-on-background flex items-center gap-2 group shrink-0">
                <div className="w-6 h-6 bg-on-background text-background rounded-md flex items-center justify-center font-bold text-[10px] transition-transform group-hover:scale-110">
-                  M
+                  {navbar.logo.charAt(0)}
                </div>
-               <span className="hidden sm:inline">Mitralabs</span>
+               <span className="hidden sm:inline">{navbar.logo}</span>
             </Link>
 
             {/* Desktop Nav Links (Hidden on Mobile) */}
@@ -53,7 +53,7 @@ export default function Navbar() {
                 );
               })}
               <Link href="/track" className="transition-colors hover:text-on-background relative group">
-                Lacak Projek
+                {pathname?.startsWith("/track") ? "Dashboard Projek" : "Lacak Projek"}
                 <span className="absolute -bottom-1 left-0 w-full h-px bg-on-background scale-x-0 group-hover:scale-x-100 origin-left transition-transform duration-300"></span>
               </Link>
             </nav>

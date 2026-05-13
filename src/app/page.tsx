@@ -7,6 +7,7 @@ import StatsSection from "@/sections/home/StatsSection";
 import CTASection from "@/sections/home/CTASection";
 import TestimonialsSection from "@/sections/home/TestimonialsSection";
 import FAQSection from "@/sections/home/FAQSection";
+import PricingSection from "@/sections/home/PricingSection";
 import PortfolioSection from "@/sections/home/PortfolioSection";
 import Footer from "@/components/Footer";
 
@@ -68,6 +69,7 @@ export default function Home() {
       <HeroSection />
       <ProblemSection />
       <SolutionSection />
+      <PricingSection />
       <PortfolioSection />
       <ProcessSection />
       <StatsSection />

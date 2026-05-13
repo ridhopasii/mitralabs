@@ -24,7 +24,7 @@ export default function CTASection() {
               href="/pesan-sekarang"
               className="btn-apple w-full sm:w-auto text-lg md:text-xl px-12 py-4 md:py-5"
             >
-              Pesan Sekarang
+              {cta.buttonText}
             </Link>
             <p className="text-[8px] md:text-[10px] font-bold text-secondary tracking-[0.2em] uppercase">
               {cta.promoText}

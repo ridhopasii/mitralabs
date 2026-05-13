@@ -22,13 +22,13 @@ export default function FAQSection() {
         <div className="text-center mb-20">
           <div className="inline-flex items-center gap-3 px-5 py-2.5 rounded-full bg-primary/10 text-primary text-xs font-black uppercase tracking-widest mb-8">
             <HelpCircle size={14} />
-            FAQ
+            {data.home.faqLabels?.badge || "FAQ"}
           </div>
           <h2 className="font-display text-4xl md:text-6xl font-black text-on-surface tracking-tighter mb-6">
-            Pertanyaan yang Sering Ditanyakan
+            {data.home.faqLabels?.title || "Pertanyaan yang Sering Ditanyakan"}
           </h2>
           <p className="text-on-surface-variant font-medium text-lg max-w-2xl mx-auto leading-relaxed">
-            Semua yang perlu Anda ketahui sebelum memulai project bersama kami.
+            {data.home.faqLabels?.subtitle || "Semua yang perlu Anda ketahui sebelum memulai project bersama kami."}
           </p>
         </div>
 
@@ -88,13 +88,17 @@ export default function FAQSection() {
 
         {/* Bottom CTA */}
         <div className="mt-16 text-center bg-white p-10 rounded-[3rem] border border-surface-container-highest shadow-sm">
-          <h3 className="text-2xl font-black mb-4">Masih punya pertanyaan lain?</h3>
-          <p className="text-on-surface-variant font-medium mb-8">Tim kami siap membantu Anda menemukan solusi terbaik.</p>
+          <h3 className="text-2xl font-black mb-4">
+            {data.home.faqLabels?.ctaTitle || "Masih punya pertanyaan lain?"}
+          </h3>
+          <p className="text-on-surface-variant font-medium mb-8">
+            {data.home.faqLabels?.ctaSubtitle || "Tim kami siap membantu Anda menemukan solusi terbaik."}
+          </p>
           <a
             href="/kontak"
             className="inline-flex items-center gap-3 px-10 py-5 bg-primary text-on-primary rounded-2xl font-black text-sm uppercase tracking-widest hover:scale-105 active:scale-95 transition-all shadow-xl shadow-primary/20"
           >
-            Hubungi Kami
+            {data.home.faqLabels?.ctaButton || "Hubungi Kami"}
           </a>
         </div>
       </div>

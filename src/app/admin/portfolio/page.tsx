@@ -178,69 +178,95 @@ export default function PortfolioCMS() {
                 <th className="px-10 py-8 text-[11px] font-bold uppercase tracking-widest text-slate-400 text-right">Operational</th>
               </tr>
             </thead>
-            <tbody>
-              {filteredProjects.map((project) => (
-                <tr key={project.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-all group">
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-6">
-                      <div className="w-20 h-14 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 relative shrink-0">
-                        {project.image ? (
-                          <Image src={project.image} alt={project.title} fill className="object-cover" />
-                        ) : (
-                          <div className="flex items-center justify-center h-full text-slate-200">
-                            <ImageIcon size={20} />
-                          </div>
-                        )}
-                      </div>
-                      <div>
-                        <h4 className="text-base font-bold text-slate-900 tracking-tight leading-none mb-1.5">{project.title}</h4>
-                        <div className="flex items-center gap-2">
-                           <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">/{project.slug || "no-slug"}</p>
-                           {project.id.toString().length > 15 && (
-                              <span className="text-[8px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">ORDER-BASED</span>
-                           )}
+            <tbody className="divide-y divide-slate-50">
+              {isLoading && projects.length === 0 ? (
+                Array(5).fill(0).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="w-20 h-14 rounded-xl bg-slate-100" />
+                        <div className="space-y-2">
+                           <div className="w-32 h-3 bg-slate-100 rounded-full" />
+                           <div className="w-24 h-2 bg-slate-50 rounded-full" />
                         </div>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-10 py-8">
-                     <span className="px-4 py-1.5 bg-slate-50 text-slate-600 text-[9px] font-bold uppercase tracking-widest rounded-full border border-slate-100">
-                        {project.category}
-                     </span>
-                  </td>
-                  <td className="px-10 py-8">
-                    <StatusBadge status={project.status} />
-                  </td>
-                  <td className="px-10 py-8 text-right">
-                    <div className="flex items-center justify-end gap-3">
-                      {project.id.toString().length > 15 ? (
-                         <Link
-                           href={`/admin/booking/${project.id}`}
-                           className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm flex items-center gap-2"
-                         >
-                           <ExternalLink size={16} />
-                           <span className="text-[10px] font-bold uppercase tracking-widest px-2">Manage Order</span>
-                         </Link>
-                      ) : (
-                        <>
-                          <button
-                            onClick={() => { setEditingProject(project); setActiveTab("identity"); }}
-                            className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm"
-                          >
-                            <Edit3 size={16} />
-                          </button>
-                          <button
-                            onClick={() => handleDelete(project.id)}
-                            className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-rose-500 hover:border-rose-500 transition-all shadow-sm"
-                          >
-                            <Trash2 size={16} />
-                          </button>
-                        </>
-                      )}
-                    </div>
-                  </td>
+                    </td>
+                    <td className="px-10 py-8"><div className="w-20 h-6 bg-slate-50 rounded-full" /></td>
+                    <td className="px-10 py-8"><div className="w-24 h-6 bg-slate-50 rounded-full" /></td>
+                    <td className="px-10 py-8"><div className="ml-auto w-10 h-10 bg-slate-50 rounded-xl" /></td>
+                  </tr>
+                ))
+              ) : filteredProjects.length === 0 ? (
+                <tr>
+                   <td colSpan={4} className="py-40 text-center opacity-10">
+                      <Briefcase size={64} className="mx-auto mb-4" strokeWidth={1} />
+                      <p className="font-black uppercase tracking-widest text-[10px]">No projects found</p>
+                   </td>
                 </tr>
-              ))}
+              ) : (
+                filteredProjects.map((project) => (
+                  <tr key={project.id} className="border-b border-slate-50 hover:bg-slate-50/30 transition-all group">
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="w-20 h-14 rounded-xl overflow-hidden bg-slate-50 border border-slate-100 relative shrink-0">
+                          {project.image ? (
+                            <Image src={project.image} alt={project.title} fill className="object-cover" />
+                          ) : (
+                            <div className="flex items-center justify-center h-full text-slate-200">
+                              <ImageIcon size={20} />
+                            </div>
+                          )}
+                        </div>
+                        <div>
+                          <h4 className="text-base font-bold text-slate-900 tracking-tight leading-none mb-1.5">{project.title}</h4>
+                          <div className="flex items-center gap-2">
+                             <p className="text-[10px] text-slate-400 font-bold tracking-widest uppercase">/{project.slug || "no-slug"}</p>
+                             {project.id.toString().length > 15 && (
+                                <span className="text-[8px] bg-blue-50 text-blue-500 px-1.5 py-0.5 rounded font-black uppercase tracking-tighter">ORDER-BASED</span>
+                             )}
+                          </div>
+                        </div>
+                      </div>
+                    </td>
+                    <td className="px-10 py-8">
+                       <span className="px-4 py-1.5 bg-slate-50 text-slate-600 text-[9px] font-bold uppercase tracking-widest rounded-full border border-slate-100">
+                          {project.category}
+                       </span>
+                    </td>
+                    <td className="px-10 py-8">
+                      <StatusBadge status={project.status} />
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                      <div className="flex items-center justify-end gap-3">
+                        {project.id.toString().length > 15 ? (
+                           <Link
+                             href={`/admin/booking/${project.id}`}
+                             className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm flex items-center gap-2"
+                           >
+                             <ExternalLink size={16} />
+                             <span className="text-[10px] font-bold uppercase tracking-widest px-2">Manage Order</span>
+                           </Link>
+                        ) : (
+                          <>
+                            <button
+                              onClick={() => { setEditingProject(project); setActiveTab("identity"); }}
+                              className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-primary hover:border-primary transition-all shadow-sm"
+                            >
+                              <Edit3 size={16} />
+                            </button>
+                            <button
+                              onClick={() => handleDelete(project.id)}
+                              className="p-3 bg-white border border-slate-200 text-slate-400 rounded-xl hover:text-rose-500 hover:border-rose-500 transition-all shadow-sm"
+                            >
+                              <Trash2 size={16} />
+                            </button>
+                          </>
+                        )}
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
         </div>

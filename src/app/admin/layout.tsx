@@ -56,25 +56,32 @@ export default function AdminLayout({
   };
 
   const menuItems = [
-    { name: "Dashboard", icon: LayoutDashboard, href: "/admin", category: "Utama" },
-    { name: "CRM Pipeline", icon: Layers, href: "/admin/crm", category: "Utama" },
-    { name: "Users & Staff", icon: Users, href: "/admin/users", category: "Utama" },
-    { name: "Clients", icon: Users, href: "/admin/clients", category: "Utama" },
-    { name: "Order & Invoice", icon: Package, href: "/admin/booking", category: "Utama" },
-    { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Utama" },
-    { name: "Riwayat", icon: History, href: "/admin/logs", category: "Utama" },
-    { name: "Settings", icon: Settings, href: "/admin/settings", category: "Utama" },
-    { name: "Site Settings", icon: Type, href: "/admin/konten", category: "CMS" },
-    { name: "Layanan", icon: Briefcase, href: "/admin/layanan", category: "CMS" },
-    { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "CMS" },
-    { name: "Blog", icon: FileText, href: "/admin/blog", category: "CMS" },
-    { name: "Dokumen", icon: FileText, href: "/admin/dokumen", category: "CMS" },
-    { name: "Media", icon: Image, href: "/admin/media", category: "CMS" },
-    { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "CMS" },
-    { name: "FAQ", icon: HelpCircle, href: "/admin/faq", category: "CMS" },
+    // --- Utama / Operations ---
+    { name: "Command Center", icon: LayoutDashboard, href: "/admin", category: "Operations" },
+    { name: "Project Pipeline", icon: Layers, href: "/admin/crm", category: "Operations" },
+    { name: "Bookings & Invoices", icon: Package, href: "/admin/booking", category: "Operations" },
+    { name: "Client Registry", icon: Users, href: "/admin/clients", category: "Operations" },
+
+    // --- Communications ---
+    { name: "Pesan Masuk", icon: MessageSquare, href: "/admin/pesan", category: "Communications" },
+    { name: "Blog / Artikel", icon: FileText, href: "/admin/blog", category: "Communications" },
+
+    // --- CMS / Site Engine ---
+    { name: "Site Builder", icon: Type, href: "/admin/konten", category: "Site Engine" },
+    { name: "Service Plans", icon: Briefcase, href: "/admin/layanan", category: "Site Engine" },
+    { name: "Portfolio", icon: Package, href: "/admin/portfolio", category: "Site Engine" },
+    { name: "Testimoni", icon: Star, href: "/admin/testimonials", category: "Site Engine" },
+    { name: "FAQ Library", icon: HelpCircle, href: "/admin/faq", category: "Site Engine" },
+
+    // --- Infrastructure ---
+    { name: "System & Finance", icon: Settings, href: "/admin/settings", category: "Infrastructure" },
+    { name: "Media Assets", icon: Image, href: "/admin/media", category: "Infrastructure" },
+    { name: "Generated Docs", icon: FileText, href: "/admin/dokumen", category: "Infrastructure" },
+    { name: "Users & Staff", icon: Users, href: "/admin/users", category: "Infrastructure" },
+    { name: "Audit Logs", icon: History, href: "/admin/logs", category: "Infrastructure" },
   ];
 
-  const categories = ["Utama", "CMS"];
+  const categories = ["Operations", "Communications", "Site Engine", "Infrastructure"];
 
   if (!isAuthorized) return null;
 

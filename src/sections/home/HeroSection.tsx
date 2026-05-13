@@ -32,10 +32,10 @@ export default function HeroSection() {
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-6 mb-16 md:mb-24 px-4">
             <Link
-              href="/pesan-sekarang"
+              href="/layanan"
               className="btn-apple w-full sm:w-auto text-base md:text-lg text-center"
             >
-              Pesan Sekarang
+              {data.navbar.buttonText}
             </Link>
             <a
               href="/layanan"
@@ -79,13 +79,17 @@ export default function HeroSection() {
                 <p className="text-lg md:text-3xl font-semibold text-on-background tracking-tight">{hero.stats.value}</p>
               </div>
               <div className="text-left md:pl-12">
-                <p className="text-[8px] md:text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-1 md:mb-2">Status</p>
+                <p className="text-[8px] md:text-[10px] font-bold text-secondary uppercase tracking-[0.2em] mb-1 md:mb-2">
+                  {hero.stats.statusLabel || "Status"}
+                </p>
                 <div className="flex items-center gap-2 md:gap-3">
                    <div className="relative">
                     <div className="w-2 h-2 md:w-2.5 md:h-2.5 bg-success rounded-full"></div>
                     <div className="absolute inset-0 w-2 h-2 md:w-2.5 md:h-2.5 bg-success rounded-full animate-ping opacity-75"></div>
                    </div>
-                   <p className="text-lg md:text-3xl font-semibold text-on-background tracking-tight">Aktif</p>
+                   <p className="text-lg md:text-3xl font-semibold text-on-background tracking-tight">
+                     {hero.stats.statusValue || "Aktif"}
+                   </p>
                 </div>
               </div>
             </div>

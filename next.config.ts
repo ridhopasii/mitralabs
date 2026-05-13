@@ -23,6 +23,15 @@ const nextConfig: NextConfig = {
   experimental: {
     optimizePackageImports: ['lucide-react', 'framer-motion'],
   },
+  async redirects() {
+    return [
+      {
+        source: '/dashboard',
+        destination: '/track',
+        permanent: true,
+      },
+    ];
+  },
 };
 
 export default nextConfig;

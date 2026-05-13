@@ -155,6 +155,18 @@ export interface AppData {
     notes: string[];
     comparisonTitle: string;
     comparisonSubtitle: string;
+    labels?: {
+      tagline: string;
+      comparisonTagline: string;
+      featureColumn: string;
+      durationLabel: string;
+      pagesLabel: string;
+      investmentLabel: string;
+      ctaTitle: string;
+      ctaSubtitle: string;
+      ctaPrimary: string;
+      ctaSecondary: string;
+    };
   };
   portfolio: {
     title: string;
@@ -165,6 +177,22 @@ export interface AppData {
       title: string;
       subtitle: string;
       buttonText: string;
+      promoText: string;
+    };
+    faqLabels?: {
+      title: string;
+      subtitle: string;
+      badge: string;
+      ctaTitle: string;
+      ctaSubtitle: string;
+      ctaButton: string;
+    };
+    labels?: {
+      viewDetail: string;
+      searchPlaceholder: string;
+      emptyState: string;
+      loadMore: string;
+      tagline: string;
     };
   };
   about: {
@@ -182,6 +210,13 @@ export interface AppData {
     teamTitle: string;
     teamSubtitle: string;
     team: { id: number; name: string; role: string; bio: string; image: string }[];
+    labels?: {
+      teamTagline: string;
+      ctaTitle: string;
+      ctaSubtitle: string;
+      ctaPrimary: string;
+      ctaSecondary: string;
+    };
   };
   contact: {
     title: string;
@@ -191,6 +226,12 @@ export interface AppData {
     instagram: string;
     address: string;
     mapsUrl: string;
+    labels?: {
+      tagline: string;
+      successTitle: string;
+      successSubtitle: string;
+      sendAnother: string;
+    };
   };
   footer: {
     description: string;
@@ -209,6 +250,10 @@ export interface AppData {
     linkedinUrl: string;
     logo_url: string;
     favicon_url: string;
+    metaTitle: string;
+    metaDescription: string;
+    metaKeywords: string;
+    ogImage: string;
   };
   invoiceSettings: {
     companyName: string;
@@ -259,6 +304,43 @@ export interface AppData {
     category: string;
   }[];
   bookings: Booking[];
+  track?: {
+    title: string;
+    subtitle: string;
+    loginInstructions: string;
+    labels?: {
+      secureBadge: string;
+      emailLabel: string;
+      passwordLabel: string;
+      emailPlaceholder: string;
+      submitButton: string;
+      helpText: string;
+      tabs: {
+        progress: string;
+        assets: string;
+        documents: string;
+        invoices: string;
+        chat: string;
+      };
+      dashboard?: {
+        header: {
+          projectNum: string;
+          lastUpdate: string;
+          logoutTitle: string;
+        };
+        stats: {
+          status: string;
+          plan: string;
+          service: string;
+          orderDate: string;
+          investment: string;
+        };
+        empty: {
+          preparing: string;
+        };
+      };
+    };
+  };
 }
 
 const DataContext = createContext<{

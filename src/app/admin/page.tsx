@@ -165,7 +165,23 @@ export default function AdminPage() {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <AnimatePresence>
           {loading ? Array(4).fill(0).map((_, i) => (
-            <div key={i} className="h-44 bg-white rounded-[2.5rem] border border-slate-100 animate-pulse" />
+            <div key={i} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 relative overflow-hidden">
+               <div className="flex justify-between items-start mb-10">
+                  <div className="w-14 h-14 bg-slate-50 rounded-2xl animate-pulse" />
+                  <div className="w-16 h-6 bg-slate-50 rounded-full animate-pulse" />
+               </div>
+               <div className="space-y-3">
+                  <div className="w-24 h-3 bg-slate-50 rounded-full animate-pulse" />
+                  <div className="w-32 h-8 bg-slate-50 rounded-full animate-pulse" />
+               </div>
+               {/* Shimmer effect */}
+               <motion.div 
+                 initial={{ x: "-100%" }}
+                 animate={{ x: "100%" }}
+                 transition={{ repeat: Infinity, duration: 1.5, ease: "linear" }}
+                 className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
+               />
+            </div>
           )) : dashboardStats.map((stat, i) => (
             <motion.div 
               key={i}
@@ -190,6 +206,31 @@ export default function AdminPage() {
             </motion.div>
           ))}
         </AnimatePresence>
+      </div>
+
+      {/* Quick Action Navigation - Workflow Optimization */}
+      <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-6 gap-6">
+         {[
+           { name: "New Invoice", icon: CreditCard, href: "/admin/booking", color: "bg-emerald-50 text-emerald-600" },
+           { name: "Add Project", icon: Package, href: "/admin/portfolio", color: "bg-blue-50 text-blue-600" },
+           { name: "Update Site", icon: Type, href: "/admin/konten", color: "bg-purple-50 text-purple-600" },
+           { name: "Pricing Edit", icon: DollarSign, href: "/admin/layanan", color: "bg-amber-50 text-amber-600" },
+           { name: "Check Leads", icon: MessageSquare, href: "/admin/pesan", color: "bg-rose-50 text-rose-600" },
+           { name: "System Config", icon: Settings, href: "/admin/settings", color: "bg-slate-50 text-slate-600" },
+         ].map((action, i) => (
+           <Link key={i} href={action.href}>
+             <motion.div 
+               whileHover={{ scale: 1.05, y: -5 }}
+               whileTap={{ scale: 0.95 }}
+               className="bg-white p-6 rounded-3xl border border-slate-100 shadow-sm flex flex-col items-center justify-center text-center gap-4 hover:shadow-xl transition-all cursor-pointer group"
+             >
+               <div className={`w-12 h-12 ${action.color} rounded-2xl flex items-center justify-center group-hover:scale-110 transition-transform`}>
+                 <action.icon size={20} />
+               </div>
+               <span className="text-[10px] font-black uppercase tracking-widest text-slate-900">{action.name}</span>
+             </motion.div>
+           </Link>
+         ))}
       </div>
 
       {/* Charts Section */}

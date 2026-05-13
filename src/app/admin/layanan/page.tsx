@@ -138,60 +138,80 @@ export default function ServicesCMS() {
               </tr>
             </thead>
             <tbody className="divide-y divide-outline/5">
-              {filteredPlans.map((plan) => (
-                <tr key={plan.id} className={`group hover:bg-on-background/[0.02] transition-all ${plan.highlight ? "bg-primary/[0.03]" : ""}`}>
-                  <td className="px-10 py-8">
-                    <div className="flex items-center gap-6">
-                      <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-apple ${plan.highlight ? "bg-primary text-on-primary" : "bg-background text-secondary"}`}>
-                        <Package size={24} />
-                      </div>
-                      <div>
-                        <div className="flex items-center gap-3">
-                          <h5 className="text-lg font-black text-on-background leading-none">{plan.name}</h5>
-                          {plan.highlight && (
-                            <span className="px-3 py-1 bg-amber-500 text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.3)]">
-                              Featured
-                            </span>
-                          )}
+              {plans.length === 0 ? (
+                Array(3).fill(0).map((_, i) => (
+                  <tr key={i} className="animate-pulse">
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className="w-14 h-14 rounded-2xl bg-on-background/5" />
+                        <div className="space-y-3">
+                           <div className="w-40 h-4 bg-on-background/5 rounded-full" />
+                           <div className="w-24 h-2 bg-on-background/5 rounded-full" />
                         </div>
-                        <p className="text-[11px] text-secondary font-bold uppercase tracking-widest mt-2">{plan.duration} Deployment • {plan.pages}</p>
                       </div>
-                    </div>
-                  </td>
-                  <td className="px-8 py-8">
-                     <span className="px-4 py-2 bg-background text-secondary rounded-xl text-[10px] font-black uppercase tracking-widest border border-outline/10 shadow-inner">
-                       {plan.tier}
-                     </span>
-                  </td>
-                  <td className="px-8 py-8 font-black text-on-background text-lg">
-                    {plan.price}
-                  </td>
-                  <td className="px-8 py-8">
-                    <div className="flex items-center gap-3">
-                      <div className="w-8 h-8 bg-success/10 text-success rounded-lg flex items-center justify-center">
-                        <CheckCircle2 size={16} />
+                    </td>
+                    <td className="px-8 py-8"><div className="w-24 h-8 bg-on-background/5 rounded-xl" /></td>
+                    <td className="px-8 py-8"><div className="w-32 h-6 bg-on-background/5 rounded-full" /></td>
+                    <td className="px-8 py-8"><div className="w-20 h-4 bg-on-background/5 rounded-full" /></td>
+                    <td className="px-10 py-8 text-right"><div className="ml-auto w-12 h-12 bg-on-background/5 rounded-2xl" /></td>
+                  </tr>
+                ))
+              ) : (
+                filteredPlans.map((plan) => (
+                  <tr key={plan.id} className={`group hover:bg-on-background/[0.02] transition-all ${plan.highlight ? "bg-primary/[0.03]" : ""}`}>
+                    <td className="px-10 py-8">
+                      <div className="flex items-center gap-6">
+                        <div className={`w-14 h-14 rounded-2xl flex items-center justify-center shadow-apple ${plan.highlight ? "bg-primary text-on-primary" : "bg-background text-secondary"}`}>
+                          <Package size={24} />
+                        </div>
+                        <div>
+                          <div className="flex items-center gap-3">
+                            <h5 className="text-lg font-black text-on-background leading-none">{plan.name}</h5>
+                            {plan.highlight && (
+                              <span className="px-3 py-1 bg-amber-500 text-white text-[9px] font-black uppercase tracking-widest rounded-lg shadow-[0_0_15px_rgba(245,158,11,0.3)]">
+                                Featured
+                              </span>
+                            )}
+                          </div>
+                          <p className="text-[11px] text-secondary font-bold uppercase tracking-widest mt-2">{plan.duration} Deployment • {plan.pages}</p>
+                        </div>
                       </div>
-                      <span className="text-[11px] font-black text-secondary uppercase tracking-widest">{plan.features.length} Components</span>
-                    </div>
-                  </td>
-                  <td className="px-10 py-8 text-right">
-                    <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
-                      <button 
-                        onClick={() => setEditingPlan(plan)}
-                        className="p-4 bg-background border border-outline/10 text-secondary rounded-2xl hover:text-on-background hover:border-on-background shadow-apple transition-all"
-                      >
-                        <Edit3 size={18} />
-                      </button>
-                      <button 
-                        onClick={() => handleDelete(plan.id)}
-                        className="p-4 bg-error/5 text-error border border-error/10 rounded-2xl hover:bg-error hover:text-on-error shadow-apple transition-all"
-                      >
-                        <Trash2 size={18} />
-                      </button>
-                    </div>
-                  </td>
-                </tr>
-              ))}
+                    </td>
+                    <td className="px-8 py-8">
+                       <span className="px-4 py-2 bg-background text-secondary rounded-xl text-[10px] font-black uppercase tracking-widest border border-outline/10 shadow-inner">
+                         {plan.tier}
+                       </span>
+                    </td>
+                    <td className="px-8 py-8 font-black text-on-background text-lg">
+                      {plan.price}
+                    </td>
+                    <td className="px-8 py-8">
+                      <div className="flex items-center gap-3">
+                        <div className="w-8 h-8 bg-success/10 text-success rounded-lg flex items-center justify-center">
+                          <CheckCircle2 size={16} />
+                        </div>
+                        <span className="text-[11px] font-black text-secondary uppercase tracking-widest">{plan.features.length} Components</span>
+                      </div>
+                    </td>
+                    <td className="px-10 py-8 text-right">
+                      <div className="flex justify-end gap-3 opacity-0 group-hover:opacity-100 transition-all">
+                        <button 
+                          onClick={() => setEditingPlan(plan)}
+                          className="p-4 bg-background border border-outline/10 text-secondary rounded-2xl hover:text-on-background hover:border-on-background shadow-apple transition-all"
+                        >
+                          <Edit3 size={18} />
+                        </button>
+                        <button 
+                          onClick={() => handleDelete(plan.id)}
+                          className="p-4 bg-error/5 text-error border border-error/10 rounded-2xl hover:bg-error hover:text-on-error shadow-apple transition-all"
+                        >
+                          <Trash2 size={18} />
+                        </button>
+                      </div>
+                    </td>
+                  </tr>
+                ))
+              )}
             </tbody>
           </table>
           {filteredPlans.length === 0 && (

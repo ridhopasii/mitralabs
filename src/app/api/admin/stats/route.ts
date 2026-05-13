@@ -1,14 +1,22 @@
 import { NextRequest, NextResponse } from "next/server";
-import { prisma } from "../../../../lib/prisma";
+import { supabase } from "@/lib/supabase";
 
 export async function GET(request: NextRequest) {
   try {
     // 1. Total Financials & Leads
-    const [invoices, bookings, siteMessages] = await Promise.all([
-      prisma.invoice.findMany(),
-      prisma.booking.findMany(),
-      prisma.siteMessage.findMany()
+    const [invoicesRes, bookingsRes, siteMessagesRes] = await Promise.all([
+      supabase.from("Invoice").select("*"),
+      supabase.from("Booking").select("*"),
+      supabase.from("SiteMessage").select("*")
     ]);
+
+    if (invoicesRes.error) throw invoicesRes.error;
+    if (bookingsRes.error) throw bookingsRes.error;
+    if (siteMessagesRes.error) throw siteMessagesRes.error;
+
+    const invoices = invoicesRes.data || [];
+    const bookings = bookingsRes.data || [];
+    const siteMessages = siteMessagesRes.data || [];
     
     const totalRevenue = invoices.reduce((acc: number, inv: any) => acc + (inv.status === "Paid" ? inv.amount : 0), 0);
     const pendingRevenue = invoices.reduce((acc: number, inv: any) => acc + (inv.status !== "Paid" ? inv.amount : 0), 0);

@@ -93,7 +93,9 @@ export default function ContactPage() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="text-primary font-semibold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-6 block">Kontak Kami</span>
+              <span className="text-primary font-semibold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-6 block">
+                {contact.labels?.tagline || "Kontak Kami"}
+              </span>
               <h1 className="text-5xl md:text-8xl lg:text-9xl font-semibold text-on-surface mb-10 leading-[1.05] tracking-tight md:tracking-[-0.03em] reveal-text">
                 {contact.title}
               </h1>
@@ -197,15 +199,17 @@ export default function ContactPage() {
                     <div className="w-24 h-24 bg-success text-on-success rounded-[2.5rem] flex items-center justify-center shadow-apple ring-8 ring-success/10">
                       <CheckCircle2 size={48} strokeWidth={1.5} />
                     </div>
-                    <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-on-background">Pesan Terkirim</h2>
+                    <h2 className="text-4xl md:text-5xl font-semibold tracking-tight text-on-background">
+                      {contact.labels?.successTitle || "Pesan Terkirim"}
+                    </h2>
                     <p className="text-secondary font-medium text-xl max-w-sm">
-                      Terima kasih sudah menghubungi kami. Tim kami akan segera merespon pesan Anda.
+                      {contact.labels?.successSubtitle || "Terima kasih sudah menghubungi kami. Tim kami akan segera merespon pesan Anda."}
                     </p>
                     <button
                       onClick={() => setIsSuccess(false)}
                       className="text-primary font-bold uppercase tracking-[0.2em] text-[11px] hover:opacity-70 transition-all flex items-center gap-2"
                     >
-                      Kirim Pesan Lainnya <ArrowRight size={14} />
+                      {contact.labels?.sendAnother || "Kirim Pesan Lainnya"} <ArrowRight size={14} />
                     </button>
                   </motion.div>
                 ) : (

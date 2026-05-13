@@ -19,7 +19,7 @@ export const initialData: AppData = {
       title: "Solusi Digital Presisi Untuk Bisnis Anda.",
       subtitle: "Kami membangun infrastruktur digital yang tangguh untuk UMKM, Institusi Pendidikan, dan Industri Pariwisata. Fokus kami adalah fungsionalitas, kecepatan, dan konversi nyata.",
       image: "/mitralabs_hero_premium_1778227502346.png",
-      stats: { label: "Success Projects", value: "240+", desc: "Digital Assets Live" }
+      stats: { label: "Success Projects", value: "240+", statusLabel: "Sistem Status", statusValue: "Aktif" }
     },
     problem: {
       title: "Masalah Umum Bisnis di Era Digital",
@@ -73,10 +73,16 @@ export const initialData: AppData = {
       { id: 2, label: "Client Satisfaction", value: "4.9/5", desc: "Customer Rating" },
     ],
     cta: {
-      title: "Mulai Transformasi Digital Anda Hari Ini",
-      subtitle: "Tim ahli kami siap membantu Anda membangun kehadiran digital yang dominan di pasar.",
       buttonText: "Jadwalkan Konsultasi Gratis",
       promoText: "Sesi Strategi Digital Gratis (Terbatas untuk 5 Klien/Bulan)",
+    },
+    faqLabels: {
+      title: "Pertanyaan yang Sering Ditanyakan",
+      subtitle: "Semua yang perlu Anda ketahui sebelum memulai project bersama kami.",
+      badge: "FAQ",
+      ctaTitle: "Masih punya pertanyaan lain?",
+      ctaSubtitle: "Tim kami siap membantu Anda menemukan solusi terbaik.",
+      ctaButton: "Hubungi Kami",
     },
   },
   services: {
@@ -116,8 +122,20 @@ export const initialData: AppData = {
       }
     ],
     notes: ["Semua paket sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance bug selama 3 bulan pertama."],
-    comparisonTitle: "Bandingkan Paket",
-    comparisonSubtitle: "Pilih jalur investasi yang paling sesuai dengan skala pertumbuhan bisnis Anda saat ini."
+    comparisonTitle: "Head-to-Head Comparison",
+    comparisonSubtitle: "Lihat perbedaan mendetail antara paket layanan kami untuk menentukan pilihan terbaik bagi bisnis Anda.",
+    labels: {
+      tagline: "Solusi Digital",
+      comparisonTagline: "Perbandingan Detail",
+      featureColumn: "Fitur",
+      durationLabel: "Waktu Pengerjaan",
+      pagesLabel: "Jumlah Halaman",
+      investmentLabel: "Investasi",
+      ctaTitle: "Siap untuk Go-Digital?",
+      ctaSubtitle: "Konsultasikan kebutuhan bisnis Anda secara gratis dan dapatkan penawaran terbaik dari tim ahli kami.",
+      ctaPrimary: "Konsultasi Gratis",
+      ctaSecondary: "Lihat Portfolio",
+    },
   },
   portfolio: {
     title: "Karya Terpilih Kami",
@@ -137,7 +155,7 @@ export const initialData: AppData = {
         status: "Completed",
         client_name: "Bpk. Andi Wijaya",
         project_date: "Januari 2024",
-        live_link: "#",
+        live_link: "https://tobadreamtravel.com",
         tech_stack: ["Next.js", "Tailwind CSS", "Supabase"],
       },
       {
@@ -153,7 +171,7 @@ export const initialData: AppData = {
         status: "Completed",
         client_name: "Kepala Sekolah SMK Penerbangan",
         project_date: "Februari 2024",
-        live_link: "#",
+        live_link: "https://smkpenerbanganmedan.sch.id",
         tech_stack: ["Next.js", "Prisma", "Supabase"],
       }
     ],
@@ -161,7 +179,14 @@ export const initialData: AppData = {
       title: "Mulai Project Anda",
       subtitle: "Konsultasikan kebutuhan digital Anda dengan tim ahli kami.",
       buttonText: "Hubungi Kami"
-    }
+    },
+    labels: {
+      viewDetail: "Detail Project",
+      searchPlaceholder: "Cari project...",
+      emptyState: "Project tidak ditemukan",
+      loadMore: "Lihat Lebih Banyak",
+      tagline: "Karya Terpilih",
+    },
   },
   blog: {
     title: "Insight & Strategi Digital",
@@ -205,15 +230,28 @@ export const initialData: AppData = {
       { id: 1, name: "Ridho Robbi", role: "CEO & Tech Lead", bio: "Fokus pada arsitektur sistem dan strategi pertumbuhan digital.", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
       { id: 2, name: "Ghazy Muhalla", role: "Head of Operations", bio: "Memastikan setiap project berjalan tepat waktu dengan standar QA tertinggi.", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
     ],
+    labels: {
+      teamTagline: "Tim Ahli Kami",
+      ctaTitle: "Siap Berkolaborasi?",
+      ctaSubtitle: "Mari wujudkan visi digital Anda bersama tim yang berdedikasi dan berpengalaman.",
+      ctaPrimary: "Mulai Project",
+      ctaSecondary: "Lihat Paket",
+    },
   },
   contact: {
     title: "Hubungi Kami",
     subtitle: "Siap mendiskusikan project Anda? Tim kami siap membantu 24/7.",
     phone: "6282381118520",
-    email: "ridhorobbipasi@gmail.com",
+    email: "contact@mitralabs.web.id",
     instagram: "@mitralabs.id",
     address: "Medan, Sumatera Utara, Indonesia",
-    mapsUrl: "",
+    mapsUrl: "https://maps.google.com/?q=Medan",
+    labels: {
+      tagline: "Kontak Kami",
+      successTitle: "Pesan Terkirim",
+      successSubtitle: "Terima kasih sudah menghubungi kami. Tim kami akan segera merespon pesan Anda.",
+      sendAnother: "Kirim Pesan Lainnya",
+    },
   },
   footer: {
     description: "Technical precision in every pixel.",
@@ -226,6 +264,7 @@ export const initialData: AppData = {
     socials: [
       { label: "LinkedIn", href: "https://linkedin.com" },
       { label: "GitHub", href: "https://github.com" },
+      { label: "Designed with precision in Medan, Indonesia.", href: "#designed-by" },
     ],
   },
   settings: {
@@ -240,6 +279,10 @@ export const initialData: AppData = {
     linkedinUrl: "linkedin.com/company/mitralabs-id",
     logo_url: "/logo.png",
     favicon_url: "/favicon.ico",
+    metaTitle: "Mitralabs - Precision Web Engineering & Tech Agency",
+    metaDescription: "Membangun infrastruktur digital yang tangguh, cepat, dan berfokus pada konversi untuk UMKM dan Industri.",
+    metaKeywords: "jasa website, agency digital medan, software house medan, mitralabs",
+    ogImage: "/mitralabs_hero_premium_1778227502346.png",
   },
   invoiceSettings: {
     companyName: "MITRALABS.WEB.ID",
@@ -277,6 +320,7 @@ export const initialData: AppData = {
       role: "CEO Toba Dream",
       content: "Mitralabs membantu kami membangun sistem yang sangat efisien. Performa website luar biasa.",
       rating: 5,
+      is_published: true,
       image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200"
     }
   ],
@@ -307,5 +351,42 @@ export const initialData: AppData = {
       created_at: new Date().toISOString(),
       total_price: 3500000,
     }
-  ]
+  ],
+  track: {
+    title: "Dashboard Projek Anda.",
+    subtitle: "Pantau progres pengerjaan proyek digital Anda secara real-time.",
+    loginInstructions: "Masukkan email pesanan dan password yang Anda buat saat memesan.",
+    labels: {
+      secureBadge: "Secure Project Dashboard",
+      emailLabel: "Email Pesanan",
+      passwordLabel: "Password Projek",
+      emailPlaceholder: "nama@email.com",
+      submitButton: "Buka Dashboard Projek",
+      helpText: "Lupa password atau butuh bantuan? Hubungi Admin",
+      tabs: {
+        progress: "Progress",
+        assets: "Aset",
+        documents: "Dokumen",
+        invoices: "Kwitansi",
+        chat: "Chat",
+      },
+      dashboard: {
+        header: {
+          projectNum: "Projek #",
+          lastUpdate: "Update:",
+          logoutTitle: "Keluar dari Dashboard",
+        },
+        stats: {
+          status: "Status Projek",
+          plan: "Paket",
+          service: "Layanan",
+          orderDate: "Tanggal Order",
+          investment: "Total Investasi",
+        },
+        empty: {
+          preparing: "Tim sedang mempersiapkan projek...",
+        },
+      },
+    },
+  },
 };

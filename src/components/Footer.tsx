@@ -34,8 +34,20 @@ export default function Footer() {
           <div className="md:col-span-2">
              <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Sosial</h4>
              <ul className="space-y-4">
-                <li><a href="#" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">Instagram</a></li>
-                <li><a href="#" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">LinkedIn</a></li>
+                {footer.socials.filter(s => s.href !== '#designed-by').map((social, i) => (
+                  <li key={i}>
+                    <a href={social.href} target="_blank" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
+                      {social.label}
+                    </a>
+                  </li>
+                ))}
+             </ul>
+          </div>
+          <div className="md:col-span-2">
+             <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Legal</h4>
+             <ul className="space-y-4">
+                <li><Link href="/privacy" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">Privacy Policy</Link></li>
+                <li><Link href="/terms" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">Terms of Service</Link></li>
              </ul>
           </div>
           <div className="md:col-span-4">
@@ -53,7 +65,9 @@ export default function Footer() {
         </div>
         <div className="pt-8 border-t border-outline/5 text-center md:text-left flex flex-col md:flex-row justify-between gap-4">
            <p className="text-xs text-secondary/60 font-medium">© {new Date().getFullYear()} {navbar.logo}. All rights reserved.</p>
-           <p className="text-xs text-secondary/60 font-medium">Designed with precision in Medan, Indonesia.</p>
+           <p className="text-xs text-secondary/60 font-medium">
+             {footer.links.find(l => l.href === '#designed-by')?.label || "Designed with precision in Medan, Indonesia."}
+           </p>
         </div>
       </div>
     </footer>

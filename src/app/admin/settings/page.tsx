@@ -62,17 +62,17 @@ const FormInput = React.memo(({ label, value, onChange, placeholder, type = "tex
   }, [value]);
 
   return (
-    <div className={`space-y-3 ${className}`}>
-      {label && <label className="text-xs font-bold uppercase tracking-widest text-slate-400">{label}</label>}
+    <div className={`space-y-4 ${className}`}>
+      {label && <label className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">{label}</label>}
       <input
         type={type}
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={() => onChange(localValue)}
         placeholder={placeholder}
-        className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all"
+        className="w-full px-10 py-6 bg-slate-50 border border-transparent rounded-[2rem] outline-none font-black text-lg focus:bg-white focus:border-slate-200 focus:shadow-xl transition-all shadow-inner"
       />
-      {description && <p className="text-[10px] text-slate-400 font-medium">{description}</p>}
+      {description && <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest ml-4">{description}</p>}
     </div>
   );
 });
@@ -87,15 +87,15 @@ const FormTextarea = React.memo(({ label, value, onChange, placeholder, rows = 3
   }, [value]);
 
   return (
-    <div className={`space-y-3 ${className}`}>
-      {label && <label className="text-xs font-bold uppercase tracking-widest text-slate-400">{label}</label>}
+    <div className={`space-y-4 ${className}`}>
+      {label && <label className="text-[11px] font-black uppercase tracking-[0.2em] text-slate-400 ml-4">{label}</label>}
       <textarea
         value={localValue}
         onChange={(e) => setLocalValue(e.target.value)}
         onBlur={() => onChange(localValue)}
         rows={rows}
         placeholder={placeholder}
-        className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all resize-none"
+        className="w-full px-10 py-8 bg-slate-50 border border-transparent rounded-[2.5rem] outline-none font-medium text-lg leading-relaxed focus:bg-white focus:border-slate-200 focus:shadow-xl transition-all resize-none shadow-inner"
       />
     </div>
   );
@@ -261,92 +261,8 @@ export default function SettingsPage() {
           </div>
         )}
 
-        {/* Global Settings Section */}
-        <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
-          <div className="flex items-center gap-6">
-            <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
-              <Database size={32} />
-            </div>
-            <div>
-              <h3 className="text-2xl font-black uppercase tracking-tight">Pengaturan Global Website</h3>
-              <p className="text-sm font-bold opacity-40 uppercase tracking-widest mt-1">WhatsApp, Logo, dan Konfigurasi Umum</p>
-            </div>
-          </div>
-
-          <div className="space-y-8">
-            {/* WhatsApp & Contact */}
-            <div className="space-y-6">
-              <div className="flex items-center gap-3 text-slate-400">
-                <Phone size={18} />
-                <h4 className="text-sm font-bold uppercase tracking-widest">WhatsApp & Kontak</h4>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <FormInput
-                  label="Nomor WhatsApp (untuk API)"
-                  value={globalSettings.waNumber}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, waNumber: val})}
-                  placeholder="6282381118520"
-                  description="Format: 62xxx (tanpa +, tanpa spasi)"
-                />
-                <FormInput
-                  label="Pesan Promo WhatsApp"
-                  value={globalSettings.waPromoMessage}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, waPromoMessage: val})}
-                  placeholder="🔥 Promo Bulan Ini!"
-                />
-              </div>
-            </div>
-
-            {/* Logo & Branding */}
-            <div className="space-y-6 pt-8 border-t border-slate-100">
-              <div className="flex items-center gap-3 text-slate-400">
-                <Building2 size={18} />
-                <h4 className="text-sm font-bold uppercase tracking-widest">Logo & Branding</h4>
-              </div>
-
-              <div className="grid md:grid-cols-2 gap-6">
-                <ImageUploadField
-                  label="Logo Perusahaan"
-                  value={globalSettings.logo_url}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, logo_url: val})}
-                  description="Akan muncul di Navbar dan Invoice"
-                />
-                <ImageUploadField
-                  label="Favicon Website"
-                  value={globalSettings.favicon_url}
-                  onChange={(val: string) => setGlobalSettings({...globalSettings, favicon_url: val})}
-                  description="Ikon kecil di tab browser"
-                />
-              </div>
-            </div>
-
-            {/* Business Mode */}
-            <div className="space-y-6 pt-8 border-t border-slate-100">
-              <div className="flex items-center gap-3 text-slate-400">
-                <Briefcase size={18} />
-                <h4 className="text-sm font-bold uppercase tracking-widest">Mode Bisnis</h4>
-              </div>
-
-              <div className="space-y-3">
-                <label className="text-xs font-bold uppercase tracking-widest text-slate-400">Mode Operasional</label>
-                <select
-                  value={globalSettings.businessMode}
-                  onChange={(e) => setGlobalSettings({...globalSettings, businessMode: e.target.value})}
-                  className="w-full px-5 py-4 bg-slate-50 border border-transparent rounded-xl outline-none font-semibold text-sm focus:bg-white focus:border-slate-200 transition-all appearance-none cursor-pointer"
-                >
-                  <option value="agresif">Agresif (Promo & CTA Kuat)</option>
-                  <option value="profesional">Profesional (Formal & Elegan)</option>
-                  <option value="santai">Santai (Friendly & Casual)</option>
-                </select>
-                <p className="text-[10px] text-slate-400 font-medium">Mempengaruhi tone komunikasi di website</p>
-              </div>
-            </div>
-          </div>
-        </section>
-
         {/* Invoice Settings Section */}
-        <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
+        <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
               <Receipt size={32} />
@@ -598,7 +514,7 @@ export default function SettingsPage() {
         </section>
 
         {/* Backup & Restore Section */}
-        <section className="bg-white rounded-[3.5rem] p-12 border border-surface-container-highest shadow-premium space-y-10">
+        <section className="bg-white rounded-[4rem] p-12 md:p-16 border border-slate-100 shadow-apple space-y-12">
           <div className="flex items-center gap-6">
             <div className="w-16 h-16 bg-primary/10 text-primary rounded-2xl flex items-center justify-center">
               <Database size={32} />

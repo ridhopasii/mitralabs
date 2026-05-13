@@ -116,7 +116,9 @@ export default function TentangClient() {
         <section className="py-24 md:py-48 bg-background">
           <div className="section-container">
             <div className="text-center mb-32">
-              <span className="text-primary font-semibold uppercase tracking-[0.3em] mb-6 block text-[10px] md:text-xs">Tim Ahli Kami</span>
+              <span className="text-primary font-semibold uppercase tracking-[0.3em] mb-6 block text-[10px] md:text-xs">
+                {about.labels?.teamTagline || "Tim Ahli Kami"}
+              </span>
               <h2 className="text-5xl md:text-7xl font-semibold text-on-surface mb-8 tracking-tight reveal-text">{about.teamTitle}</h2>
               <p className="text-secondary max-w-2xl mx-auto text-xl md:text-2xl font-medium leading-relaxed">{about.teamSubtitle}</p>
             </div>
@@ -152,16 +154,18 @@ export default function TentangClient() {
         <section className="section-container py-24 md:py-48 mb-20">
            <div className="bg-surface-container p-16 md:p-32 rounded-[4rem] text-center relative overflow-hidden border border-outline/5 shadow-apple">
               <div className="relative z-10">
-                <h2 className="text-5xl md:text-8xl font-semibold mb-10 text-on-background tracking-tight reveal-text">Siap Berkolaborasi?</h2>
+                <h2 className="text-5xl md:text-8xl font-semibold mb-10 text-on-background tracking-tight reveal-text">
+                  {about.labels?.ctaTitle || "Siap Berkolaborasi?"}
+                </h2>
                 <p className="text-xl md:text-2xl text-secondary max-w-2xl mx-auto mb-16 font-medium leading-relaxed">
-                  Mari wujudkan visi digital Anda bersama tim yang berdedikasi dan berpengalaman.
+                  {about.labels?.ctaSubtitle || "Mari wujudkan visi digital Anda bersama tim yang berdedikasi dan berpengalaman."}
                 </p>
                 <div className="flex flex-col sm:flex-row gap-8 justify-center">
                   <Link href="/kontak" className="btn-apple text-lg px-12 py-5 flex items-center justify-center gap-3">
-                    Mulai Project <ArrowRight size={20} />
+                    {about.labels?.ctaPrimary || "Mulai Project"} <ArrowRight size={20} />
                   </Link>
                   <Link href="/layanan" className="btn-apple-secondary text-lg px-12 py-5 border border-outline/20">
-                    Lihat Paket
+                    {about.labels?.ctaSecondary || "Lihat Paket"}
                   </Link>
                 </div>
               </div>

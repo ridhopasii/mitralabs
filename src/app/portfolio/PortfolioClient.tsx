@@ -41,7 +41,9 @@ export default function PortfolioClient() {
               animate={{ opacity: 1, y: 0 }}
               transition={{ duration: 0.8, ease: [0.22, 1, 0.36, 1] }}
             >
-              <span className="text-primary font-semibold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-6 block">Karya Terpilih</span>
+              <span className="text-primary font-semibold uppercase tracking-[0.2em] text-[10px] md:text-xs mb-6 block">
+                {portfolio.labels?.tagline || "Karya Terpilih"}
+              </span>
               <h1 className="text-5xl md:text-8xl lg:text-9xl font-semibold text-on-surface mb-10 leading-[1.05] tracking-tight md:tracking-[-0.03em] reveal-text">
                 {portfolio.title.split('.')[0]}
               </h1>
@@ -78,7 +80,7 @@ export default function PortfolioClient() {
                   <Search size={16} className="absolute left-5 top-1/2 -translate-y-1/2 text-secondary transition-colors group-focus-within:text-on-background" />
                   <input
                     type="text"
-                    placeholder="Cari project..."
+                    placeholder={portfolio.labels?.searchPlaceholder || "Cari project..."}
                     value={search}
                     onChange={(e) => setSearch(e.target.value)}
                     className="w-full pl-12 pr-6 py-3 bg-surface-container/50 border border-transparent rounded-full outline-none focus:border-outline/20 focus:bg-background transition-all font-medium text-sm"
@@ -130,7 +132,7 @@ export default function PortfolioClient() {
                         {p.title}
                       </h3>
                       <div className="flex items-center gap-3 text-[11px] font-bold uppercase tracking-widest opacity-0 translate-y-4 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                        Detail Project <ArrowRight size={14} />
+                        {portfolio.labels?.viewDetail || "Detail Project"} <ArrowRight size={14} />
                       </div>
                     </div>
                   </div>
@@ -151,7 +153,9 @@ export default function PortfolioClient() {
                <div className="w-20 h-20 bg-surface-container rounded-full flex items-center justify-center mx-auto mb-8 text-secondary/30">
                   <LayoutGrid size={32} />
                </div>
-               <h3 className="text-3xl font-semibold text-on-background mb-4">Project tidak ditemukan</h3>
+               <h3 className="text-3xl font-semibold text-on-background mb-4">
+                  {portfolio.labels?.emptyState || "Project tidak ditemukan"}
+               </h3>
                <p className="text-secondary font-medium max-w-sm mx-auto">
                  Coba cari dengan kata kunci lain atau pilih kategori yang berbeda.
                </p>
@@ -166,7 +170,7 @@ export default function PortfolioClient() {
               onClick={() => setVisibleCount(prev => prev + 6)}
               className="btn-apple-secondary border border-outline/10 text-sm px-12"
             >
-              Lihat Lebih Banyak
+              {portfolio.labels?.loadMore || "Lihat Lebih Banyak"}
             </button>
           </div>
         )}

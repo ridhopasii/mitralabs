@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send, LogOut } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -43,11 +43,11 @@ function TrackContent() {
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya butuh bantuan untuk melacak projek saya.")}`;
   
   const tabs = [
-    { id: "progress", label: "Progress", icon: BarChart3 },
-    { id: "assets", label: "Aset", icon: Package },
-    { id: "dokumen", label: "Dokumen", icon: FileText },
-    { id: "kwitansi", label: "Kwitansi", icon: CreditCard },
-    { id: "chat", label: "Chat", icon: MessageCircle },
+    { id: "progress", label: data.track?.labels?.tabs.progress || "Progress", icon: BarChart3 },
+    { id: "assets", label: data.track?.labels?.tabs.assets || "Aset", icon: Package },
+    { id: "dokumen", label: data.track?.labels?.tabs.documents || "Dokumen", icon: FileText },
+    { id: "kwitansi", label: data.track?.labels?.tabs.invoices || "Kwitansi", icon: CreditCard },
+    { id: "chat", label: data.track?.labels?.tabs.chat || "Chat", icon: MessageCircle },
   ];
 
   const scrollToBottom = () => {
@@ -339,6 +339,13 @@ function TrackContent() {
     }
   }
 
+  function handleLogout() {
+    setProjectData(null);
+    setPassword("");
+    // Optional: remove from URL
+    window.history.replaceState({}, '', '/track');
+  }
+
   useEffect(() => {
     const urlEmail = searchParams.get("email");
     const urlPass = searchParams.get("pass");
@@ -354,15 +361,15 @@ function TrackContent() {
         <div className="text-center mb-16 space-y-4">
           <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }}
             className="inline-flex items-center gap-2 px-4 py-2 bg-slate-900 text-white rounded-full text-[10px] font-bold uppercase tracking-[0.2em] mb-4">
-            <ShieldCheck size={12} /> Secure Project Dashboard
+            <ShieldCheck size={12} /> {data.track?.labels?.secureBadge || "Secure Project Dashboard"}
           </motion.div>
           <motion.h1 initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.1 }}
             className="text-4xl md:text-6xl font-bold tracking-tight">
-            {projectData ? `Projek ${projectData.customer_name.split(' ')[0]}` : "Dashboard Projek Anda."}
+            {projectData ? `Projek ${projectData.customer_name.split(' ')[0]}` : (data.track?.title || "Dashboard Projek Anda.")}
           </motion.h1>
           <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.2 }}
             className="text-slate-500 font-medium max-w-xl mx-auto">
-            Masukkan email pesanan dan password yang Anda buat saat memesan.
+            {data.track?.subtitle || "Masukkan email pesanan dan password yang Anda buat saat memesan."}
           </motion.p>
         </div>
 
@@ -372,16 +379,20 @@ function TrackContent() {
               <form onSubmit={handleTrack} className="bg-white p-10 rounded-[2.5rem] border border-slate-200/60 shadow-2xl space-y-6">
                 <div className="space-y-4">
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Email Pesanan</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                      {data.track?.labels?.emailLabel || "Email Pesanan"}
+                    </label>
                     <div className="relative">
                       <Mail className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                       <input type="email" required value={email} onChange={(e) => setEmail(e.target.value)}
-                        placeholder="nama@email.com"
+                        placeholder={data.track?.labels?.emailPlaceholder || "nama@email.com"}
                         className="w-full pl-14 pr-6 py-4 bg-slate-50 border-none rounded-2xl outline-none font-bold text-sm focus:bg-white transition-all ring-1 ring-transparent focus:ring-slate-200" />
                     </div>
                   </div>
                   <div className="space-y-2">
-                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">Password Projek</label>
+                    <label className="text-[10px] font-bold uppercase tracking-widest text-slate-400 ml-2">
+                      {data.track?.labels?.passwordLabel || "Password Projek"}
+                    </label>
                     <div className="relative">
                       <Lock className="absolute left-5 top-1/2 -translate-y-1/2 text-slate-300" size={18} />
                       <input type="password" required value={password} onChange={(e) => setPassword(e.target.value)}
@@ -398,12 +409,12 @@ function TrackContent() {
                 <button id="track-submit-btn" type="submit" disabled={isLoading}
                   className="w-full py-5 bg-slate-900 text-white rounded-2xl font-bold text-xs uppercase tracking-widest flex items-center justify-center gap-3 hover:bg-slate-800 transition-all shadow-xl disabled:opacity-50">
                   {isLoading ? <Loader2 size={18} className="animate-spin" /> : <ArrowRight size={18} />}
-                  Buka Dashboard Projek
+                  {data.track?.labels?.submitButton || "Buka Dashboard Projek"}
                 </button>
               </form>
               <div className="mt-8 text-center">
                 <a href={waUrl} target="_blank" className="text-slate-400 hover:text-slate-900 font-bold text-[10px] uppercase tracking-widest transition-all">
-                  Lupa password atau butuh bantuan? Hubungi Admin <ChevronRight size={12} className="inline ml-1" />
+                  {data.track?.labels?.helpText || "Lupa password atau butuh bantuan? Hubungi Admin"} <ChevronRight size={12} className="inline ml-1" />
                 </a>
               </div>
             </motion.div>
@@ -412,17 +423,28 @@ function TrackContent() {
               {/* Header Card */}
               <div className="bg-[#1D1D1F] text-white p-10 rounded-[2.5rem] flex flex-col md:flex-row justify-between items-start md:items-center gap-6">
                 <div>
-                  <p className="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mb-2">Projek #{projectData.id}</p>
+                  <p className="text-[10px] font-bold opacity-40 uppercase tracking-[0.2em] mb-2">
+                    {data.track?.labels?.dashboard?.header.projectNum || "Projek #"} {projectData.id}
+                  </p>
                   <h2 className="text-3xl font-bold tracking-tight">{projectData.plan_name} — {projectData.service_type}</h2>
                   <p className="text-slate-400 mt-2 font-medium">{projectData.customer_name} · {projectData.customer_email}</p>
                 </div>
-                <div className="flex flex-col items-end gap-3">
-                  <div className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${
-                    projectData.status === 'Completed' ? 'bg-emerald-500' : 
-                    projectData.status === 'In Progress' ? 'bg-blue-500' : 'bg-amber-500'}`}>
-                    {projectData.status}
+                <div className="flex flex-col items-end gap-4">
+                  <div className="flex items-center gap-3">
+                    <button 
+                      onClick={handleLogout}
+                      className="p-2 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all"
+                      title={data.track?.labels?.dashboard?.header.logoutTitle || "Keluar dari Dashboard"}
+                    >
+                      <LogOut size={18} />
+                    </button>
+                    <div className={`px-4 py-2 rounded-full text-[10px] font-black uppercase tracking-widest ${
+                      projectData.status === 'Completed' ? 'bg-emerald-500' : 
+                      projectData.status === 'In Progress' ? 'bg-blue-500' : 'bg-amber-500'}`}>
+                      {projectData.status}
+                    </div>
                   </div>
-                  <p className="text-[10px] opacity-40">Update: {new Date(projectData.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
+                  <p className="text-[10px] opacity-40">{data.track?.labels?.dashboard?.header.lastUpdate || "Update:"} {new Date(projectData.updated_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' })}</p>
                 </div>
               </div>
 
@@ -501,7 +523,9 @@ function TrackContent() {
                       ) : (
                         <div className="flex flex-col items-center py-12 text-center opacity-40">
                           <Clock size={40} className="mb-4" />
-                          <p className="text-sm font-bold uppercase tracking-widest">Tim sedang mempersiapkan projek...</p>
+                          <p className="text-sm font-bold uppercase tracking-widest">
+                            {data.track?.labels?.dashboard?.empty.preparing || "Tim sedang mempersiapkan projek..."}
+                          </p>
                         </div>
                       )}
                     </div>
@@ -509,10 +533,10 @@ function TrackContent() {
 
                   <div className="space-y-6">
                     {[
-                      { label: "Status Projek", value: projectData.status, color: "text-blue-600" },
-                      { label: "Paket", value: projectData.plan_name },
-                      { label: "Layanan", value: projectData.service_type },
-                      { label: "Tanggal Order", value: new Date(projectData.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) },
+                      { label: data.track?.labels?.dashboard?.stats.status || "Status Projek", value: projectData.status, color: "text-blue-600" },
+                      { label: data.track?.labels?.dashboard?.stats.plan || "Paket", value: projectData.plan_name },
+                      { label: data.track?.labels?.dashboard?.stats.service || "Layanan", value: projectData.service_type },
+                      { label: data.track?.labels?.dashboard?.stats.orderDate || "Tanggal Order", value: new Date(projectData.created_at).toLocaleDateString('id-ID', { day: 'numeric', month: 'long', year: 'numeric' }) },
                     ].map(item => (
                       <div key={item.label} className="bg-white p-6 rounded-[1.5rem] border border-slate-200/60 flex justify-between items-center">
                         <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest">{item.label}</p>
@@ -520,7 +544,9 @@ function TrackContent() {
                       </div>
                     ))}
                     <div className="bg-white p-6 rounded-[1.5rem] border border-slate-200/60">
-                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">Total Investasi</p>
+                      <p className="text-[10px] font-bold text-slate-400 uppercase tracking-widest mb-3">
+                        {data.track?.labels?.dashboard?.stats.investment || "Total Investasi"}
+                      </p>
                       <p className="text-2xl font-black text-slate-900">{new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', minimumFractionDigits: 0 }).format(projectData.total_price)}</p>
                     </div>
                   </div>
