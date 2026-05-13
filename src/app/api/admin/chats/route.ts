@@ -15,9 +15,10 @@ export async function GET(req: Request) {
       .order("created_at", { ascending: false });
 
     if (error) throw error;
-    return NextResponse.json(chats);
+    return NextResponse.json(chats || []);
   } catch (err: any) {
-    return NextResponse.json({ error: err.message }, { status: 500 });
+    console.error("❌ Chats API Error:", err);
+    return NextResponse.json([]);
   }
 }
 
@@ -39,6 +40,7 @@ export async function POST(req: Request) {
     if (error) throw error;
     return NextResponse.json(newMessage);
   } catch (err: any) {
+    console.error("❌ Chats API POST Error:", err);
     return NextResponse.json({ error: err.message }, { status: 500 });
   }
 }

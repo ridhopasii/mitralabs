@@ -166,7 +166,7 @@ export default function AdminPage() {
       {/* Main Stats Grid */}
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-8">
         <AnimatePresence>
-          {loading ? Array(4).fill(0).map((_, i) => (
+          {loading || !stats?.summary ? Array(4).fill(0).map((_, i) => (
             <div key={i} className="bg-white p-10 rounded-[2.5rem] border border-slate-100 relative overflow-hidden">
                <div className="flex justify-between items-start mb-10">
                   <div className="w-14 h-14 bg-slate-50 rounded-2xl animate-pulse" />
@@ -176,7 +176,6 @@ export default function AdminPage() {
                   <div className="w-24 h-3 bg-slate-50 rounded-full animate-pulse" />
                   <div className="w-32 h-8 bg-slate-50 rounded-full animate-pulse" />
                </div>
-               {/* Shimmer effect */}
                <motion.div 
                  initial={{ x: "-100%" }}
                  animate={{ x: "100%" }}
@@ -184,7 +183,12 @@ export default function AdminPage() {
                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent skew-x-12"
                />
             </div>
-          )) : dashboardStats.map((stat, i) => (
+          )) : [
+            { label: "Total Revenue", value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(stats.summary.totalRevenue || 0), trend: "+12.5%", icon: DollarSign, color: "bg-emerald-500/10", iconColor: "text-emerald-500" },
+            { label: "Pending Revenue", value: new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).format(stats.summary.pendingRevenue || 0), trend: "+8.2%", icon: CreditCard, color: "bg-blue-500/10", iconColor: "text-blue-500" },
+            { label: "Total Bookings", value: stats.summary.totalBookings || 0, trend: "+14.3%", icon: Package, color: "bg-purple-500/10", iconColor: "text-purple-500" },
+            { label: "Conversion Rate", value: `${stats.summary.conversionRate || 0}%`, trend: "+5.1%", icon: Target, color: "bg-amber-500/10", iconColor: "text-amber-500" },
+          ].map((stat, i) => (
             <motion.div 
               key={i}
               initial={{ opacity: 0, scale: 0.9 }}
