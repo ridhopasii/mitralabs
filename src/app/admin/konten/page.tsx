@@ -29,7 +29,8 @@ import {
   Mail,
   Linkedin,
   Monitor,
-  Search
+  Search,
+  Image as ImageIcon
 } from "lucide-react";
 import { uploadImage } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
