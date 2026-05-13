@@ -339,6 +339,7 @@ export default function GlobalContentCMS() {
                         <InputField onChange={updateField} label="Stat Value" path="home.hero.stats.value" value={formData.home.hero.stats.value} />
                         <InputField onChange={updateField} label="Status Label" path="home.hero.stats.statusLabel" value={formData.home.hero.stats.statusLabel} />
                         <InputField onChange={updateField} label="Status Value" path="home.hero.stats.statusValue" value={formData.home.hero.stats.statusValue} />
+                        <InputField onChange={updateField} label="Hero Stats Description" path="home.hero.stats.desc" value={formData.home.hero.stats.desc} type="textarea" />
                       </div>
                     </div>
                   </div>

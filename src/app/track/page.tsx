@@ -1,7 +1,7 @@
 "use client";
 
 import React, { useState, useEffect, Suspense } from "react";
-import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send, LogOut, Building2, ClipboardList, Upload } from "lucide-react";
+import { Mail, Lock, ArrowRight, Loader2, AlertCircle, CheckCircle2, Clock, FileText, ExternalLink, ChevronRight, ShieldCheck, Download, MessageCircle, BarChart3, CreditCard, Phone, Package, Plus, Trash2, Image as ImageIcon, Sparkles, Send, LogOut, Building2, ClipboardList, Upload, Zap, X } from "lucide-react";
 import { supabase } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
 import Link from "next/link";
@@ -19,7 +19,6 @@ import ProposalDoc from "@/components/documents/ProposalDoc";
 import MoUDoc from "@/components/documents/MoUDoc";
 import SPKDoc from "@/components/documents/SPKDoc";
 import FormBriefDoc from "@/components/documents/FormBriefDoc";
-import { X } from "lucide-react";
 
 function TrackContent() {
   const searchParams = useSearchParams();
