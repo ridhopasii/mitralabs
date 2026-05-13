@@ -31,7 +31,9 @@ import {
   LayoutDashboard,
   Users,
   Send,
-  X
+  X,
+  Type,
+  Settings
 } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { supabase } from "@/lib/supabase";

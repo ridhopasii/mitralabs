@@ -28,7 +28,8 @@ import {
   FileText,
   Mail,
   Linkedin,
-  Monitor
+  Monitor,
+  Search
 } from "lucide-react";
 import { uploadImage } from "@/lib/supabase";
 import { motion, AnimatePresence } from "framer-motion";
