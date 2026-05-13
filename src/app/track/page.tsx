@@ -48,6 +48,7 @@ function TrackContent() {
   const chatEndRef = React.useRef<HTMLDivElement>(null);
   const chatFileInputRef = React.useRef<HTMLInputElement>(null);
   const reportRef = React.useRef<HTMLDivElement>(null);
+  const docRef = React.useRef<HTMLDivElement>(null);
 
   // Derived Data
   const proj = projectData?.client_projects?.[0];
@@ -279,6 +280,34 @@ function TrackContent() {
       alert("Gagal mengekspor laporan: " + err.message);
     } finally {
       setIsExporting(false);
+    }
+  }
+
+  async function handleDownloadDoc() {
+    if (!docRef.current) return;
+    setIsLoading(true);
+    try {
+      const element = docRef.current;
+      const canvas = await html2canvas(element, {
+        scale: 2,
+        useCORS: true,
+        logging: false,
+        backgroundColor: "#ffffff"
+      });
+
+      const imgData = canvas.toDataURL("image/png");
+      const pdf = new jsPDF({
+        orientation: "portrait",
+        unit: "px",
+        format: [canvas.width / 2, canvas.height / 2]
+      });
+
+      pdf.addImage(imgData, "PNG", 0, 0, canvas.width / 2, canvas.height / 2);
+      pdf.save(`Dokumen_${viewingDoc}_${projectData?.customer_name || 'Mitralabs'}.pdf`);
+    } catch (err: any) {
+      alert("Gagal mengunduh dokumen: " + err.message);
+    } finally {
+      setIsLoading(false);
     }
   }
 
@@ -991,12 +1020,13 @@ function TrackContent() {
                     </div>
                  </div>
                  <div className="flex items-center gap-3">
-                   <button 
-                     onClick={() => window.print()}
-                     className="px-6 py-2.5 bg-white text-slate-900 rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-slate-100 transition-all"
-                   >
-                     Cetak Dokumen
-                   </button>
+                    <button 
+                      onClick={handleDownloadDoc}
+                      className="px-6 py-2.5 bg-primary text-white rounded-xl font-black text-[10px] uppercase tracking-widest hover:bg-primary/90 transition-all flex items-center gap-2"
+                    >
+                      {isLoading ? <Loader2 size={12} className="animate-spin" /> : <Download size={12} />}
+                      Unduh Dokumen
+                    </button>
                    <button 
                      onClick={() => setViewingDoc(null)}
                      className="p-2.5 bg-white/10 hover:bg-white/20 text-white rounded-xl transition-all"
@@ -1007,7 +1037,7 @@ function TrackContent() {
               </div>
               
               <div className="w-full flex-grow overflow-y-auto rounded-[2.5rem] bg-slate-100/50 p-2 md:p-4 print:p-0">
-                 <div className="origin-top transform scale-100 print:scale-100">
+                 <div ref={docRef} className="origin-top transform scale-100 print:scale-100 bg-white shadow-2xl">
                     {viewingDoc === 'mou' && <MoUDoc data={data} booking={projectData} />}
                     {viewingDoc === 'spk' && <SPKDoc data={data} booking={projectData} />}
                     {viewingDoc === 'proposal' && <ProposalDoc data={data} booking={projectData} />}
