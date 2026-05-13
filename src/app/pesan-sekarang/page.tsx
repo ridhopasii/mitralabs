@@ -197,7 +197,7 @@ export default function PesanSekarang() {
   };
 
   if (showSuccess) {
-    const waNumber = data.settings?.waNumber || "6282381118520";
+    const waNumber = data.brand.whatsapp;
     const waMessage = `Halo Mitralabs! Saya baru saja melakukan pemesanan website.\n\n*Nomor Projek:* #${trackingInfo?.id}\n*Nama:* ${formData.name}\n*Layanan:* ${formData.service}\n*Paket:* ${formData.plan}\n\nSaya ingin melanjutkan konsultasi via WA.`;
     const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent(waMessage)}`;
 
