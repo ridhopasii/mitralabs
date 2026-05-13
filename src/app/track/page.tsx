@@ -52,7 +52,7 @@ function TrackContent() {
 
   // Derived Data
   const proj = projectData?.client_projects?.[0];
-  const waNumber = data?.settings?.waNumber || "6282381118520";
+  const waNumber = data?.brand?.whatsapp || "6282381118520";
   const waUrl = `https://wa.me/${waNumber}?text=${encodeURIComponent("Halo Mitralabs! Saya butuh bantuan untuk melacak projek saya.")}`;
   
   const tabs = [
