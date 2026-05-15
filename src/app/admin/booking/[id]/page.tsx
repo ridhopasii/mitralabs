@@ -107,39 +107,25 @@ export default function BookingDetailPage() {
   const handleCreateProject = async () => {
     setIsUpdating(true);
     try {
-      const { data: { user } } = await supabase.auth.getUser();
-      let currentClientId = booking.client_id;
+      const res = await fetch('/api/admin/projects/create', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          booking_id: booking.id,
+          client_id: booking.client_id,
+          customer_email: booking.customer_email,
+          customer_name: booking.customer_name,
+          organization_name: booking.organization_name,
+          customer_phone: booking.customer_phone,
+          plan_name: booking.plan_name,
+          service_type: booking.service_type,
+          project_brief: booking.project_brief
+        })
+      });
 
-      // Auto-create client profile if missing
-      const now = new Date().toISOString();
-      if (!currentClientId) {
-        currentClientId = crypto.randomUUID();
-        await supabase.from('Client').insert([{
-          id: currentClientId,
-          email: booking.customer_email,
-          full_name: booking.customer_name,
-          company_name: booking.organization_name,
-          phone: booking.customer_phone,
-          created_at: now,
-          updated_at: now
-        }]);
-        await supabase.from('Booking').update({ client_id: currentClientId }).eq('id', booking.id);
-      }
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Failed to create project');
 
-      // Insert new ClientProject
-      const { data: newProj, error } = await supabase.from('ClientProject').insert([{
-        id: crypto.randomUUID(),
-        booking_id: booking.id,
-        client_id: currentClientId,
-        project_name: `Projek ${booking.plan_name} - ${booking.customer_name.split(' ')[0]}`,
-        description: `Workspace otomatis untuk pesanan ${booking.service_type}: ${booking.plan_name}. ${booking.project_brief || ''}`,
-        status: "Active",
-        progress: 0,
-        created_at: now,
-        updated_at: now
-      }]).select().single();
-
-      if (error) throw error;
       await logActivity("Create Project Workspace", `ID Booking: ${booking.id}`);
       fetchData();
     } catch (e: any) {
