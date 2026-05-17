@@ -394,29 +394,29 @@
 # BAGIAN 3 — PRIORITAS PERBAIKAN
 
 ## 🔴 DARURAT (Selesaikan Hari Ini)
-1. Hapus testimoni palsu / ganti dengan placeholder jujur
-2. Ganti foto tim Unsplash dengan foto nyata
-3. Ubah alamat "Jl. Contoh No. 123" ke lokasi nyata
-4. Isi FAQ — minimal 4 pertanyaan
-5. Seragamkan garansi: 7 hari (bukan 3 bulan)
-6. Seragamkan jabatan Ridho & Ghazy di semua halaman
+- [x] Hapus testimoni palsu / ganti dengan placeholder jujur
+- [x] Ganti foto tim Unsplash dengan foto nyata
+- [x] Ubah alamat "Jl. Contoh No. 123" ke lokasi nyata
+- [x] Isi FAQ — minimal 4 pertanyaan
+- [x] Seragamkan garansi: 7 hari (bukan 3 bulan)
+- [x] Seragamkan jabatan Ridho & Ghazy di semua halaman
 
 ## 🟡 PENTING (Selesaikan Minggu Ini)
-7. Tambah floating WhatsApp button di semua halaman
-8. Ubah CTA hero ke WA langsung
-9. Turunkan angka "240+" ke angka nyata
-10. Ganti bahasa korporat ke bahasa yang lebih manusiawi
-11. Ganti foto peta ke Google Maps embed nyata
-12. Tambah cerita brand di halaman Tentang
+- [x] Tambah floating WhatsApp button di semua halaman
+- [x] Ubah CTA hero ke WA langsung
+- [x] Turunkan angka "240+" ke angka nyata
+- [x] Ganti bahasa korporat ke bahasa yang lebih manusiawi
+- [x] Ganti foto peta ke Google Maps embed nyata
+- [x] Tambah cerita brand di halaman Tentang
 
 ## 🟢 IDEAL (Selesaikan Bulan Ini)
-13. Tambah Blog — minimal 2 artikel awal
-14. Tambah halaman Thank You setelah form
-15. Buat 404 page branded
-16. Integrasi Google Analytics
-17. Tambah Instagram feed
-18. Tambah filter kategori di Portfolio
-19. Lengkapi tabel perbandingan di Layanan
+- [x] Tambah Blog — minimal 2 artikel awal
+- [x] Tambah halaman Thank You setelah form (Di-handle oleh UI Form Sukses)
+- [x] Buat 404 page branded
+- [ ] Integrasi Google Analytics
+- [ ] Tambah Instagram feed
+- [x] Tambah filter kategori di Portfolio
+- [x] Lengkapi tabel perbandingan di Layanan
 
 ---
 
