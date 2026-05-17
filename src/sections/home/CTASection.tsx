@@ -20,12 +20,14 @@ export default function CTASection() {
             {cta.subtitle}
           </p>
           <div className="flex flex-col items-center gap-6 md:gap-8">
-            <Link
-              href="/layanan"
+            <a
+              href={`https://wa.me/${settings.whatsapp || "6282381118520"}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik untuk konsultasi gratis.")}`}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-apple w-full sm:w-auto text-lg md:text-xl px-12 py-4 md:py-5"
             >
               {cta.buttonText}
-            </Link>
+            </a>
             <p className="text-[8px] md:text-[10px] font-bold text-secondary tracking-[0.2em] uppercase">
               {cta.promoText}
             </p>

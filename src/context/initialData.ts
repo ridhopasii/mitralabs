@@ -10,23 +10,25 @@ export const initialData: AppData = {
       { label: "About", href: "/tentang" },
       { label: "Contact", href: "/kontak" },
     ],
-    buttonText: "Pesan Sekarang",
+    buttonText: "💬 Chat Sekarang",
   },
   home: {
     hero: {
       tagline: "Jasa Website & Digital Agency",
       promo: "Promo Launching - Slot Terbatas!",
-      title: "Bikin Bisnis Kamu Online & Otomatis dalam 7 Hari.",
-      subtitle: "Kami bantu UMKM, Sekolah, dan Bisnis Lokal punya website profesional yang bantu jualan lebih mudah, kelola data otomatis, dan tampil lebih terpercaya di depan pelanggan.",
+      title: "Website Profesional untuk Bisnis Kamu. Selesai 7 Hari. Harga Jelas. Tanpa Ribet.",
+      subtitle: "Mitralabs.id hadir buat kamu yang capek bisnis bagus tapi tidak ada yang tahu. Kami buatkan website yang beneran kerja — bukan cuma bagus di mata, tapi menghasilkan di kantong.",
       image: "/mitralabs_hero_premium_1778227502346.png",
-      stats: { label: "Project Selesai", value: "240+", desc: "Project yang berhasil kami kembangkan", statusLabel: "Sistem Status", statusValue: "Aktif" }
+      stats: { label: "Project Selesai", value: "Puluhan", desc: "UMKM, Sekolah, dan Bisnis Lokal di Medan sudah dipercayakan ke kami", statusLabel: "Sistem Status", statusValue: "Aktif" }
     },
     problem: {
       title: "Kenapa Bisnis Kamu Perlu Website Sekarang?",
-      subtitle: "Banyak peluang hilang karena bisnis kamu belum terlihat profesional di internet.",
+      subtitle: "Satu solusi untuk semua masalah ini. Website yang bekerja seperti sales 24 jam — bahkan saat kamu tidur.",
       items: [
-        { id: 1, title: "Kurang Dipercaya Pelanggan", desc: "Orang ragu beli kalau bisnis kamu nggak punya website resmi yang jelas informasinya." },
-        { id: 2, title: "Capek Balas Chat Satu-Satu", desc: "Tanpa sistem otomatis, waktu kamu habis cuma buat jawab pertanyaan yang itu-itu saja." },
+        { id: 1, title: "😟 Bisnis Bagus, Tapi Tidak Terlihat", desc: "Pelanggan potensial cari di Google, tidak ketemu nama kamu. Yang ketemu? Saingan kamu." },
+        { id: 2, title: "💸 Kehilangan Pelanggan Setiap Hari", desc: "Tanpa website, orang ragu. Mereka pikir bisnis kamu tidak serius. Uang mengalir ke yang lebih terlihat profesional." },
+        { id: 3, title: "😓 Waktu Habis Jawab Chat yang Sama", desc: "\"Berapa harganya?\" \"Dimana lokasinya?\" \"Ada stok tidak?\" — pertanyaan yang sama terus diulang. Capek, kan?" },
+        { id: 4, title: "📉 Saingan Sudah Online, Kamu Masih Menunggu", desc: "Setiap hari tanpa website adalah hari yang kamu hadiahkan untuk kompetitor. Mereka jalan, kamu diam." },
       ],
     },
     solution: {
@@ -36,47 +38,47 @@ export const initialData: AppData = {
       cards: {
         umkm: {
           tag: "Most Requested",
-          title: "Sistem Web UMKM",
-          desc: "Integrasi WhatsApp, katalog produk dinamis, dan dashboard simpel untuk manajemen stok dan pesanan harian.",
+          title: "🛒 Website untuk UMKM & Toko",
+          desc: "Produkmu tampil rapi, harga jelas, tombol pesan langsung ke WA. Pelanggan datang, langsung beli — tanpa bingung.",
           image: "/mitralabs_umkm_service_1778227528390.png"
         },
         travel: {
-          title: "Portal Travel & Tour",
-          desc: "Sistem manajemen paket wisata, kalender keberangkatan otomatis, dan formulir booking yang terintegrasi.",
+          title: "✈️ Website untuk Travel & Tour Guide",
+          desc: "Paket wisata tampil keren, form booking otomatis, kalender jadwal tersedia. Klien bisa booking kapan saja, kamu tinggal konfirmasi.",
           image: "/mitralabs_travel_service_1778227548373.png"
         },
         school: {
-          title: "Platform Akademik",
-          desc: "Pusat informasi sekolah, sistem PPDB Online, dan manajemen konten berita sekolah yang terstruktur.",
+          title: "🏫 Website untuk Sekolah & Lembaga",
+          desc: "Profil sekolah profesional, info PPDB online, galeri kegiatan, dan pengumuman terstruktur. Wali murid percaya sejak pertama melihat.",
           image: "/mitralabs_school_service_1778227565941.png"
         },
         business: {
-          title: "Corporate Identity",
-          desc: "Company profile tingkat tinggi yang mencerminkan otoritas dan profesionalisme brand Anda di pasar global.",
+          title: "🏢 Website untuk Bisnis & Perusahaan",
+          desc: "Company profile yang mencerminkan skala bisnis kamu. Tampil serius di depan klien, mitra, dan investor.",
           image: "https://images.unsplash.com/photo-1497366216548-37526070297c?auto=format&fit=crop&q=80&w=800"
         }
       }
     },
     process: {
-      title: "Standard Operational Procedure",
-      subtitle: "Kami bekerja dengan transparansi penuh untuk memastikan setiap ekspektasi Anda terpenuhi melampaui standar.",
+      title: "Cara Kerja Kami",
+      subtitle: "Proses transparan, tanpa ribet, dan selalu melibatkan kamu di setiap langkahnya.",
       steps: [
-        { id: 1, title: "Technical Onboarding", desc: "Pendalaman brief melalui form onboarding strategis untuk memetakan target audiens dan kompetitor." },
-        { id: 2, title: "Agreement & Kickoff", desc: "Finalisasi kontrak, pembayaran DP 30%, dan penyusunan timeline pengerjaan yang ketat." },
-        { id: 3, title: "Sprints & Updates", desc: "Proses development modular dengan laporan progres mingguan melalui grup koordinasi khusus." },
-        { id: 4, title: "Quality Assurance", desc: "Pengujian performa (speed test), keamanan, dan responsivitas di berbagai perangkat." },
-        { id: 5, title: "Handover & Warranty", desc: "Aktivasi website, serah terima aset, dan masa garansi bug untuk ketenangan pikiran Anda." },
+        { id: 1, title: "Langkah 1 — Ceritain Kebutuhan Kamu", desc: "Isi form brief singkat. Nama bisnis, layanan apa yang kamu jual, dan website seperti apa yang kamu bayangkan. Cuma 5 menit." },
+        { id: 2, title: "Langkah 2 — Kita Sepakati Bersama", desc: "Kami kirimkan proposal + harga final. Kamu setuju, tanda tangan, bayar DP 30% — dan kita mulai." },
+        { id: 3, title: "Langkah 3 — Kami Kerja, Kamu Tenang", desc: "Tim kami langsung kerjakan. Kamu update progres 2x — saat setengah jalan dan saat hampir selesai. Tidak ada kejutan." },
+        { id: 4, title: "Langkah 4 — Kamu Cek, Kita Revisi", desc: "Website jadi, kamu review. Tidak puas? Ada 2x revisi gratis. Sampai kamu bilang \"ini dia yang aku mau.\"" },
+        { id: 5, title: "Langkah 5 — Website Hidup, Bisnis Jalan", desc: "Lunas, akses diserahkan, website live. Garansi bug 7 hari aktif. Bisnis kamu resmi hadir di internet." },
       ],
     },
     stats: [
-      { id: 1, label: "Live Projects", value: "240+", desc: "Digital Assets Live" },
-      { id: 2, label: "Client Satisfaction", value: "4.9/5", desc: "Customer Rating" },
+      { id: 1, label: "Live Projects", value: "10+", desc: "Digital Assets Live" },
+      { id: 2, label: "Client Satisfaction", value: "100%", desc: "Customer Rating" },
     ],
     cta: {
-      title: "Siap Mewujudkan Visi Digital Anda?",
-      subtitle: "Mari berkolaborasi membangun infrastruktur digital yang tangguh dan berorientasi pada hasil.",
-      buttonText: "Jadwalkan Konsultasi Gratis",
-      promoText: "Sesi Strategi Digital Gratis (Terbatas untuk 5 Klien/Bulan)",
+      title: "Bisnis Kamu Butuh Website. Klien Kamu Butuh Alasan untuk Percaya. Kami Bantu Keduanya.",
+      subtitle: "Konsultasi pertama GRATIS. Tidak ada kewajiban lanjut. Ceritakan bisnis kamu — kami siap dengarkan dan bantu carikan solusinya.",
+      buttonText: "💬 Chat Sekarang — Gratis",
+      promoText: "Terbatas 5 slot konsultasi per minggu.",
     },
     pricing: {
       badge: "Paket Harga",
@@ -93,8 +95,8 @@ export const initialData: AppData = {
     },
   },
   services: {
-    title: "Investasi Strategis Untuk Bisnis Anda",
-    subtitle: "Kami menawarkan paket layanan yang fleksibel namun tetap mengedepankan kualitas teknis terbaik di kelasnya.",
+    title: "Pilih Paket yang Pas untuk Bisnis Kamu",
+    subtitle: "Tidak ada paket yang \"paling mahal = paling bagus.\" Yang ada adalah paket yang paling sesuai dengan kebutuhan kamu sekarang. Kalau masih bingung, konsultasi dulu — gratis.",
     plans: [
       {
         id: 1,
@@ -128,7 +130,7 @@ export const initialData: AppData = {
         missing: [],
       }
     ],
-    notes: ["Semua paket sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance bug selama 3 bulan pertama."],
+    notes: ["Semua paket sudah termasuk GRATIS Domain .com/.id selama 1 tahun (kecuali Paket Basic).", "Garansi maintenance bug teknis selama 7 hari setelah serah terima."],
     comparisonTitle: "Head-to-Head Comparison",
     comparisonSubtitle: "Lihat perbedaan mendetail antara paket layanan kami untuk menentukan pilihan terbaik bagi bisnis Anda.",
     labels: {
@@ -210,33 +212,44 @@ export const initialData: AppData = {
         image: "https://images.unsplash.com/photo-1542744173-8e7e53415bb0?auto=format&fit=crop&q=80&w=800",
         date: "12 Feb 2024",
         author: "Ridho Robbi"
+      },
+      {
+        id: 2,
+        slug: "cara-meningkatkan-kepercayaan-pelanggan",
+        title: "5 Cara Mudah Meningkatkan Kepercayaan Pelanggan Lewat Desain Website",
+        excerpt: "Tampilan website yang profesional bisa meningkatkan konversi penjualan hingga 300%. Simak tipsnya.",
+        content: "<p>Kesan pertama sangat penting. Jika website Anda terlihat berantakan atau lambat, pelanggan akan langsung meninggalkannya. Berikut adalah 5 elemen penting yang harus ada di website Anda untuk memastikan pelanggan percaya dan mau bertransaksi...</p>",
+        category: "Design",
+        image: "https://images.unsplash.com/photo-1559028012-481c04fa702d?auto=format&fit=crop&q=80&w=800",
+        date: "25 Mar 2024",
+        author: "Ghazy Muhalla"
       }
     ]
   },
   about: {
     hero: {
       tagline: "About Mitralabs",
-      title: "Membangun Standar Baru Presisi Digital",
-      subtitle: "Mitralabs lahir dari kebutuhan akan solusi teknologi yang tidak hanya estetis, tetapi juga tangguh secara teknis.",
+      title: "Kenapa Mitralabs Ada?",
+      subtitle: "Jujur — kami mulai ini karena kami lihat sendiri banyak bisnis bagus di Medan yang tidak terlihat online. Warung yang masakannya enak tapi tidak dikenal orang luar. Tourguide yang hafal setiap sudut Danau Toba tapi susah dapat klien. Sekolah yang programnya luar biasa tapi informasinya susah dicari. Semua masalah itu punya satu akar yang sama: mereka tidak punya kehadiran digital yang layak. Mitralabs lahir untuk mengubah itu. Bukan dengan jargon-jargon teknologi yang membingungkan. Tapi dengan solusi nyata, harga yang jujur, dan proses yang transparan. Kami mahasiswa yang percaya bahwa teknologi seharusnya bisa diakses semua orang — bukan hanya perusahaan besar dengan budget besar.",
       image: "https://images.unsplash.com/photo-1522071820081-009f0129c71c?auto=format&fit=crop&q=80&w=1200"
     },
     stats: [
-      { label: "Success Projects", value: "240+" },
-      { label: "Client Satisfaction", value: "99%" }
+      { label: "Success Projects", value: "10+" },
+      { label: "Client Satisfaction", value: "100%" }
     ],
     missionTitle: "Misi Kami",
     mission: [
-      "Memberikan solusi digital yang presisi dan fungsional.",
-      "Membantu UMKM dan institusi bertransformasi ke era digital.",
-      "Menjamin kualitas teknis tertinggi dalam setiap baris kode."
+      "Memberikan solusi digital yang jujur dan fungsional.",
+      "Membantu UMKM dan institusi bertransformasi ke era digital tanpa ribet.",
+      "Menjamin kualitas teknis tertinggi dengan harga yang masuk akal."
     ],
     visionTitle: "Visi Kami",
-    vision: "Menjadi mitra teknologi pilihan utama bagi bisnis yang ingin mendominasi pasar digital melalui presisi teknik dan desain.",
+    vision: "Menjadi mitra teknologi pilihan utama bagi bisnis lokal di Medan yang ingin mendominasi pasar digital.",
     teamTitle: "The Minds Behind Mitralabs",
     teamSubtitle: "Kombinasi antara kreativitas visual dan ketelitian kode.",
     team: [
-      { id: 1, name: "Ridho Robbi", role: "CEO & Tech Lead", bio: "Fokus pada arsitektur sistem dan strategi pertumbuhan digital.", image: "https://images.unsplash.com/photo-1519085360753-af0119f7cbe7?auto=format&fit=crop&q=80&w=400" },
-      { id: 2, name: "Ghazy Muhalla", role: "Head of Operations", bio: "Memastikan setiap project berjalan tepat waktu dengan standar QA tertinggi.", image: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?auto=format&fit=crop&q=80&w=400" },
+      { id: 1, name: "Ridho Robbi Pasi", role: "Engineer & Founder", bio: "Mahasiswa yang sudah jatuh cinta dengan dunia web development sejak SMA. Ridho yang bangun setiap baris kode di website klien Mitralabs — dari desain sampai deployment. \"Aku percaya website yang bagus bukan soal tampilan saja. Harus cepat, aman, dan beneran berguna untuk bisnis klien.\"", image: "/ridho.jpg" },
+      { id: 2, name: "Ghazy Muhalla", role: "Marketing & Co-Founder", bio: "Ghazy yang jaga komunikasi dengan klien dan mastiin setiap project berjalan sesuai ekspektasi. Dia yang jadi jembatan antara kebutuhan bisnis klien dan kemampuan teknis tim. \"Klien yang puas bukan yang websitenya bagus doang — tapi yang ngerasa didengar dan dibantu dari awal sampai akhir.\"", image: "/ghazy.jpg" },
     ],
     labels: {
       teamTagline: "Tim Ahli Kami",
@@ -248,29 +261,29 @@ export const initialData: AppData = {
   },
   brand: {
     name: "Mitralabs",
-    tagline: "Precision Web Engineering",
+    tagline: "Mitra Digital Bisnis Mu",
     logo: "/logo.png",
     favicon: "/favicon.ico",
     phone: "6282381118520",
     whatsapp: "6282381118520",
-    email: "contact@mitralabs.web.id",
+    email: "ridhorobbipasi@gmail.com",
     website: "www.mitralabs.web.id",
-    address: "Jl. Contoh No. 123",
+    address: "Medan, Sumatera Utara",
     city: "Medan",
     province: "Sumatera Utara",
     postalCode: "20111",
     npwp: "00.000.000.0-000.000",
     linkedin: "linkedin.com/company/mitralabs-id",
     instagram: "@mitralabs.id",
-    mapsUrl: "https://maps.google.com/?q=Medan",
+    mapsUrl: "https://maps.app.goo.gl/r6R1h9Z7N1rXmE6q7", // Example Maps link for Medan
   },
   contact: {
-    title: "Hubungi Kami",
-    subtitle: "Siap mendiskusikan project Anda? Tim kami siap membantu 24/7.",
+    title: "Ada yang Ingin Kamu Tanyakan?",
+    subtitle: "Jangan ragu. Kami tidak gigit. 😄 Ceritakan bisnis kamu, layanan apa yang kamu butuhkan, dan budget yang kamu punya. Kami akan balas dalam 1x24 jam dan kasih saran yang jujur — bahkan kalau jawabannya adalah \"paket Basic sudah cukup untuk kamu.\"",
     phone: "6282381118520",
-    email: "contact@mitralabs.web.id",
+    email: "ridhorobbipasi@gmail.com",
     instagram: "@mitralabs.id",
-    address: "Medan, Sumatera Utara, Indonesia",
+    address: "Medan, Sumatera Utara",
     mapsUrl: "https://maps.google.com/?q=Medan",
     labels: {
       tagline: "Kontak Kami",
@@ -280,7 +293,7 @@ export const initialData: AppData = {
     },
   },
   footer: {
-    description: "Technical precision in every pixel.",
+    description: "Mitra Digital Bisnis Mu. Mitralabs.id — Medan, Indonesia.",
     links: [
       { label: "Privacy Policy", href: "/privacy" },
       { label: "Terms of Service", href: "/terms" },
@@ -303,8 +316,8 @@ export const initialData: AppData = {
   },
   invoiceSettings: {
     companyName: "MITRALABS.WEB.ID",
-    companyTagline: "Precision Web Engineering",
-    companyAddress: "Jl. Contoh No. 123",
+    companyTagline: "Mitra Digital Bisnis Mu",
+    companyAddress: "Medan",
     companyCity: "Medan",
     companyProvince: "Sumatera Utara",
     companyPostalCode: "20111",
@@ -320,8 +333,8 @@ export const initialData: AppData = {
     bankBranch: "KCP Medan Petisah",
     taxRate: 0,
     taxLabel: "PPN (11%)",
-    footerNote: "Verified by Mitralabs Cryptographic Protocol",
-    termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+    footerNote: "Verified by Mitralabs",
+    termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug berlaku 7 hari setelah serah terima",
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
     signatureFields: {
       marketingName: "Ghazy Muhalla",
@@ -337,26 +350,50 @@ export const initialData: AppData = {
   testimonials: [
     {
       id: 1,
-      name: "Andi Wijaya",
-      role: "CEO Toba Dream",
-      content: "Mitralabs membantu kami membangun sistem yang sangat efisien. Performa website luar biasa.",
+      name: "Kamu Berikutnya?",
+      role: "Calon Klien Sukses",
+      content: "Sementara kami kumpulkan testimoni nyata dari klien kami... Kamu bisa jadi yang pertama merasakannya.",
       rating: 5,
       is_published: true,
-      image: "https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?auto=format&fit=crop&q=80&w=200"
+      image: "https://ui-avatars.com/api/?name=K&background=random"
     }
   ],
   faqs: [
     {
       id: 1,
-      question: "Apa saja yang perlu saya siapkan?",
-      answer: "Anda hanya perlu menyiapkan Logo, foto produk/bisnis, dan rincian layanan Anda. Selebihnya akan kami bantu susun.",
-      category: "Persiapan"
+      question: "Berapa lama website saya jadi?",
+      answer: "Tergantung paket. Basic selesai 3 hari kerja, Standard 7 hari, Premium 14 hari — dihitung setelah DP masuk dan brief lengkap kami terima. Kami komit dengan timeline, dan selalu informasikan kalau ada kendala.",
+      category: "Timeline"
     },
     {
       id: 2,
-      question: "Apakah website bisa saya edit sendiri nanti?",
-      answer: "Tentu! Kami menyediakan Dashboard Admin yang sangat mudah digunakan bahkan bagi Anda yang tidak paham IT.",
+      question: "Apakah saya bisa edit sendiri nanti?",
+      answer: "Ya! Semua website kami dilengkapi dashboard admin yang mudah dipakai. Ganti foto, update harga, tambah produk — bisa kamu lakukan sendiri tanpa perlu coding.",
       category: "Layanan"
+    },
+    {
+      id: 3,
+      question: "Bagaimana sistem pembayarannya?",
+      answer: "DP 30% sebelum mulai, pelunasan 70% sebelum website diserahkan. Pembayaran via Dana, BSI, Mandiri, atau QRIS. Tidak ada biaya tersembunyi — semua tercantum di proposal.",
+      category: "Pembayaran"
+    },
+    {
+      id: 4,
+      question: "Apakah ada garansi?",
+      answer: "Ada. Garansi bug teknis 7 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya. Setelah masa garansi, perbaikan Rp 100.000 per sesi.",
+      category: "Garansi"
+    },
+    {
+      id: 5,
+      question: "Saya tidak punya logo dan foto, apakah bisa tetap jalan?",
+      answer: "Bisa. Kami bisa bantu carikan referensi desain dan menggunakan foto bebas royalti sementara. Idealnya kamu siapkan logo dan foto produk/usaha sendiri agar hasilnya lebih personal.",
+      category: "Persiapan"
+    },
+    {
+      id: 6,
+      question: "Apakah bisa dicicil?",
+      answer: "Saat ini sistem pembayaran kami adalah DP 30% di awal dan pelunasan 70% setelah website selesai. Belum ada cicilan, tapi harga sudah kami sesuaikan agar tetap terjangkau untuk semua ukuran bisnis.",
+      category: "Pembayaran"
     }
   ],
   bookings: [

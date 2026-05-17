@@ -16,8 +16,8 @@ const featureMatrix = [
   { name: "Blog / Artikel",   val: [false, false, true] },
   { name: "Sistem Booking",   val: [false, false, true] },
   { name: "Animasi",          val: [false, false, true] },
-  { name: "Domain .com",      val: [false, false, "Gratis (1 Thn)"] },
-  { name: "Hosting",          val: [false, "Opsional", "Gratis (1 Thn)"] },
+  { name: "Domain .com/.id",  val: [false, "Gratis (1 Thn)", "Gratis (1 Thn)"] },
+  { name: "Hosting",          val: [false, "Gratis (1 Thn)", "Gratis (1 Thn)"] },
   { name: "Revisi",           val: ["2x", "2x", "2x"] },
   { name: "Garansi Bug",      val: ["7 Hari", "7 Hari", "7 Hari"] },
 ];
@@ -45,16 +45,19 @@ export default function ComparisonTable() {
   });
 
   return (
-    <section className="py-24 bg-surface-container-low">
-      <div className="max-w-7xl mx-auto px-6">
-        <div className="text-center mb-16">
-          <h2 className="font-display text-4xl md:text-5xl font-black text-on-surface tracking-tighter mb-4">
+    <section className="py-24 md:py-40 bg-surface-container/30 px-6">
+      <div className="section-container">
+        <div className="text-center mb-16 md:mb-24">
+          <span className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">
+            {data.services.labels?.comparisonTagline || "Perbandingan Detail"}
+          </span>
+          <h2 className="text-5xl md:text-7xl font-semibold text-on-surface tracking-tight mb-8">
             {comparisonTitle}
           </h2>
-          <p className="text-on-surface-variant font-medium">{comparisonSubtitle}</p>
+          <p className="text-xl md:text-2xl text-secondary font-medium max-w-2xl mx-auto">{comparisonSubtitle}</p>
         </div>
 
-        <div className="overflow-x-auto rounded-[3rem] border border-surface-container-highest shadow-premium bg-white">
+        <div className="overflow-x-auto no-scrollbar rounded-[3.5rem] border border-outline/10 shadow-apple bg-background">
           <table className="w-full text-left border-collapse">
             <thead>
               <tr className="border-b border-surface-container-highest">

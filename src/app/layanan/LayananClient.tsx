@@ -6,6 +6,7 @@ import { useData } from "@/context/DataContext";
 import Link from "next/link";
 import FAQSection from "@/sections/home/FAQSection";
 import CalculatorSection from "@/sections/services/CalculatorSection";
+import ComparisonTable from "@/sections/services/ComparisonTable";
 import { motion } from "framer-motion";
 
 export default function LayananClient() {
@@ -118,52 +119,7 @@ export default function LayananClient() {
         </section>
 
         {/* Comparison Table */}
-        <section className="py-32 md:py-48 px-6">
-          <div className="section-container">
-            <div className="text-center mb-32">
-              <span className="text-primary font-bold uppercase tracking-[0.3em] text-[10px] mb-4 block">
-                {services.labels?.comparisonTagline || "Perbandingan Detail"}
-              </span>
-              <h2 className="text-5xl md:text-7xl font-semibold tracking-tight reveal-text mb-10">{services.comparisonTitle}</h2>
-              <p className="text-xl md:text-2xl text-secondary font-medium max-w-2xl mx-auto">{services.comparisonSubtitle}</p>
-            </div>
-            
-            <div className="overflow-x-auto no-scrollbar rounded-[3.5rem] border border-outline/10 shadow-apple">
-              <table className="w-full border-collapse bg-background">
-                <thead>
-                  <tr className="border-b border-outline/10 text-left">
-                    <th className="p-10 md:p-14 text-[11px] font-bold uppercase tracking-[0.2em] text-secondary w-1/4">
-                      {services.labels?.featureColumn || "Fitur"}
-                    </th>
-                    {plans.map(p => (
-                      <th key={p.id} className="p-10 md:p-14 text-[11px] font-bold uppercase tracking-[0.2em] text-on-background">{p.name}</th>
-                    ))}
-                  </tr>
-                </thead>
-                <tbody className="divide-y divide-outline/10 text-lg font-medium text-on-surface">
-                  <tr className="hover:bg-surface-container transition-colors">
-                    <td className="p-10 md:p-14 text-secondary">
-                      {services.labels?.durationLabel || "Waktu Pengerjaan"}
-                    </td>
-                    {plans.map(p => <td key={p.id} className="p-10 md:p-14">{p.duration}</td>)}
-                  </tr>
-                  <tr className="hover:bg-surface-container transition-colors">
-                    <td className="p-10 md:p-14 text-secondary">
-                      {services.labels?.pagesLabel || "Jumlah Halaman"}
-                    </td>
-                    {plans.map(p => <td key={p.id} className="p-10 md:p-14">{p.pages}</td>)}
-                  </tr>
-                  <tr className="hover:bg-surface-container transition-colors">
-                    <td className="p-10 md:p-14 text-secondary font-semibold">
-                      {services.labels?.investmentLabel || "Investasi"}
-                    </td>
-                    {plans.map(p => <td key={p.id} className="p-10 md:p-14 text-primary font-bold">{p.price}</td>)}
-                  </tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
-        </section>
+        <ComparisonTable />
 
 
         {/* Dynamic Price Calculator */}

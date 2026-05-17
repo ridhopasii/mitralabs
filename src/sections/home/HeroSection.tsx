@@ -31,12 +31,14 @@ export default function HeroSection() {
             {hero.subtitle}
           </p>
           <div className="flex flex-col sm:flex-row items-center justify-center gap-4 md:gap-5 mb-20 md:mb-28 px-4">
-            <Link
-              href="/layanan"
+            <a
+              href={waUrl}
+              target="_blank"
+              rel="noopener noreferrer"
               className="btn-apple w-full sm:w-auto text-base text-center"
             >
               {data.navbar.buttonText}
-            </Link>
+            </a>
             <Link
               href="/layanan"
               className="btn-apple-secondary w-full sm:w-auto text-base text-center group flex items-center justify-center gap-2"

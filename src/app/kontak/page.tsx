@@ -167,15 +167,16 @@ export default function ContactPage() {
                   <p className="text-secondary font-medium leading-relaxed">{brand.address}</p>
                 </div>
                 <div className="h-[300px] relative overflow-hidden bg-background">
-                  <img
-                    src="https://images.unsplash.com/photo-1526772662000-3f88f10405ff?auto=format&fit=crop&q=80&w=800"
-                    alt="Office Location"
-                    className="w-full h-full object-cover grayscale opacity-40 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-2000 group-hover:scale-110"
-                  />
-                  <div className="absolute inset-0 flex items-center justify-center">
-                    <div className="w-12 h-12 bg-primary rounded-full animate-ping opacity-20"></div>
-                    <div className="absolute w-6 h-6 bg-primary rounded-full border-4 border-background shadow-xl"></div>
-                  </div>
+                  <iframe
+                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127607.41160395353!2d98.57523992019914!3d3.5970313880630806!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x303131cc1cb3be27%3A0x4039d80b220cc50!2sMedan%2C%20Medan%20City%2C%20North%20Sumatra!5e0!3m2!1sen!2sid!4v1715949214300!5m2!1sen!2sid"
+                    width="100%"
+                    height="100%"
+                    style={{ border: 0 }}
+                    allowFullScreen={true}
+                    loading="lazy"
+                    referrerPolicy="no-referrer-when-downgrade"
+                    className="w-full h-full grayscale opacity-60 group-hover:grayscale-0 group-hover:opacity-100 transition-all duration-1000"
+                  ></iframe>
                 </div>
               </motion.div>
             </div>

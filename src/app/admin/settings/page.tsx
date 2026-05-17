@@ -25,7 +25,7 @@ import React from "react";
 const defaultInvoiceSettings = {
   companyName: "MITRALABS.ID",
   companyTagline: "Precision Web Engineering",
-  companyAddress: "Jl. Contoh No. 123",
+  companyAddress: "Medan, Sumatera Utara",
   companyCity: "Medan",
   companyProvince: "Sumatera Utara",
   companyPostalCode: "20111",
@@ -40,7 +40,7 @@ const defaultInvoiceSettings = {
   taxRate: 0,
   taxLabel: "PPN (11%)",
   footerNote: "Verified by Mitralabs Cryptographic Protocol",
-  termsAndConditions: "1. Pembayaran dilakukan maksimal 7 hari setelah invoice diterbitkan\n2. Pembayaran dapat dilakukan melalui transfer bank\n3. Konfirmasi pembayaran wajib disertai bukti transfer\n4. Garansi bug berlaku 3 bulan setelah serah terima",
+  termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug berlaku 7 hari setelah serah terima",
   paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran."
 };
 
