@@ -7,7 +7,7 @@ import Link from "next/link";
 export default function CTASection() {
   const { data } = useData();
   const { cta } = data.home;
-  const { settings } = data;
+  const { brand } = data;
 
   return (
     <section className="py-24 md:py-40 px-4 md:px-6">
@@ -21,7 +21,7 @@ export default function CTASection() {
           </p>
           <div className="flex flex-col items-center gap-6 md:gap-8">
             <a
-              href={`https://wa.me/${settings.whatsapp || "6282381118520"}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik untuk konsultasi gratis.")}`}
+              href={`https://wa.me/${brand.whatsapp || "6282381118520"}?text=${encodeURIComponent("Halo Mitralabs! Saya tertarik untuk konsultasi gratis.")}`}
               target="_blank"
               rel="noopener noreferrer"
               className="btn-apple w-full sm:w-auto text-lg md:text-xl px-12 py-4 md:py-5"
