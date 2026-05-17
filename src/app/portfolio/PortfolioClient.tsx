@@ -13,13 +13,13 @@ export default function PortfolioClient() {
   const { portfolio, brand } = data;
   const { projects, categories, cta } = portfolio;
   
-  const [filter, setFilter] = useState("All Works");
+  const [filter, setFilter] = useState(categories[0] || "Semua");
   const [search, setSearch] = useState("");
   const [visibleCount, setVisibleCount] = useState(6);
 
   const filteredProjects = useMemo(() => {
     return projects.filter(p => {
-      const matchesFilter = filter === "All Works" || p.category === filter;
+      const matchesFilter = filter === "Semua" || filter === categories[0] || p.category === filter;
       const matchesSearch = p.title.toLowerCase().includes(search.toLowerCase()) || 
                            p.description.toLowerCase().includes(search.toLowerCase());
       return matchesFilter && matchesSearch;

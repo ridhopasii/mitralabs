@@ -400,16 +400,12 @@
 - [x] Isi FAQ — minimal 4 pertanyaan
 - [x] Seragamkan garansi: 7 hari (bukan 3 bulan)
 - [x] Seragamkan jabatan Ridho & Ghazy di semua halaman
-
-## 🟡 PENTING (Selesaikan Minggu Ini)
 - [x] Tambah floating WhatsApp button di semua halaman
 - [x] Ubah CTA hero ke WA langsung
 - [x] Turunkan angka "240+" ke angka nyata
 - [x] Ganti bahasa korporat ke bahasa yang lebih manusiawi
 - [x] Ganti foto peta ke Google Maps embed nyata
 - [x] Tambah cerita brand di halaman Tentang
-
-## 🟢 IDEAL (Selesaikan Bulan Ini)
 - [x] Tambah Blog — minimal 2 artikel awal
 - [x] Tambah halaman Thank You setelah form (Di-handle oleh UI Form Sukses)
 - [x] Buat 404 page branded
@@ -417,7 +413,13 @@
 - [x] Tambah Instagram feed
 - [x] Tambah filter kategori di Portfolio
 - [x] Lengkapi tabel perbandingan di Layanan
-
+- [x] Ubah teks Navbar menu ke Bahasa Indonesia (Home -> Beranda, dll)
+- [x] Ubah nama Tier Paket yang terlalu korporat ("Enterprise", "Essential") menjadi humanis ("Paket Awal", "Solusi Lengkap")
+- [x] Perbaiki deskripsi "Notes" pada Paket Layanan agar akurat (Basic tidak include Domain/Hosting gratis)
+- [x] Ganti filter kategori Portfolio dari "All Works" menjadi "Semua"
+- [x] Hapus placeholder URL di Footer (contoh: linkedin.com random) dan ganti ke URL resmi Mitralabs
+- [x] Selesaikan error `Next/Image` terkait hostname `ui-avatars.com` dengan menambahkannya ke `next.config.ts`
+- [x] Pastikan seluruh *TypeScript check* berjalan mulus tanpa error (`exit code 0`)
 ---
 
 # BAGIAN 4 — KONSISTENSI YANG HARUS DISERAGAMKAN
@@ -434,3 +436,15 @@
 
 *Dokumen ini dibuat sebagai panduan revisi website Mitralabs.id*
 *Versi 1.0 — Mei 2026*
+
+---
+
+# BAGIAN 5 — CLEANUP TAMBAHAN (Selesai Saat Audit Final)
+
+- [x] Ubah teks Navbar menu ke Bahasa Indonesia (Home -> Beranda, dll)
+- [x] Ubah nama Tier Paket yang terlalu korporat ("Enterprise", "Essential") menjadi humanis ("Paket Awal", "Solusi Lengkap")
+- [x] Perbaiki deskripsi "Notes" pada Paket Layanan agar akurat (Basic tidak include Domain/Hosting gratis)
+- [x] Ganti filter kategori Portfolio dari "All Works" menjadi "Semua"
+- [x] Hapus placeholder URL di Footer (contoh: linkedin.com random) dan ganti ke URL resmi Mitralabs
+- [x] Selesaikan error `Next/Image` terkait hostname `ui-avatars.com` dengan menambahkannya ke `next.config.ts`
+- [x] Pastikan seluruh *TypeScript check* berjalan mulus tanpa error (`exit code 0`)

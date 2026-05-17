@@ -4,11 +4,11 @@ export const initialData: AppData = {
   navbar: {
     logo: "Mitralabs",
     links: [
-      { label: "Home", href: "/" },
-      { label: "Services", href: "/layanan" },
+      { label: "Beranda", href: "/" },
+      { label: "Layanan", href: "/layanan" },
       { label: "Portfolio", href: "/portfolio" },
-      { label: "About", href: "/tentang" },
-      { label: "Contact", href: "/kontak" },
+      { label: "Tentang", href: "/tentang" },
+      { label: "Kontak", href: "/kontak" },
     ],
     buttonText: "💬 Chat Sekarang",
   },
@@ -102,20 +102,20 @@ export const initialData: AppData = {
         id: 1,
         name: "Basic",
         price: "Rp 1.500.000",
-        tier: "Essential",
+        tier: "Paket Awal",
         pages: "1 Halaman",
         duration: "3-5 Hari",
-        features: ["Landing Page Modern", "Integrasi WhatsApp", "Domain & Hosting (1 Thn)", "Mobile Responsive", "SSL Security"],
-        missing: ["Sistem Booking", "Dashboard Admin", "Custom Features"],
+        features: ["Landing Page Modern", "Integrasi WhatsApp", "Mobile Responsive", "SSL Security"],
+        missing: ["Domain & Hosting", "Sistem Booking", "Dashboard Admin"],
       },
       {
         id: 2,
         name: "Standard",
         price: "Rp 3.500.000",
-        tier: "Professional",
+        tier: "Paling Populer",
         pages: "Sampai 5 Halaman",
         duration: "7-10 Hari",
-        features: ["Multi-page Website", "Dashboard Admin", "Integrasi WhatsApp", "Sistem Galeri Pro", "SEO Basic", "Laporan Bulanan"],
+        features: ["Multi-page Website", "Dashboard Admin", "Integrasi WhatsApp", "Domain & Hosting Gratis 1 Thn", "Sistem Galeri Pro", "SEO Basic"],
         missing: ["Custom API Integrasi", "Prioritas Support 24/7"],
         highlight: true
       },
@@ -123,16 +123,16 @@ export const initialData: AppData = {
         id: 3,
         name: "Premium",
         price: "Rp 7.000.000",
-        tier: "Enterprise",
+        tier: "Solusi Lengkap",
         pages: "Halaman Unlimited",
         duration: "14-21 Hari",
-        features: ["Full Custom Website", "Sistem Booking/E-commerce", "High-End SEO", "Prioritas Support", "Custom Integrasi API", "Manual Book"],
+        features: ["Full Custom Website", "Sistem Booking/E-commerce", "Domain & Hosting Gratis 1 Thn", "SEO Lanjutan", "Prioritas Support", "Custom Integrasi API"],
         missing: [],
       }
     ],
-    notes: ["Semua paket sudah termasuk GRATIS Domain .com/.id selama 1 tahun (kecuali Paket Basic).", "Garansi maintenance bug teknis selama 7 hari setelah serah terima."],
-    comparisonTitle: "Head-to-Head Comparison",
-    comparisonSubtitle: "Lihat perbedaan mendetail antara paket layanan kami untuk menentukan pilihan terbaik bagi bisnis Anda.",
+    notes: ["Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance bug teknis selama 7 hari setelah serah terima.", "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."],
+    comparisonTitle: "Perbandingan Lengkap Paket",
+    comparisonSubtitle: "Lihat perbedaan detail antara paket kami dan tentukan mana yang paling cocok untuk bisnis kamu sekarang.",
     labels: {
       tagline: "Solusi Digital",
       comparisonTagline: "Perbandingan Detail",
@@ -149,7 +149,7 @@ export const initialData: AppData = {
   portfolio: {
     title: "Karya Terpilih Kami",
     subtitle: "Lihat bagaimana kami membantu berbagai industri membangun otoritas digital mereka.",
-    categories: ["All", "UMKM", "Travel", "School", "Corporate"],
+    categories: ["Semua", "UMKM", "Travel", "School", "Corporate"],
     projects: [
       {
         id: 1,
@@ -249,7 +249,7 @@ export const initialData: AppData = {
     teamSubtitle: "Kombinasi antara kreativitas visual dan ketelitian kode.",
     team: [
       { id: 1, name: "Ridho Robbi Pasi", role: "Engineer & Founder", bio: "Mahasiswa yang sudah jatuh cinta dengan dunia web development sejak SMA. Ridho yang bangun setiap baris kode di website klien Mitralabs — dari desain sampai deployment. \"Aku percaya website yang bagus bukan soal tampilan saja. Harus cepat, aman, dan beneran berguna untuk bisnis klien.\"", image: "/ridho.jpg" },
-      { id: 2, name: "Ghazy Muhalla", role: "Marketing & Co-Founder", bio: "Ghazy yang jaga komunikasi dengan klien dan mastiin setiap project berjalan sesuai ekspektasi. Dia yang jadi jembatan antara kebutuhan bisnis klien dan kemampuan teknis tim. \"Klien yang puas bukan yang websitenya bagus doang — tapi yang ngerasa didengar dan dibantu dari awal sampai akhir.\"", image: "/ghazy.jpg" },
+      { id: 2, name: "Ghazy Muhalla", role: "Marketing", bio: "Ghazy yang jaga komunikasi dengan klien dan mastiin setiap project berjalan sesuai ekspektasi. Dia yang jadi jembatan antara kebutuhan bisnis klien dan kemampuan teknis tim. \"Klien yang puas bukan yang websitenya bagus doang — tapi yang ngerasa didengar dan dibantu dari awal sampai akhir.\"", image: "/ghazy.jpg" },
     ],
     labels: {
       teamTagline: "Tim Ahli Kami",
@@ -301,9 +301,9 @@ export const initialData: AppData = {
       { label: "Admin", href: "/admin" },
     ],
     socials: [
-      { label: "LinkedIn", href: "https://linkedin.com" },
-      { label: "GitHub", href: "https://github.com" },
-      { label: "Designed with precision in Medan, Indonesia.", href: "#designed-by" },
+      { label: "Instagram", href: "https://instagram.com/mitralabs.id" },
+      { label: "LinkedIn", href: "https://linkedin.com/company/mitralabs-id" },
+      { label: "Designed with care in Medan, Indonesia.", href: "#designed-by" },
     ],
   },
   settings: {
