@@ -413,8 +413,8 @@
 - [x] Tambah Blog — minimal 2 artikel awal
 - [x] Tambah halaman Thank You setelah form (Di-handle oleh UI Form Sukses)
 - [x] Buat 404 page branded
-- [ ] Integrasi Google Analytics
-- [ ] Tambah Instagram feed
+- [x] Integrasi Google Analytics
+- [x] Tambah Instagram feed
 - [x] Tambah filter kategori di Portfolio
 - [x] Lengkapi tabel perbandingan di Layanan
 
@@ -422,13 +422,13 @@
 
 # BAGIAN 4 — KONSISTENSI YANG HARUS DISERAGAMKAN
 
-| Item | Di Website | Di Dokumen | Yang Benar |
-|---|---|---|---|
-| Garansi | 3 bulan | 7 hari | 7 hari |
-| Hosting Basic | Include | Tidak include | Sesuaikan |
-| Jabatan Ridho | CEO & Tech Lead | Engineer & Founder | Engineer & Founder |
-| Jabatan Ghazy | Head of Operations | Marketing | Marketing |
-| DP | Tidak disebutkan | 30% | 30% |
+| Item | Di Website | Di Dokumen | Yang Benar | Status |
+|---|---|---|---|---|
+| Garansi | 3 bulan | 7 hari | 7 hari | ✅ Selesai |
+| Hosting Basic | Include | Tidak include | Sesuaikan | ✅ Selesai |
+| Jabatan Ridho | CEO & Tech Lead | Engineer & Founder | Engineer & Founder | ✅ Selesai |
+| Jabatan Ghazy | Head of Operations | Marketing | Marketing | ✅ Selesai |
+| DP | Tidak disebutkan | 30% | 30% | ✅ Selesai |
 
 ---
 

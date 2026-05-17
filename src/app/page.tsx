@@ -9,6 +9,7 @@ import TestimonialsSection from "@/sections/home/TestimonialsSection";
 import FAQSection from "@/sections/home/FAQSection";
 import PricingSection from "@/sections/home/PricingSection";
 import PortfolioSection from "@/sections/home/PortfolioSection";
+import InstagramSection from "@/sections/home/InstagramSection";
 import Footer from "@/components/Footer";
 
 export const metadata: Metadata = {
@@ -76,6 +77,7 @@ export default function Home() {
       <TestimonialsSection />
       <CTASection />
       <FAQSection />
+      <InstagramSection />
       <Footer />
     </>
   );

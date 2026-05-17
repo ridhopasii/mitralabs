@@ -7,6 +7,7 @@ import { DataProvider } from "@/context/DataContext";
 import MaintenanceGuard from "@/components/MaintenanceGuard";
 import { Analytics } from "@vercel/analytics/react";
 import { SpeedInsights } from "@vercel/speed-insights/next";
+import { GoogleAnalytics } from "@next/third-parties/google";
 
 // Dynamic Metadata Generation
 export async function generateMetadata(): Promise<Metadata> {
@@ -85,6 +86,7 @@ export default function RootLayout({
           </ErrorBoundary>
           <Analytics />
           <SpeedInsights />
+          <GoogleAnalytics gaId="G-XXXXXXXXXX" />
           
           {/* JSON-LD Structured Data for SEO */}
           <script
