@@ -86,7 +86,7 @@ export default function RootLayout({
           </ErrorBoundary>
           <Analytics />
           <SpeedInsights />
-          <GoogleAnalytics gaId="G-5CV42D125D" />
+          <GoogleAnalytics gaId={process.env.NEXT_PUBLIC_GA_ID || "G-5CV42D125D"} />
           
           {/* JSON-LD Structured Data for SEO */}
           <script

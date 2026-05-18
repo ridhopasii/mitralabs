@@ -6,10 +6,10 @@ import { motion } from "framer-motion";
 import { useState, useEffect } from "react";
 
 const IG_POSTS = [
-  "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
-  "https://images.unsplash.com/photo-1555421689-d68471e189f2?auto=format&fit=crop&q=80&w=600",
-  "https://images.unsplash.com/photo-1504384308090-c894fdcc538d?auto=format&fit=crop&q=80&w=600",
-  "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600",
+  "/mitralabs_ig_tips.png",
+  "/mitralabs_travel_service_1778227548373.png",
+  "/mitralabs_school_service_1778227565941.png",
+  "/mitralabs_business_service.png",
 ];
 
 interface InstagramPost {
