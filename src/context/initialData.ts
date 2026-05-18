@@ -9,6 +9,7 @@ export const initialData: AppData = {
       { label: "Portfolio", href: "/portfolio" },
       { label: "Tentang", href: "/tentang" },
       { label: "Kontak", href: "/kontak" },
+      { label: "Lacak Projek", href: "/track" },
     ],
     buttonText: "💬 Chat Sekarang",
   },

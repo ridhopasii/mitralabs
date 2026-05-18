@@ -44,6 +44,26 @@ export default function Footer() {
              </ul>
           </div>
           <div className="md:col-span-2">
+             <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Klien</h4>
+             <ul className="space-y-4">
+                <li>
+                  <Link href="/track" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
+                    Lacak Projek
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/login" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
+                    Client Area
+                  </Link>
+                </li>
+                <li>
+                  <Link href="/kontak" className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
+                    Bantuan
+                  </Link>
+                </li>
+             </ul>
+          </div>
+          <div className="md:col-span-2">
              <h4 className="text-[11px] font-bold text-on-background uppercase tracking-widest mb-6">Legal</h4>
              <ul className="space-y-4">
                 {footer.links.filter(l => l.href.includes('privacy') || l.href.includes('terms')).map((link, i) => (
