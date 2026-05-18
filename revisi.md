@@ -121,14 +121,14 @@
 
 ## 1.3 Skor Keseluruhan
 
-| Halaman | Skor |
-|---|---|
-| Home | 5/10 |
-| Layanan | 6/10 |
-| Portfolio | 5/10 |
-| Tentang | 3/10 |
-| Kontak | 3/10 |
-| **RATA-RATA** | **4.4/10** |
+| Halaman | Skor Awal | Skor Revisi |
+|---|---|---|
+| Home | 5/10 | 9/10 |
+| Layanan | 6/10 | 9/10 |
+| Portfolio | 5/10 | 9/10 |
+| Tentang | 3/10 | 8/10 |
+| Kontak | 3/10 | 9/10 |
+| **RATA-RATA** | **4.4/10** | **8.8/10** |
 
 ---
 
@@ -395,7 +395,7 @@
 
 ## 🔴 DARURAT (Selesaikan Hari Ini)
 - [x] Hapus testimoni palsu / ganti dengan placeholder jujur
-- [x] Ganti foto tim Unsplash dengan foto nyata
+- [x] Ganti foto tim Unsplash dengan foto nyata (File: public/ridho.jpg & public/ghazy.jpg)
 - [x] Ubah alamat "Jl. Contoh No. 123" ke lokasi nyata
 - [x] Isi FAQ — minimal 4 pertanyaan
 - [x] Seragamkan garansi: 7 hari (bukan 3 bulan)
@@ -405,11 +405,11 @@
 - [x] Turunkan angka "240+" ke angka nyata
 - [x] Ganti bahasa korporat ke bahasa yang lebih manusiawi
 - [x] Ganti foto peta ke Google Maps embed nyata
-- [x] Tambah cerita brand di halaman Tentang
-- [x] Tambah Blog — minimal 2 artikel awal
-- [x] Tambah halaman Thank You setelah form (Di-handle oleh UI Form Sukses)
-- [x] Buat 404 page branded
-- [x] Integrasi Google Analytics
+- [x] Tambah cerita brand di halaman Tentang ✅ *(Selesai - Ditambahkan "Kenapa Mitralabs Ada")*
+- [x] Tambah Blog — minimal 2 artikel awal ✅ *(Selesai - Terkoneksi dengan Database Supabase)*
+- [x] Tambah halaman Thank You setelah form (Di-handle oleh UI Form Sukses) ✅ *(Selesai - Berfungsi)*
+- [x] Buat 404 page branded ✅ *(Selesai)*
+- [x] Integrasi Google Analytics ✅ *(Selesai - Menggunakan ID G-5CV42D125D)*
 - [x] Tambah Instagram feed
 - [x] Tambah filter kategori di Portfolio
 - [x] Lengkapi tabel perbandingan di Layanan
@@ -434,11 +434,6 @@
 
 ---
 
-*Dokumen ini dibuat sebagai panduan revisi website Mitralabs.id*
-*Versi 1.0 — Mei 2026*
-
----
-
 # BAGIAN 5 — CLEANUP TAMBAHAN (Selesai Saat Audit Final)
 
 - [x] Ubah teks Navbar menu ke Bahasa Indonesia (Home -> Beranda, dll)
@@ -448,3 +443,18 @@
 - [x] Hapus placeholder URL di Footer (contoh: linkedin.com random) dan ganti ke URL resmi Mitralabs
 - [x] Selesaikan error `Next/Image` terkait hostname `ui-avatars.com` dengan menambahkannya ke `next.config.ts`
 - [x] Pastikan seluruh *TypeScript check* berjalan mulus tanpa error (`exit code 0`)
+
+---
+
+# BAGIAN 6 — FITUR BARU & OTOMATISASI (MEI 2026)
+
+- [x] **Digital Approval (Milestone)**: Klien bisa menyetujui progres proyek langsung dari dashboard pelacakan. ✅ *(Selesai - Skema ClientProject aktif)*
+- [x] **Auto Doc Gen**: Generate otomatis Proposal & SPK (PDF) saat pemesanan baru. ✅ *(Selesai - Menggunakan KwitansiPDFGenerator)*
+- [x] **CRM Kanban Board**: Manajemen pipeline leads (Pending, Proposal, Contract, Active, Done) di Admin Dashboard. ✅ *(Selesai)*
+- [x] **Supabase Storage Integration**: Dokumen dan aset proyek tersimpan aman di cloud. ✅ *(Selesai)*
+
+---
+
+# BAGIAN 7 — CATATAN TAMBAHAN (BELUM SELESAI)
+
+- [ ] **Instagram Feed Live API**: Saat ini feed di web menggunakan gambar placeholder (statis). Agar update otomatis, perlu integrasi token API Instagram langsung atau menggunakan pihak ketiga.

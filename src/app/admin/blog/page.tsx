@@ -48,7 +48,7 @@ const blogPostSchema = z.object({
 type BlogPost = z.infer<typeof blogPostSchema> & { id: number };
 
 export default function BlogManagement() {
-  const { data, updateData } = useData();
+  const { data, updateData, syncBlogPost } = useData();
   const [posts, setPosts] = useState<BlogPost[]>(data.blog.posts);
   const [search, setSearch] = useState("");
   const [editingPost, setEditingPost] = useState<BlogPost | null>(null);
@@ -93,9 +93,16 @@ export default function BlogManagement() {
     const newData = { ...data };
     newData.blog.posts = newPosts;
 
-    setTimeout(() => {
+    setTimeout(async () => {
       updateData(newData);
       setPosts(newPosts);
+      
+      try {
+        await syncBlogPost(postWithSlug as any);
+      } catch (err) {
+        console.error(err);
+      }
+      
       logActivity(isNew ? "Create Blog" : "Update Blog", `Artikel: ${postWithSlug.title}`);
       setIsSaving(false);
       setShowSuccess(true);

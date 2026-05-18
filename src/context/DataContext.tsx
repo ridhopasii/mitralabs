@@ -381,6 +381,7 @@ const DataContext = createContext<{
   updateData: (newData: AppData) => void;
   syncBooking: (booking: Booking) => Promise<void>;
   syncProject: (project: Project) => Promise<void>;
+  syncBlogPost: (post: BlogPost) => Promise<void>;
 } | undefined>(undefined);
 
 import LoadingScreen from "@/components/LoadingScreen";
@@ -661,6 +662,28 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
     }
   };
 
+  const syncBlogPost = async (post: BlogPost) => {
+    if (!isSupabaseConfigured()) return;
+    try {
+      const { id, image, date, ...postData } = post;
+      const isNew = id > 1000000000;
+      
+      const { error } = await supabase
+        .from("BlogPost")
+        .upsert({
+          ...(isNew ? {} : { id }),
+          ...postData,
+          image_url: image,
+          published_at: new Date().toISOString()
+        });
+        
+      if (error) throw error;
+    } catch (e) {
+      console.error("Failed to sync blog post:", e);
+      throw e;
+    }
+  };
+
   const updateData = async (newData: AppData) => {
     setData(newData);
     localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
@@ -747,7 +770,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   }
 
   return (
-    <DataContext.Provider value={{ data, updateData, syncBooking, syncProject }}>
+    <DataContext.Provider value={{ data, updateData, syncBooking, syncProject, syncBlogPost }}>
       {children}
     </DataContext.Provider>
   );

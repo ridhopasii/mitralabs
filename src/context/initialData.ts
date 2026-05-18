@@ -275,7 +275,7 @@ export const initialData: AppData = {
     npwp: "00.000.000.0-000.000",
     linkedin: "linkedin.com/company/mitralabs-id",
     instagram: "@mitralabs.id",
-    mapsUrl: "https://maps.app.goo.gl/r6R1h9Z7N1rXmE6q7", // Example Maps link for Medan
+    mapsUrl: "https://maps.app.goo.gl/tkf2KxR8h9ZsskkL7",
   },
   contact: {
     title: "Ada yang Ingin Kamu Tanyakan?",
@@ -284,7 +284,7 @@ export const initialData: AppData = {
     email: "ridhorobbipasi@gmail.com",
     instagram: "@mitralabs.id",
     address: "Medan, Sumatera Utara",
-    mapsUrl: "https://maps.google.com/?q=Medan",
+    mapsUrl: "https://maps.app.goo.gl/tkf2KxR8h9ZsskkL7",
     labels: {
       tagline: "Kontak Kami",
       successTitle: "Pesan Terkirim",
@@ -322,7 +322,7 @@ export const initialData: AppData = {
     companyProvince: "Sumatera Utara",
     companyPostalCode: "20111",
     companyPhone: "+62 823-8111-8520",
-    companyEmail: "contact@mitralabs.web.id",
+    companyEmail: "ridhorobbipasi@gmail.com",
     companyWebsite: "www.mitralabs.web.id",
     companyNPWP: "00.000.000.0-000.000",
     companyLinkedin: "linkedin.com/company/mitralabs-id",
@@ -338,10 +338,10 @@ export const initialData: AppData = {
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
     signatureFields: {
       marketingName: "Ghazy Muhalla",
-      marketingTitle: "Marketing Officer",
+      marketingTitle: "Marketing",
       marketingSignature: "",
       ownerName: "Ridho Robbi Pasi",
-      ownerTitle: "Direktur Utama",
+      ownerTitle: "Engineer & Founder",
       ownerSignature: ""
     },
     stampDutyRequired: false,
