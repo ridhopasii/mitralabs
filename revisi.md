@@ -457,4 +457,4 @@
 
 # BAGIAN 7 — CATATAN TAMBAHAN (BELUM SELESAI)
 
-- [ ] **Instagram Feed Live API**: Saat ini feed di web menggunakan gambar placeholder (statis). Agar update otomatis, perlu integrasi token API Instagram langsung atau menggunakan pihak ketiga.
+- [x] **Instagram Feed Live API**: Saat ini feed di web menggunakan gambar placeholder (statis). Agar update otomatis, perlu integrasi token API Instagram langsung atau menggunakan pihak ketiga. ✅ *(Selesai - Menggunakan API Route resmi & fallback statis)*

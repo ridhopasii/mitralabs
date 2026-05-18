@@ -2,8 +2,8 @@
 
 import { useData } from "@/context/DataContext";
 import { Instagram, ArrowRight } from "lucide-react";
-import Image from "next/image";
 import { motion } from "framer-motion";
+import { useState, useEffect } from "react";
 
 const IG_POSTS = [
   "https://images.unsplash.com/photo-1460925895917-afdab827c52f?auto=format&fit=crop&q=80&w=600",
@@ -12,20 +12,48 @@ const IG_POSTS = [
   "https://images.unsplash.com/photo-1551288049-bebda4e38f71?auto=format&fit=crop&q=80&w=600",
 ];
 
+interface InstagramPost {
+  url: string;
+  link: string;
+}
+
 export default function InstagramSection() {
   const { data } = useData();
   const { brand } = data;
+  const [posts, setPosts] = useState<InstagramPost[]>(
+    IG_POSTS.map((url) => ({ url, link: "" }))
+  );
+
+  useEffect(() => {
+    fetch("/api/instagram")
+      .then((res) => {
+        if (!res.ok) throw new Error("Failed to fetch");
+        return res.json();
+      })
+      .then((resData) => {
+        if (resData && resData.data && resData.data.length > 0) {
+          const igData = resData.data.slice(0, 4).map((p: any) => ({
+            url: p.media_type === "VIDEO" ? p.thumbnail_url || p.media_url : p.media_url,
+            link: p.permalink,
+          }));
+          setPosts(igData);
+        }
+      })
+      .catch((err) => {
+        console.log("Using static fallback for Instagram feed:", err.message);
+      });
+  }, []);
 
   if (!brand.instagram) return null;
 
-  const igHandle = brand.instagram.replace('@', '');
+  const igHandle = brand.instagram.replace("@", "");
   const igUrl = `https://instagram.com/${igHandle}`;
 
   return (
     <section className="py-24 md:py-32 bg-background overflow-hidden border-t border-outline/5">
       <div className="section-container">
         <div className="flex flex-col md:flex-row justify-between items-end gap-8 mb-16">
-          <motion.div 
+          <motion.div
             initial={{ opacity: 0, x: -20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -44,8 +72,8 @@ export default function InstagramSection() {
               Dapatkan tips digital marketing, inspirasi desain website, dan *behind the scene* project terbaru kami setiap hari.
             </p>
           </motion.div>
-          
-          <motion.a 
+
+          <motion.a
             initial={{ opacity: 0, x: 20 }}
             whileInView={{ opacity: 1, x: 0 }}
             viewport={{ once: true }}
@@ -59,10 +87,10 @@ export default function InstagramSection() {
         </div>
 
         <div className="grid grid-cols-2 md:grid-cols-4 gap-4 md:gap-6">
-          {IG_POSTS.map((post, i) => (
+          {posts.map((post, i) => (
             <motion.a
               key={i}
-              href={igUrl}
+              href={post.link || igUrl}
               target="_blank"
               rel="noopener noreferrer"
               initial={{ opacity: 0, y: 20 }}
@@ -71,14 +99,18 @@ export default function InstagramSection() {
               transition={{ delay: i * 0.1 }}
               className="group relative aspect-square rounded-[2rem] overflow-hidden bg-surface-container shadow-apple"
             >
-              <Image
-                src={post}
+              {/* Using standard img tag to prevent issues with variable Instagram CDN domains in Next.js Remote Patterns */}
+              <img
+                src={post.url}
                 alt="Instagram post"
-                fill
-                className="object-cover transition-transform duration-700 group-hover:scale-110"
+                className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110"
+                loading="lazy"
               />
               <div className="absolute inset-0 bg-black/0 group-hover:bg-black/40 transition-colors duration-300 flex items-center justify-center">
-                <Instagram size={32} className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100" />
+                <Instagram
+                  size={32}
+                  className="text-white opacity-0 group-hover:opacity-100 transition-opacity duration-300 transform scale-50 group-hover:scale-100"
+                />
               </div>
             </motion.a>
           ))}
