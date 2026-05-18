@@ -25,7 +25,7 @@ const initialData = {
       promo: "Promo Launching - Slot Terbatas!",
       title: "Website Profesional untuk Bisnis Kamu. Selesai 7 Hari. Harga Jelas. Tanpa Ribet.",
       subtitle: "Mitralabs.id hadir buat kamu yang capek bisnis bagus tapi tidak ada yang tahu. Kami buatkan website yang beneran kerja — bukan cuma bagus di mata, tapi menghasilkan di kantong.",
-      image: "/mitralabs_hero_premium_1778227502346.png",
+      image: "/mitralabs_hero_premium.png",
       stats: { label: "Project Selesai", value: "Puluhan", desc: "UMKM, Sekolah, dan Bisnis Lokal di Medan sudah dipercayakan ke kami", statusLabel: "Sistem Status", statusValue: "Aktif" }
     },
     problem: {
@@ -47,17 +47,17 @@ const initialData = {
           tag: "Most Requested",
           title: "🛒 Website untuk UMKM & Toko",
           desc: "Produkmu tampil rapi, harga jelas, tombol pesan langsung ke WA. Pelanggan datang, langsung beli — tanpa bingung.",
-          image: "/mitralabs_umkm_service_1778227528390.png"
+          image: "/mitralabs_umkm_service.png"
         },
         travel: {
           title: "✈️ Website untuk Travel & Tour Guide",
           desc: "Paket wisata tampil keren, form booking otomatis, kalender jadwal tersedia. Klien bisa booking kapan saja, kamu tinggal konfirmasi.",
-          image: "/mitralabs_travel_service_1778227548373.png"
+          image: "/mitralabs_travel_service.png"
         },
         school: {
           title: "🏫 Website untuk Sekolah & Lembaga",
           desc: "Profil sekolah profesional, info PPDB online, galeri kegiatan, dan pengumuman terstruktur. Wali murid percaya sejak pertama melihat.",
-          image: "/mitralabs_school_service_1778227565941.png"
+          image: "/mitralabs_school_service.png"
         },
         business: {
           title: "🏢 Website untuk Bisnis & Perusahaan",
@@ -163,7 +163,7 @@ const initialData = {
         slug: "toba-dream-travel",
         title: "Toba Dream Travel Portal",
         category: "Travel",
-        image: "/mitralabs_travel_service_1778227548373.png",
+        image: "/mitralabs_travel_service.png",
         description: "Modernisasi portal wisata Danau Toba dengan sistem booking otomatis dan kalender keberangkatan.",
         challenge: "Menampilkan puluhan paket wisata dengan navigasi yang simpel namun lengkap.",
         solution: "Membangun sistem filter dinamis berbasis kategori dan destinasi wisata.",
@@ -179,7 +179,7 @@ const initialData = {
         slug: "smk-penerbangan-medan",
         title: "Sistem Informasi SMK Penerbangan",
         category: "School",
-        image: "/mitralabs_school_service_1778227565941.png",
+        image: "/mitralabs_school_service.png",
         description: "Website profil sekolah yang dilengkapi sistem pendaftaran siswa baru (PPDB) terintegrasi.",
         challenge: "Mendigitalkan formulir pendaftaran yang kompleks agar mudah diakses wali murid.",
         solution: "Membangun sistem CMS khusus sekolah untuk update berita dan galeri kegiatan.",
@@ -445,7 +445,7 @@ async function main() {
       promo: "Promo Launching - Slot Terbatas!",
       title: "Website Profesional untuk Bisnis Kamu. Selesai 7 Hari. Harga Jelas. Tanpa Ribet.",
       subtitle: "Mitralabs.id hadir buat kamu yang capek bisnis bagus tapi tidak ada yang tahu. Kami buatkan website yang beneran kerja — bukan cuma bagus di mata, tapi menghasilkan di kantong.",
-      image_url: "/mitralabs_hero_premium_1778227502346.png",
+      image_url: "/mitralabs_hero_premium.png",
       stats_label: "Project Selesai",
       stats_value: "Puluhan",
       stats_desc: "UMKM, Sekolah, dan Bisnis Lokal di Medan sudah dipercayakan ke kami"
