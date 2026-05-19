@@ -154,16 +154,6 @@ export default function ContactPage() {
                     </div>
                   </div>
 
-                  <div className="flex items-start gap-6 group">
-                    <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center shrink-0 shadow-apple border border-outline/5 transition-transform group-hover:scale-110">
-                      <MapPin className="text-primary" size={20} />
-                    </div>
-                    <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Area Operasional</p>
-                      <p className="text-2xl font-semibold text-on-background tracking-tight">Medan, Sumatera Utara</p>
-                    </div>
-                  </div>
-
                   <div className="pt-6">
                     <a
                       href={waUrl}
@@ -175,6 +165,23 @@ export default function ContactPage() {
                       Diskusi via WhatsApp
                     </a>
                   </div>
+                </div>
+              </motion.div>
+
+              {/* Location Card */}
+              <motion.div
+                initial={{ opacity: 0, x: -20 }}
+                whileInView={{ opacity: 1, x: 0 }}
+                viewport={{ once: true }}
+                transition={{ delay: 0.1 }}
+                className="bg-surface-container rounded-[3.5rem] overflow-hidden shadow-apple border border-outline/5 group"
+              >
+                <div className="p-10 md:p-14">
+                  <h3 className="text-3xl font-semibold mb-4 tracking-tight text-on-background">📍 Lokasi</h3>
+                  <p className="text-xl font-bold text-on-background mb-2">Medan, Sumatera Utara</p>
+                  <p className="text-secondary font-medium leading-relaxed">
+                    Beroperasi secara remote — siap melayani seluruh Indonesia.
+                  </p>
                 </div>
               </motion.div>
             </div>
