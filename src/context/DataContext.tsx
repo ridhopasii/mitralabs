@@ -672,7 +672,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
             description: p.description,
             challenge: "Proyek klien yang berhasil diselesaikan dengan standar kualitas Mitralabs.",
             solution: "Implementasi solusi digital kustom menggunakan teknologi modern.",
-            results: ["100% Client Satisfaction", "On-time Delivery"],
+            results: ["Selesai Tepat Waktu", "Optimasi Performa"],
             status: "Published",
             client_name: p.booking?.customer_name,
             project_date: new Date(p.created_at).getFullYear().toString(),

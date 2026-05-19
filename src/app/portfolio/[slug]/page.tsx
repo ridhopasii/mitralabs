@@ -60,7 +60,7 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
         challenge: "Proyek klien yang berhasil diselesaikan dengan standar kualitas Mitralabs.",
         solution: "Implementasi solusi digital kustom menggunakan teknologi modern.",
         tech_stack: [],
-        results: ["100% Client Satisfaction", "On-time Delivery"],
+        results: ["Selesai Tepat Waktu", "Optimasi Performa"],
         live_link: null
       };
     }
