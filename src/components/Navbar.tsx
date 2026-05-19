@@ -8,16 +8,15 @@ import { useData } from "@/context/DataContext";
 import ThemeToggle from "./ThemeToggle";
 
 const translateLabel = (label: string) => {
-  const mapping: Record<string, string> = {
-    "Home": "Beranda",
-    "Services": "Layanan",
-    "About": "Tentang",
-    "Contact": "Kontak",
-    "Portfolio": "Portfolio",
-    "Track Project": "Lacak Projek",
-    "Lacak Projek": "Lacak Projek",
-  };
-  return mapping[label] || label;
+  if (!label) return "";
+  const cleaned = label.trim().toLowerCase();
+  if (cleaned === "home" || cleaned === "beranda") return "Beranda";
+  if (cleaned === "services" || cleaned === "layanan") return "Layanan";
+  if (cleaned === "about" || cleaned === "about us" || cleaned === "tentang") return "Tentang";
+  if (cleaned === "contact" || cleaned === "contact us" || cleaned === "kontak") return "Kontak";
+  if (cleaned === "portfolio" || cleaned === "portofolio") return "Portfolio";
+  if (cleaned === "track project" || cleaned === "lacak projek" || cleaned === "track") return "Lacak Projek";
+  return label;
 };
 
 export default function Navbar() {

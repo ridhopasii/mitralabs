@@ -4,10 +4,24 @@ import { useState } from "react";
 import { useData } from "@/context/DataContext";
 import { ChevronDown, HelpCircle } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
+import { initialData } from "@/context/initialData";
 
 export default function FAQSection() {
   const { data } = useData();
-  const faqs = data.faqs || [];
+  const rawFaqs = data.faqs || [];
+  
+  // Merge database FAQs with initialData rich fallbacks if answers are empty
+  const faqs = rawFaqs.map(faq => {
+    let answer = faq.answer;
+    if (!answer || answer.trim() === "") {
+      const defaultFaq = initialData.faqs.find(
+        f => f.id === faq.id || f.question.toLowerCase().trim() === faq.question.toLowerCase().trim()
+      );
+      answer = defaultFaq?.answer || "Silakan hubungi kami untuk informasi lebih lanjut mengenai pertanyaan ini.";
+    }
+    return { ...faq, answer };
+  });
+
   const [openId, setOpenId] = useState<any>(null);
 
   // Group faqs by category

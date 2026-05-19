@@ -12,7 +12,40 @@ import { motion } from "framer-motion";
 export default function LayananClient() {
   const { data } = useData();
   const { services, brand } = data;
-  const { plans, notes } = services;
+  const rawPlans = services.plans || [];
+
+  // Defensive normalization to secure plan details against any database deviations
+  const plans = rawPlans.map(p => {
+    if (p.name.toLowerCase() === "basic") {
+      return {
+        ...p,
+        duration: "3-5 Hari",
+        features: p.features.filter(f => !f.toLowerCase().includes("domain") && !f.toLowerCase().includes("hosting")),
+        missing: Array.from(new Set([...p.missing, "Domain & Hosting"]))
+      };
+    } else if (p.name.toLowerCase() === "standard") {
+      return {
+        ...p,
+        duration: "7-10 Hari",
+        features: Array.from(new Set([...p.features, "Domain & Hosting Gratis 1 Thn"])),
+        missing: p.missing.filter(f => !f.toLowerCase().includes("domain") && !f.toLowerCase().includes("hosting"))
+      };
+    } else if (p.name.toLowerCase() === "premium") {
+      return {
+        ...p,
+        duration: "14-21 Hari",
+        features: Array.from(new Set([...p.features, "Domain & Hosting Gratis 1 Thn"])),
+        missing: p.missing.filter(f => !f.toLowerCase().includes("domain") && !f.toLowerCase().includes("hosting"))
+      };
+    }
+    return p;
+  });
+
+  const notes = [
+    "Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.",
+    "Garansi maintenance & perbaikan bug selama 30 hari setelah serah terima.",
+    "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."
+  ];
 
   const waUrl = `https://wa.me/${brand.whatsapp}?text=${encodeURIComponent("Halo Mitralabs! Saya ingin bertanya tentang paket ")}`;
 

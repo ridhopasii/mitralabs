@@ -4,16 +4,15 @@ import Link from "next/link";
 import { useData } from "@/context/DataContext";
 
 const translateLabel = (label: string) => {
-  const mapping: Record<string, string> = {
-    "Home": "Beranda",
-    "Services": "Layanan",
-    "About": "Tentang",
-    "Contact": "Kontak",
-    "Portfolio": "Portfolio",
-    "Track Project": "Lacak Projek",
-    "Lacak Projek": "Lacak Projek",
-  };
-  return mapping[label] || label;
+  if (!label) return "";
+  const cleaned = label.trim().toLowerCase();
+  if (cleaned === "home" || cleaned === "beranda") return "Beranda";
+  if (cleaned === "services" || cleaned === "layanan") return "Layanan";
+  if (cleaned === "about" || cleaned === "about us" || cleaned === "tentang") return "Tentang";
+  if (cleaned === "contact" || cleaned === "contact us" || cleaned === "kontak") return "Kontak";
+  if (cleaned === "portfolio" || cleaned === "portofolio") return "Portfolio";
+  if (cleaned === "track project" || cleaned === "lacak projek" || cleaned === "track") return "Lacak Projek";
+  return label;
 };
 
 export default function Footer() {
@@ -103,9 +102,9 @@ export default function Footer() {
         </div>
         <div className="pt-8 border-t border-outline/5 text-center md:text-left flex flex-col md:flex-row justify-between gap-4">
            <p className="text-xs text-secondary/60 font-medium">© {new Date().getFullYear()} {data.brand.name}. All rights reserved.</p>
-           <p className="text-xs text-secondary/60 font-medium">
-             {footer.links.find(l => l.href === '#designed-by')?.label || "Designed with precision in Medan, Indonesia."}
-           </p>
+            <p className="text-xs text-secondary/60 font-medium">
+              {footer.socials.find(s => s.href === '#designed-by')?.label || "Dibangun dengan ☕ & cinta di Medan, Sumatera Utara."}
+            </p>
         </div>
       </div>
     </footer>

@@ -24,7 +24,7 @@ const initialData = {
     hero: {
       tagline: "Jasa Website & Digital Agency",
       promo: "Promo Launching - Slot Terbatas!",
-      title: "Website Profesional untuk Bisnis Kamu. Selesai 7 Hari. Harga Jelas. Tanpa Ribet.",
+      title: "Website Profesional untuk Bisnis Kamu. Selesai Mulai 3 Hari. Harga Jelas. Tanpa Ribet.",
       subtitle: "Mitralabs.id hadir buat kamu yang capek bisnis bagus tapi tidak ada yang tahu. Kami buatkan website yang beneran kerja — bukan cuma bagus di mata, tapi menghasilkan di kantong.",
       image: "/mitralabs_hero_premium.png",
       stats: { label: "Project Selesai", value: "Puluhan", desc: "UMKM, Sekolah, dan Bisnis Lokal di Medan sudah dipercayakan ke kami", statusLabel: "Sistem Status", statusValue: "Aktif" }
@@ -75,12 +75,12 @@ const initialData = {
         { id: 2, title: "Langkah 2 — Kita Sepakati Bersama", desc: "Kami kirimkan proposal + harga final. Kamu setuju, tanda tangan, bayar DP 30% — dan kita mulai." },
         { id: 3, title: "Langkah 3 — Kami Kerja, Kamu Tenang", desc: "Tim kami langsung kerjakan. Kamu update progres 2x — saat setengah jalan dan saat hampir selesai. Tidak ada kejutan." },
         { id: 4, title: "Langkah 4 — Kamu Cek, Kita Revisi", desc: "Website jadi, kamu review. Tidak puas? Ada 2x revisi gratis. Sampai kamu billing \"ini dia yang aku mau.\"" },
-        { id: 5, title: "Langkah 5 — Website Hidup, Bisnis Jalan", desc: "Lunas, akses diserahkan, website live. Garansi bug 7 hari aktif. Bisnis kamu resmi hadir di internet." },
+        { id: 5, title: "Langkah 5 — Website Hidup, Bisnis Jalan", desc: "Lunas, akses diserahkan, website live. Garansi bug 30 hari aktif. Bisnis kamu resmi hadir di internet." },
       ],
     },
     stats: [
       { id: 1, label: "Live Projects", value: "10+", desc: "Digital Assets Live" },
-      { id: 2, label: "Client Satisfaction", value: "100%", desc: "Customer Rating" },
+      { id: 2, label: "Rating Kepuasan", value: "4.9/5.0", desc: "Berdasarkan ulasan mitra kami" },
     ],
     cta: {
       title: "Bisnis Kamu Butuh Website. Klien Kamu Butuh Alasan untuk Percaya. Kami Bantu Keduanya.",
@@ -138,7 +138,7 @@ const initialData = {
         missing: [],
       }
     ],
-    notes: ["Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance bug teknis selama 7 hari setelah serah terima.", "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."],
+    notes: ["Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance & perbaikan bug selama 30 hari setelah serah terima.", "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."],
     comparisonTitle: "Perbandingan Lengkap Paket",
     comparisonSubtitle: "Lihat perbedaan detail antara paket kami dan tentukan mana yang paling cocok untuk bisnis kamu sekarang.",
     labels: {
@@ -310,8 +310,8 @@ const initialData = {
     ],
     socials: [
       { label: "Instagram", href: "https://instagram.com/mitralabs.id" },
-      { label: "LinkedIn", href: "https://linkedin.com/company/mitralabs-id" },
-      { label: "Designed with care in Medan, Indonesia.", href: "#designed-by" },
+      { label: "WhatsApp", href: "https://wa.me/6282381118520" },
+      { label: "Dibangun dengan ☕ & cinta di Medan, Sumatera Utara.", href: "#designed-by" },
     ],
   },
   settings: {
@@ -342,7 +342,7 @@ const initialData = {
     taxRate: 0,
     taxLabel: "PPN (11%)",
     footerNote: "Verified by Mitralabs",
-    termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug berlaku 7 hari setelah serah terima",
+    termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug & maintenance berlaku 30 hari setelah serah terima",
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
     signatureFields: {
       marketingName: "Ghazy Muhalla",
@@ -388,7 +388,7 @@ const initialData = {
     {
       id: 4,
       question: "Apakah ada garansi?",
-      answer: "Ada. Garansi bug teknis 7 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya. Setelah masa garansi, perbaikan Rp 100.000 per sesi.",
+      answer: "Ada. Garansi bug teknis & maintenance selama 30 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya tambahan.",
       category: "Garansi"
     },
     {
@@ -444,7 +444,7 @@ async function main() {
       id: 1,
       tagline: "Jasa Website & Digital Agency",
       promo: "Promo Launching - Slot Terbatas!",
-      title: "Website Profesional untuk Bisnis Kamu. Selesai 7 Hari. Harga Jelas. Tanpa Ribet.",
+      title: "Website Profesional untuk Bisnis Kamu. Selesai Mulai 3 Hari. Harga Jelas. Tanpa Ribet.",
       subtitle: "Mitralabs.id hadir buat kamu yang capek bisnis bagus tapi tidak ada yang tahu. Kami buatkan website yang beneran kerja — bukan cuma bagus di mata, tapi menghasilkan di kantong.",
       image_url: "/mitralabs_hero_premium.png",
       stats_label: "Project Selesai",
@@ -506,7 +506,7 @@ async function main() {
       {
         id: 4,
         question: "Apakah ada garansi?",
-        answer: "Ada. Garansi bug teknis 7 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya. Setelah masa garansi, perbaikan Rp 100.000 per sesi.",
+        answer: "Ada. Garansi bug teknis & maintenance selama 30 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya tambahan.",
         category: "Garansi",
         order: 4
       },

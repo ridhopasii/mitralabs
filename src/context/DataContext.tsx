@@ -402,18 +402,152 @@ function mergeData(target: any, source: any): any {
   return merged;
 }
 
+export function sanitizeData(d: AppData): AppData {
+  if (!d) return initialData;
+  const sanitized = { ...d };
+
+  // 1. Sanitize Navbar
+  if (!sanitized.navbar) {
+    sanitized.navbar = { ...initialData.navbar };
+  } else {
+    sanitized.navbar = {
+      ...sanitized.navbar,
+      buttonText: "💬 Chat Sekarang",
+      links: [
+        { label: "Beranda", href: "/" },
+        { label: "Layanan", href: "/layanan" },
+        { label: "Portfolio", href: "/portfolio" },
+        { label: "Tentang", href: "/tentang" },
+        { label: "Kontak", href: "/kontak" },
+        { label: "Lacak Projek", href: "/track" },
+      ]
+    };
+  }
+
+  // 2. Sanitize Brand details
+  if (!sanitized.brand) {
+    sanitized.brand = { ...initialData.brand };
+  } else {
+    sanitized.brand = {
+      ...sanitized.brand,
+      phone: "6282381118520",
+      whatsapp: "6282381118520",
+      address: "Medan, Sumatera Utara",
+      instagram: "@mitralabs.id",
+    };
+  }
+
+  // 3. Sanitize Contact details
+  if (!sanitized.contact) {
+    sanitized.contact = { ...initialData.contact };
+  } else {
+    sanitized.contact = {
+      ...sanitized.contact,
+      phone: "6282381118520",
+      address: "Medan, Sumatera Utara",
+      instagram: "@mitralabs.id",
+    };
+  }
+
+  // 4. Sanitize Footer
+  if (!sanitized.footer) {
+    sanitized.footer = { ...initialData.footer };
+  } else {
+    sanitized.footer = {
+      ...sanitized.footer,
+      description: "Mitra Digital Bisnis Mu. Mitralabs.id — Medan, Indonesia.",
+      socials: [
+        { label: "Instagram", href: "https://instagram.com/mitralabs.id" },
+        { label: "WhatsApp", href: "https://wa.me/6282381118520" },
+        { label: "Dibangun dengan ☕ & cinta di Medan, Sumatera Utara.", href: "#designed-by" },
+      ]
+    };
+  }
+
+  // 5. Sanitize Home Stats & Hero
+  if (!sanitized.home) {
+    sanitized.home = { ...initialData.home };
+  } else {
+    sanitized.home = {
+      ...sanitized.home,
+      hero: {
+        ...sanitized.home.hero,
+        title: "Website Profesional untuk Bisnis Kamu. Selesai Mulai 3 Hari. Harga Jelas. Tanpa Ribet."
+      },
+      stats: [
+        { id: 1, label: "Live Projects", value: "10+", desc: "Digital Assets Live" },
+        { id: 2, label: "Rating Kepuasan", value: "4.9/5.0", desc: "Berdasarkan ulasan mitra kami" },
+      ]
+    };
+  }
+
+  // 6. Sanitize Services
+  if (!sanitized.services) {
+    sanitized.services = { ...initialData.services };
+  } else {
+    const plans = sanitized.services.plans ? sanitized.services.plans.map(p => {
+      if (p.name.toLowerCase() === "basic") {
+        return {
+          ...p,
+          duration: "3-5 Hari",
+          features: p.features.filter(f => !f.toLowerCase().includes("domain") && !f.toLowerCase().includes("hosting")),
+          missing: Array.from(new Set([...p.missing, "Domain & Hosting"]))
+        };
+      }
+      return p;
+    }) : initialData.services.plans;
+
+    sanitized.services = {
+      ...sanitized.services,
+      plans,
+      notes: [
+        "Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.",
+        "Garansi maintenance & perbaikan bug selama 30 hari setelah serah terima.",
+        "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."
+      ]
+    };
+  }
+
+  // 7. Sanitize Invoice settings
+  if (!sanitized.invoiceSettings) {
+    sanitized.invoiceSettings = { ...initialData.invoiceSettings };
+  } else {
+    sanitized.invoiceSettings = {
+      ...sanitized.invoiceSettings,
+      termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug & maintenance berlaku 30 hari setelah serah terima"
+    };
+  }
+
+  // 8. Sanitize FAQs
+  if (!sanitized.faqs || sanitized.faqs.length === 0) {
+    sanitized.faqs = [...initialData.faqs];
+  } else {
+    sanitized.faqs = sanitized.faqs.map(faq => {
+      if (faq.question.toLowerCase().includes("garansi") || faq.question.toLowerCase().includes("bug")) {
+        return {
+          ...faq,
+          answer: "Ada. Garansi bug teknis & maintenance selama 30 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya tambahan."
+        };
+      }
+      return faq;
+    });
+  }
+
+  return sanitized;
+}
+
 export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem("mitralabs_final_cms_data_v8");
+        const saved = localStorage.getItem("mitralabs_final_cms_data_v9");
         if (saved) {
           const parsed = JSON.parse(saved);
-          return { ...initialData, ...parsed };
+          return sanitizeData({ ...initialData, ...parsed });
         }
       } catch (e) { /* ignore */ }
     }
-    return initialData;
+    return sanitizeData(initialData);
   });
   
   const [isLoading, setIsLoading] = useState(false);
@@ -577,8 +711,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
           }));
         }
 
-        setData(merged);
-        localStorage.setItem("mitralabs_final_cms_data_v8", JSON.stringify(merged));
+        const sanitized = sanitizeData(merged);
+        setData(sanitized);
+        localStorage.setItem("mitralabs_final_cms_data_v9", JSON.stringify(sanitized));
         setHasSynced(true);
       } catch (err: any) {
         console.error("Relational sync critical error:", err.message);
@@ -685,8 +820,9 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   };
 
   const updateData = async (newData: AppData) => {
-    setData(newData);
-    localStorage.setItem("mitralabs_final_cms_data_v8", JSON.stringify(newData));
+    const sanitized = sanitizeData(newData);
+    setData(sanitized);
+    localStorage.setItem("mitralabs_final_cms_data_v9", JSON.stringify(sanitized));
 
     if (isSupabaseConfigured()) {
       try {
