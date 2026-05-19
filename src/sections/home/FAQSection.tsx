@@ -8,7 +8,7 @@ import { initialData } from "@/context/initialData";
 
 export default function FAQSection() {
   const { data } = useData();
-  const rawFaqs = data.faqs || [];
+  const rawFaqs = data.faqs && data.faqs.length > 0 ? data.faqs : initialData.faqs;
   
   // Merge database FAQs with initialData rich fallbacks if answers are empty
   const faqs = rawFaqs.map(faq => {
