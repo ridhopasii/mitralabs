@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowLeft, ArrowRight, Calendar, User, Clock, Share2 } from "lucide-react";
 import Link from "next/link";
@@ -44,7 +43,6 @@ export default async function BlogPostDetail({ params }: { params: Promise<{ slu
 
   return (
     <>
-      <Navbar />
       <main className="pt-32 pb-24 bg-white">
         {/* Article Header */}
         <article className="max-w-4xl mx-auto px-6">

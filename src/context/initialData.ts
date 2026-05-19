@@ -68,7 +68,7 @@ export const initialData: AppData = {
         { id: 2, title: "Langkah 2 — Kita Sepakati Bersama", desc: "Kami kirimkan proposal + harga final. Kamu setuju, tanda tangan, bayar DP 30% — dan kita mulai." },
         { id: 3, title: "Langkah 3 — Kami Kerja, Kamu Tenang", desc: "Tim kami langsung kerjakan. Kamu update progres 2x — saat setengah jalan dan saat hampir selesai. Tidak ada kejutan." },
         { id: 4, title: "Langkah 4 — Kamu Cek, Kita Revisi", desc: "Website jadi, kamu review. Tidak puas? Ada 2x revisi gratis. Sampai kamu bilang \"ini dia yang aku mau.\"" },
-        { id: 5, title: "Langkah 5 — Website Hidup, Bisnis Jalan", desc: "Lunas, akses diserahkan, website live. Garansi bug 30 hari aktif. Bisnis kamu resmi hadir di internet." },
+        { id: 5, title: "Langkah 5 — Website Hidup, Bisnis Jalan", desc: "Lunas, akses diserahkan, website live. Garansi bug 7 hari aktif. Bisnis kamu resmi hadir di internet." },
       ],
     },
     stats: [
@@ -131,7 +131,7 @@ export const initialData: AppData = {
         missing: [],
       }
     ],
-    notes: ["Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance & perbaikan bug selama 30 hari setelah serah terima.", "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."],
+    notes: ["Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.", "Garansi maintenance & perbaikan bug selama 7 hari setelah serah terima.", "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."],
     comparisonTitle: "Perbandingan Lengkap Paket",
     comparisonSubtitle: "Lihat perbedaan detail antara paket kami dan tentukan mana yang paling cocok untuk bisnis kamu sekarang.",
     labels: {
@@ -335,7 +335,7 @@ export const initialData: AppData = {
     taxRate: 0,
     taxLabel: "PPN (11%)",
     footerNote: "Verified by Mitralabs",
-    termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug & maintenance berlaku 30 hari setelah serah terima",
+    termsAndConditions: "1. Pembayaran DP 30% dilakukan sebelum proyek dimulai\n2. Pelunasan 70% dilakukan setelah website selesai dan sebelum serah terima\n3. Pembayaran dapat dilakukan melalui transfer bank\n4. Garansi bug & maintenance berlaku 7 hari setelah serah terima",
     paymentInstructions: "Silakan transfer ke rekening yang tertera dan kirimkan bukti transfer ke WhatsApp kami untuk konfirmasi pembayaran.",
     signatureFields: {
       marketingName: "Ghazy Muhalla",
@@ -381,7 +381,7 @@ export const initialData: AppData = {
     {
       id: 4,
       question: "Apakah ada garansi?",
-      answer: "Ada. Garansi bug teknis & maintenance selama 30 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya tambahan.",
+      answer: "Ada. Garansi bug teknis 7 hari setelah serah terima. Kalau ada yang error dari sisi kami, langsung kami perbaiki tanpa biaya. Setelah masa garansi, perbaikan Rp 100.000 per sesi.",
       category: "Garansi"
     },
     {

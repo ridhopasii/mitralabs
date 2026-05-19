@@ -43,7 +43,7 @@ export default function LayananClient() {
 
   const notes = [
     "Paket Standard & Premium sudah termasuk GRATIS Domain .com/.id selama 1 tahun.",
-    "Garansi maintenance & perbaikan bug selama 30 hari setelah serah terima.",
+    "Garansi maintenance & perbaikan bug selama 7 hari setelah serah terima.",
     "Semua harga sudah termasuk pajak. Tidak ada biaya tersembunyi."
   ];
 

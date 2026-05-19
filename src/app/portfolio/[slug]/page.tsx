@@ -1,5 +1,4 @@
 import { supabase } from "@/lib/supabase";
-import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { ArrowLeft, CheckCircle2, Target, Zap, Layout, Globe, User, Calendar, Cpu } from "lucide-react";
 import Link from "next/link";
@@ -71,7 +70,6 @@ export default async function ProjectDetail({ params }: { params: Promise<{ slug
 
   return (
     <>
-      <Navbar />
       <main className="pt-32 pb-24 bg-surface">
         {/* Hero Section */}
         <section className="max-w-7xl mx-auto px-6 mb-20">
