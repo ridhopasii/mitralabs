@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import Footer from "@/components/Footer";
-import { Mail, Instagram, MessageCircle, CheckCircle2, Loader2, ArrowRight } from "lucide-react";
+import { Mail, Instagram, MessageCircle, CheckCircle2, Loader2, ArrowRight, MapPin, Phone } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import { supabase } from "@/lib/supabase";
 import HCaptcha from "@hcaptcha/react-hcaptcha";
@@ -126,11 +126,11 @@ export default function ContactPage() {
                 <div className="relative z-10 space-y-10">
                   <div className="flex items-start gap-6 group">
                     <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center shrink-0 shadow-apple border border-outline/5 transition-transform group-hover:scale-110">
-                      <Mail className="text-primary" size={20} />
+                      <Phone className="text-primary" size={20} />
                     </div>
                     <div>
-                      <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Kirim Email</p>
-                      <p className="text-2xl font-semibold text-on-background tracking-tight">{emailVal}</p>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">WhatsApp</p>
+                      <p className="text-2xl font-semibold text-on-background tracking-tight">{brand.phone || "082381118520"}</p>
                     </div>
                   </div>
 
@@ -141,6 +141,26 @@ export default function ContactPage() {
                     <div>
                       <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Instagram</p>
                       <p className="text-2xl font-semibold text-on-background tracking-tight">{instagramVal}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-6 group">
+                    <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center shrink-0 shadow-apple border border-outline/5 transition-transform group-hover:scale-110">
+                      <Mail className="text-primary" size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Kirim Email</p>
+                      <p className="text-2xl font-semibold text-on-background tracking-tight">{emailVal}</p>
+                    </div>
+                  </div>
+
+                  <div className="flex items-start gap-6 group">
+                    <div className="w-12 h-12 rounded-2xl bg-background flex items-center justify-center shrink-0 shadow-apple border border-outline/5 transition-transform group-hover:scale-110">
+                      <MapPin className="text-primary" size={20} />
+                    </div>
+                    <div>
+                      <p className="text-[10px] uppercase tracking-[0.2em] text-secondary font-bold mb-2">Area Operasional</p>
+                      <p className="text-2xl font-semibold text-on-background tracking-tight">Medan, Sumatera Utara</p>
                     </div>
                   </div>
 
@@ -155,32 +175,6 @@ export default function ContactPage() {
                       Diskusi via WhatsApp
                     </a>
                   </div>
-                </div>
-              </motion.div>
-
-              {/* Location Card */}
-              <motion.div
-                initial={{ opacity: 0, x: -20 }}
-                whileInView={{ opacity: 1, x: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: 0.1 }}
-                className="bg-surface-container rounded-[3.5rem] overflow-hidden shadow-apple border border-outline/5 group"
-              >
-                <div className="p-10 md:p-14">
-                  <h3 className="text-3xl font-semibold mb-3 tracking-tight text-on-background">Studio Kami</h3>
-                  <p className="text-secondary font-medium leading-relaxed">{addressVal}</p>
-                </div>
-                <div className="h-[300px] relative overflow-hidden bg-background">
-                  <iframe
-                    src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d127607.41160395353!2d98.57523992019914!3d3.5970313880630806!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x303131cc1cb3be27%3A0x4039d80b220cc50!2sMedan%2C%20Medan%20City%2C%20North%20Sumatra!5e0!3m2!1sen!2sid!4v1715949214300!5m2!1sen!2sid"
-                    width="100%"
-                    height="100%"
-                    style={{ border: 0 }}
-                    allowFullScreen={true}
-                    loading="lazy"
-                    referrerPolicy="no-referrer-when-downgrade"
-                    className="w-full h-full transition-all duration-1000"
-                  ></iframe>
                 </div>
               </motion.div>
             </div>
