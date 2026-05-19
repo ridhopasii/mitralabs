@@ -7,6 +7,19 @@ import { Menu, X } from "lucide-react";
 import { useData } from "@/context/DataContext";
 import ThemeToggle from "./ThemeToggle";
 
+const translateLabel = (label: string) => {
+  const mapping: Record<string, string> = {
+    "Home": "Beranda",
+    "Services": "Layanan",
+    "About": "Tentang",
+    "Contact": "Kontak",
+    "Portfolio": "Portfolio",
+    "Track Project": "Lacak Projek",
+    "Lacak Projek": "Lacak Projek",
+  };
+  return mapping[label] || label;
+};
+
 export default function Navbar() {
   const { data } = useData();
   const { brand, navbar } = data;
@@ -47,7 +60,7 @@ export default function Navbar() {
                     href={link.href}
                     className={`transition-colors hover:text-on-background relative group ${isActive ? "text-on-background" : ""}`}
                   >
-                    {link.label}
+                    {translateLabel(link.label)}
                     <span className={`absolute -bottom-1 left-0 w-full h-px bg-on-background origin-left transition-transform duration-300 ${isActive ? "scale-x-100" : "scale-x-0 group-hover:scale-x-100"}`}></span>
                   </Link>
                 );
@@ -59,12 +72,14 @@ export default function Navbar() {
               <ThemeToggle />
               
               {/* Desktop CTA */}
-              <Link
-                href="/pesan-sekarang"
+              <a
+                href={waUrl}
+                target="_blank"
+                rel="noopener noreferrer"
                 className="hidden md:block bg-on-background text-background px-6 py-2.5 rounded-full text-[12px] font-bold hover:opacity-90 transition-all active:scale-[0.98]"
               >
-                {navbar.buttonText}
-              </Link>
+                💬 Chat Sekarang
+              </a>
 
               {/* Small Mobile Hamburger */}
               <button
@@ -90,7 +105,7 @@ export default function Navbar() {
                   onClick={() => setMobileOpen(false)}
                   className={`text-[10px] font-bold uppercase tracking-[0.15em] shrink-0 transition-colors ${isActive ? "text-primary" : "text-secondary hover:text-on-background"}`}
                 >
-                  {link.label}
+                  {translateLabel(link.label)}
                 </Link>
               );
             })}
@@ -117,16 +132,18 @@ export default function Navbar() {
               onClick={() => setMobileOpen(false)}
               className={`text-4xl font-semibold tracking-tight text-on-background transition-all duration-500 delay-${idx * 100} ${mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
             >
-              {link.label}
+              {translateLabel(link.label)}
             </Link>
           ))}
-          <Link
-            href="/pesan-sekarang"
+          <a
+            href={waUrl}
+            target="_blank"
+            rel="noopener noreferrer"
             onClick={() => setMobileOpen(false)}
             className={`mt-10 btn-apple w-full text-center text-lg transition-all duration-500 delay-500 ${mobileOpen ? "opacity-100 translate-y-0" : "opacity-0 translate-y-10"}`}
           >
-            {navbar.buttonText}
-          </Link>
+            💬 Chat Sekarang
+          </a>
         </div>
       </div>
     </>

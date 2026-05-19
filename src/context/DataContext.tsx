@@ -406,7 +406,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
   const [data, setData] = useState<AppData>(() => {
     if (typeof window !== 'undefined') {
       try {
-        const saved = localStorage.getItem("mitralabs_final_cms_data_v7");
+        const saved = localStorage.getItem("mitralabs_final_cms_data_v8");
         if (saved) {
           const parsed = JSON.parse(saved);
           return { ...initialData, ...parsed };
@@ -578,7 +578,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
         }
 
         setData(merged);
-        localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(merged));
+        localStorage.setItem("mitralabs_final_cms_data_v8", JSON.stringify(merged));
         setHasSynced(true);
       } catch (err: any) {
         console.error("Relational sync critical error:", err.message);
@@ -686,7 +686,7 @@ export function DataProvider({ children }: { children: React.ReactNode }) {
 
   const updateData = async (newData: AppData) => {
     setData(newData);
-    localStorage.setItem("mitralabs_final_cms_data_v7", JSON.stringify(newData));
+    localStorage.setItem("mitralabs_final_cms_data_v8", JSON.stringify(newData));
 
     if (isSupabaseConfigured()) {
       try {

@@ -363,7 +363,7 @@ export const initialData: AppData = {
     {
       id: 1,
       question: "Berapa lama website saya jadi?",
-      answer: "Tergantung paket. Basic selesai 3 hari kerja, Standard 7 hari, Premium 14 hari — dihitung setelah DP masuk dan brief lengkap kami terima. Kami komit dengan timeline, dan selalu informasikan kalau ada kendala.",
+      answer: "Tergantung paket. Basic selesai 3-5 hari kerja, Standard 7-10 hari, Premium 14-21 hari — dihitung setelah DP masuk dan brief lengkap kami terima. Kami komit dengan timeline, dan selalu informasikan kalau ada kendala.",
       category: "Timeline"
     },
     {

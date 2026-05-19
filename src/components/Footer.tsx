@@ -3,6 +3,19 @@
 import Link from "next/link";
 import { useData } from "@/context/DataContext";
 
+const translateLabel = (label: string) => {
+  const mapping: Record<string, string> = {
+    "Home": "Beranda",
+    "Services": "Layanan",
+    "About": "Tentang",
+    "Contact": "Kontak",
+    "Portfolio": "Portfolio",
+    "Track Project": "Lacak Projek",
+    "Lacak Projek": "Lacak Projek",
+  };
+  return mapping[label] || label;
+};
+
 export default function Footer() {
   const { data } = useData();
   const { footer, navbar } = data;
@@ -25,7 +38,7 @@ export default function Footer() {
                 {navbar.links.map((link, i) => (
                   <li key={i}>
                     <Link href={link.href} className="text-sm text-secondary hover:text-on-background transition-colors font-medium">
-                      {link.label}
+                      {translateLabel(link.label)}
                     </Link>
                   </li>
                 ))}

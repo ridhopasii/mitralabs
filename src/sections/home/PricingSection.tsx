@@ -82,12 +82,17 @@ export default function PricingSection() {
                 </div>
 
                 <div className="mb-10">
-                  <span className="text-4xl md:text-5xl font-bold tracking-tight">
-                    {plan.price}
-                  </span>
-                  <span className={`text-sm ml-2 font-medium ${plan.highlight ? "text-background/50" : "text-secondary"}`}>
-                    /projek
-                  </span>
+                  <div className="flex items-baseline">
+                    <span className="text-4xl md:text-5xl font-bold tracking-tight">
+                      {plan.price}
+                    </span>
+                    <span className={`text-sm ml-2 font-medium ${plan.highlight ? "text-background/50" : "text-secondary"}`}>
+                      /projek
+                    </span>
+                  </div>
+                  <div className={`text-[11px] font-black uppercase tracking-widest mt-3 ${plan.highlight ? "text-background/80" : "text-primary"}`}>
+                    {plan.duration} • {plan.pages}
+                  </div>
                 </div>
 
                 <ul className="space-y-4 mb-12 flex-grow">

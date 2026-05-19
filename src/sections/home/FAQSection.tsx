@@ -8,7 +8,7 @@ import { motion, AnimatePresence } from "framer-motion";
 export default function FAQSection() {
   const { data } = useData();
   const faqs = data.faqs || [];
-  const [openId, setOpenId] = useState<number | null>(null);
+  const [openId, setOpenId] = useState<any>(null);
 
   // Group faqs by category
   const categories = [...new Set(faqs.map(f => f.category))];
@@ -68,6 +68,7 @@ export default function FAQSection() {
               <AnimatePresence>
                 {openId === faq.id && (
                   <motion.div
+                    key={`faq-content-${faq.id}`}
                     initial={{ height: 0, opacity: 0 }}
                     animate={{ height: "auto", opacity: 1 }}
                     exit={{ height: 0, opacity: 0 }}
